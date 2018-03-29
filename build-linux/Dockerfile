@@ -76,6 +76,7 @@ RUN cd $YADOMS_DEPS_PATH/swig-3.0.12 \
 RUN rm $YADOMS_DEPS_PATH/swig-3.0.12.tar.gz
 
 # PostgreSQL
+# TODO ne fonctionne pas, à voir...
 RUN cd $YADOMS_DEPS_PATH \
 	&& wget --no-verbose https://ftp.postgresql.org/pub/source/v9.6.2/postgresql-9.6.2.tar.bz2 \
 	&& tar xjf postgresql-9.6.2.tar.bz2

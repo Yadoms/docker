@@ -1,8 +1,9 @@
-
+#!/bin/bash
+set -e
 
 cd yadoms
 
-echo 'Update Yadoms Git repository'
+echo "Update Yadoms Git repository for $YADOMS_BUILD_BRANCH branch"
 git fetch
 git checkout $YADOMS_BUILD_BRANCH
 git clean -d -x -f
