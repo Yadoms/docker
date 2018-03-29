@@ -71,7 +71,8 @@ RUN cd $YADOMS_DEPS_PATH \
 	&& tar xzf swig-3.0.12.tar.gz
 RUN cd $YADOMS_DEPS_PATH/swig-3.0.12 \
 	&& ./configure \
-	&& make
+	&& make \
+	&& make install
 RUN rm $YADOMS_DEPS_PATH/swig-3.0.12.tar.gz
 
 # PostgreSQL
@@ -110,13 +111,7 @@ RUN echo 'Configuring Yadoms CMakeListsUserConfig.txt' \
 RUN echo 'Result:' \
 	&& cat $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt
 
+COPY entrypoint.sh /
 
-# Update Yadoms Git repository
-CMD cd yadoms \
-	&& git fetch \
-	&& git checkout $YADOMS_BUILD_BRANCH \
-	&& git clean -d -x -f \
-	&& cp $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt sources/ \
-	&& sh cmake_linux.sh m \
-	&& cd projects \
-	&& make all_unity
+CMD /entrypoint.sh
+
