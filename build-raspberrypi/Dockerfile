@@ -3,6 +3,7 @@ MAINTAINER sgallou "https://github.com/sgallou"
 LABEL authors=sgallou
 
 ENV YADOMS_BUILD_BRANCH develop
+ENV MAKE_PACKAGE false
 ENV YADOMS_DEPS_PATH /yadoms-deps
 
 RUN apt-get update \
