@@ -46,7 +46,7 @@ if [ -z ${MAKE_PACKAGE+x} ]; then
 	mv packagetomove builds/package
 	mv package.zip builds/package
 	
-	if [ -z ${UPLOAD_FTP_CREDENTIALS+x} ]; then
+	if [ ! -z "$UPLOAD_FTP_CREDENTIALS" ]; then
 		echo "Upload packages"
 		curl --ftp-create-dirs -T "{$(echo builds/package/* | tr ' ' ',')}" -u $UPLOAD_FTP_CREDENTIALS ftp://ftp.jano42.fr/travis_build/raspberry_pi/
 	fi
