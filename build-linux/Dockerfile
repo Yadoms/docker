@@ -9,7 +9,7 @@ RUN apt-get update \
 	&& apt-get install -y g++ libbz2-dev python-dev wget build-essential libssl-dev \
 	libopencv-gpu-dev libgnutls-dev autoconf automake libtool curl make g++ unzip \
 	libudev-dev libpcre3 libpcre3-dev libreadline6 libreadline6-dev libpq5 \
-	postgresql-server-dev-all git rpm
+	postgresql-server-dev-all git rpm zip
 
 RUN mkdir $YADOMS_DEPS_PATH
 
@@ -29,7 +29,7 @@ RUN cd $YADOMS_DEPS_PATH \
 	&& tar xjf boost_1_66_0.tar.bz2
 RUN cd $YADOMS_DEPS_PATH/boost_1_66_0 \
 	&& ./bootstrap.sh \
-	&& ./b2 --with-atomic --with-chrono --with-date_time --with-filesystem --with-regex --with-thread --with-system link=static runtime-link=static cxxflags=-fPIC
+	&& ./b2 --with-atomic --with-chrono --with-date_time --with-filesystem --with-regex --with-thread --with-system link=static runtime-link=static --no-samples --no-tests cxxflags=-fPIC
 RUN rm $YADOMS_DEPS_PATH/boost_1_66_0.tar.bz2
 
 # OpenSSL
@@ -87,8 +87,7 @@ RUN cd $YADOMS_DEPS_PATH/postgresql-9.6.2 \
 RUN rm $YADOMS_DEPS_PATH/postgresql-9.6.2.tar.bz2
 
 # Yadoms sources
-RUN echo 'Branche Yadoms = $YADOMS_BUILD_BRANCH'
-RUN git clone --depth=1 -b $YADOMS_BUILD_BRANCH git://github.com/Yadoms/yadoms.git
+RUN git clone git://github.com/Yadoms/yadoms.git
 
 # Yadoms configuration file
 RUN echo 'Configuring Yadoms CMakeListsUserConfig.txt' \

@@ -7,6 +7,7 @@ echo "Update Yadoms Git repository for $YADOMS_BUILD_BRANCH branch"
 git fetch
 git checkout $YADOMS_BUILD_BRANCH
 git clean -d -x -f
+git pull
 
 echo "Copy build config file"
 cp $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt sources/
@@ -31,7 +32,7 @@ if [ -z ${MAKE_PACKAGE+x} ]; then
 	# Copy script
 	cp update/scripts/update.sh updatepackage/update.sh
 	# Generate package.json
-	cp ../package.json.in updatepackage/package.json
+	cp update/package.json.in updatepackage/package.json
 	sed -i -- 's/__version__/'$yadomsVersion'/g' updatepackage/package.json
 	sed -i -- 's/__gitdate__/'`git log -1 --format=%cI `'/g' updatepackage/package.json
 	cp sources/server/changelog.md updatepackage/changelog.md
