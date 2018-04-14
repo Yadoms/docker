@@ -14,11 +14,6 @@ RUN apt-get update \
 
 RUN mkdir $YADOMS_DEPS_PATH
 
-# Installing arm-linux-gnueabihf cross toolchain
-RUN cd $YADOMS_DEPS_PATH \
-	&& git clone --depth=1 git://github.com/raspberrypi/tools.git
-ENV PATH $PATH:$YADOMS_DEPS_PATH/tools/arm-bcm2708/arm-rpi-4.9.3-linux-gnueabihf/bin
-
 # CMake
 RUN cd $YADOMS_DEPS_PATH \
 	&& wget --no-verbose https://cmake.org/files/v3.11/cmake-3.11.0.tar.gz \
@@ -29,11 +24,19 @@ RUN cd $YADOMS_DEPS_PATH/cmake-3.11.0 \
 	&& make install
 RUN rm $YADOMS_DEPS_PATH/cmake-3.11.0.tar.gz
 
+# Installing arm-linux-gnueabihf cross toolchain
+RUN cd $YADOMS_DEPS_PATH \
+	&& git clone --depth=1 git://github.com/raspberrypi/tools.git
+ENV PATH $PATH:$YADOMS_DEPS_PATH/tools/arm-bcm2708/arm-rpi-4.9.3-linux-gnueabihf/bin
+
+# Check GCC version
+RUN arm-linux-gnueabihf-gcc --version
+
 # Boost
 RUN cd $YADOMS_DEPS_PATH \
 	&& wget --no-verbose http://netcologne.dl.sourceforge.net/project/boost/boost/1.66.0/boost_1_66_0.tar.bz2 \
 	&& tar xjf boost_1_66_0.tar.bz2
-COPY boost/user-config.jam $HOME/
+COPY boost/user-config.jam /root
 RUN cd $YADOMS_DEPS_PATH/boost_1_66_0 \
 	&& ./bootstrap.sh \
 	&& ./b2 --with-atomic --with-chrono --with-date_time --with-filesystem --with-regex --with-thread --with-system link=static --no-samples --no-tests toolset=gcc-arm cxxflags=-fPIC
@@ -44,7 +47,7 @@ RUN cd $YADOMS_DEPS_PATH \
 	&& wget --no-verbose https://www.openssl.org/source/openssl-1.1.0g.tar.gz \
 	&& tar xzf openssl-1.1.0g.tar.gz
 RUN cd $YADOMS_DEPS_PATH/openssl-1.1.0g \
-	&& ./Configure --prefix=$HOME/depsBuild/openssl os/compiler:arm-linux-gnueabihf \
+	&& ./Configure linux-generic32 --prefix=$HOME/depsBuild/openssl --cross-compile-prefix=$YADOMS_DEPS_PATH/tools/arm-bcm2708/arm-rpi-4.9.3-linux-gnueabihf/bin/arm-linux-gnueabihf- \
 	&& make CC="arm-linux-gnueabihf-gcc" AR="arm-linux-gnueabihf-ar r" RANLIB="arm-linux-gnueabihf-ranlib" \
 	&& make install
 RUN rm $YADOMS_DEPS_PATH/openssl-1.1.0g.tar.gz
