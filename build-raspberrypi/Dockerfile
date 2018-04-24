@@ -91,7 +91,7 @@ RUN rm protobuf-cpp-3.5.1.tar.gz
 # Libudev TODO : must be cross-compiled
 RUN cd $YADOMS_DEPS_PATH \
 	&& wget -U 'Yadoms/1.0.0' --no-verbose http://yadoms.com/travis_build/raspberry_pi/libudev.tar.gz \
-	&& tar xzf libudev.tar.gz -C $HOME/depsBuild
+	&& tar xzf libudev.tar.gz -C $YADOMS_DEPS_PATH
 RUN rm $YADOMS_DEPS_PATH/libudev.tar.gz
 
 
@@ -143,7 +143,7 @@ RUN echo 'Configuring Yadoms CMakeListsUserConfig.txt' \
 	&& echo 'set(ALTERNATIVE_CMAKE_ROOT "'$YADOMS_BUILD_TOOLS_PATH'/cmake-3.11.0")' > $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
 	&& echo 'set(BOOST_ROOT "'$YADOMS_DEPS_PATH'/boost_1_66_0")' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
 	&& echo 'set(POCO_ROOT "'$YADOMS_DEPS_PATH'/poco-1.8.1-all")' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
-	&& echo 'set(PROTOBUF_ROOT "'$YADOMS_BUILD_TOOLS_PATH'/protobuf")' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
+	&& echo 'set(PROTOBUF_ROOT "'$YADOMS_DEPS_PATH'/protobuf")' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
 	&& echo 'set(PROTOBUF_PROTOC_EXECUTABLE "'`which protoc`'")' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
 	&& echo 'set(PROTOBUF_INSTALLED_TO_CUSTOM_DIRECTORY ON)' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
 	&& echo 'set(OPENSSL_ROOT "'$YADOMS_DEPS_PATH'/openssl")' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
@@ -159,9 +159,9 @@ RUN echo 'Configuring Yadoms CMakeListsUserConfig.txt' \
 	&& echo 'set(SWIG_ROOT "'$YADOMS_DEPS_PATH'/swig-3.0.12")' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
 	&& echo 'SET(COTIRE_USE ON)' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
 	&& echo 'SET(COTIRE_USE_UNITY ON)' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
-	&& echo 'set(LIBUDEV_ROOT "'$HOME'/depsBuild/libudev")' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
-	&& echo 'set(UDEV_PATH_LIB "'$HOME'/depsBuild/libudev")' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
-	&& echo 'set(UDEV_PATH_INCLUDES "'$HOME'/depsBuild/libudev")' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
+	&& echo 'set(LIBUDEV_ROOT "'$YADOMS_DEPS_PATH'/libudev")' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
+	&& echo 'set(UDEV_PATH_LIB "'$YADOMS_DEPS_PATH'/libudev")' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
+	&& echo 'set(UDEV_PATH_INCLUDES "'$YADOMS_DEPS_PATH'/libudev")' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
 	&& echo 'set(CC_RPI_ROOT "'$YADOMS_BUILD_TOOLS_PATH'/tools/arm-bcm2708/arm-rpi-4.9.3-linux-gnueabihf")' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt
 RUN echo 'Result:' \
 	&& cat $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt
