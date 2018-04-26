@@ -9,6 +9,7 @@ git checkout $YADOMS_BUILD_BRANCH
 git clean -d -x -f
 git pull
 
+
 echo "Copy build config file"
 cp $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt sources/
 
@@ -20,7 +21,7 @@ cd projects
 make all_unity
 cd -
 
-if [ -z ${MAKE_PACKAGE+x} ]; then
+if [ $MAKE_PACKAGE == "true" ]; then
 	echo "Build Yadoms package"
 	cd projects
 	make package
