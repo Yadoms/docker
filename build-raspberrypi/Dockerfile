@@ -90,7 +90,7 @@ RUN rm protobuf-cpp-3.5.1.tar.gz
 
 # Libudev TODO : must be cross-compiled
 RUN cd $YADOMS_DEPS_PATH \
-	&& wget -U 'Yadoms/1.0.0' --no-verbose http://yadoms.com/travis_build/raspberry_pi/libudev.tar.gz \
+	&& wget -U 'Yadoms/1.0.0' --no-verbose http://yadoms.com/builds/raspberry_pi/libs/libudev.tar.gz \
 	&& tar xzf libudev.tar.gz -C $YADOMS_DEPS_PATH
 RUN rm $YADOMS_DEPS_PATH/libudev.tar.gz
 

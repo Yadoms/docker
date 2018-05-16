@@ -4,7 +4,7 @@ set -e
 cd yadoms
 
 echo "Update Yadoms Git repository for $YADOMS_BUILD_BRANCH branch"
-git fetch
+git fetch --depth=1
 git checkout $YADOMS_BUILD_BRANCH
 git clean -d -x -f
 git pull
@@ -49,6 +49,6 @@ if [ $MAKE_PACKAGE == "true" ]; then
 	
 	if [ ! -z "$UPLOAD_FTP_CREDENTIALS" ]; then
 		echo "Upload packages"
-		curl --ftp-create-dirs -T "{$(echo builds/package/* | tr ' ' ',')}" -u $UPLOAD_FTP_CREDENTIALS ftp://ftp.jano42.fr/travis_build/linux/
+		curl --ftp-create-dirs -T "{$(echo builds/package/* | tr ' ' ',')}" -u $UPLOAD_FTP_CREDENTIALS ftp://ftp.jano42.fr/builds/linux/
 	fi
 fi
