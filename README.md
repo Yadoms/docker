@@ -6,3 +6,5 @@
 
  - [Container to build Yadoms for RaspberryPi](build-raspberrypi/README.md)
 
+  - [Container to build Yadoms for RaspberryPi image](build-raspberrypi-image/README.md)
+
