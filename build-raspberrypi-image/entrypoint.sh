@@ -10,9 +10,6 @@ update-binfmts --enable qemu-arm
 git -c http.sslVerify=false clone --depth=1 -b $CURBRANCH https://github.com/Yadoms/yadoms-build_raspberrypi_image.git
 cd yadoms-build_raspberrypi_image
 
-#fix execution flags
-chmod +x ./fsckoptlist
-
 #make the image
 ./create-yadoms-pi-image $YADOMS_VERSION
 
