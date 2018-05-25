@@ -1,10 +1,12 @@
-FROM i386/debian:9.4
+FROM debian:stable
 MAINTAINER jano42 "https://github.com/jano42"
 LABEL authors=jano42
 
-RUN apt-get -qqy update && apt-get install -qqy apt-utils && apt-get install -qqy build-essential wget git lzop u-boot-tools binfmt-support qemu qemu-user-static multistrap parted dosfstools
-
+ENV DEBIAN_FRONTEND noninteractive
+RUN apt-get update -y
+RUN apt-get install -y dialog apt-utils
+RUN apt-get install -y --allow-unauthenticated build-essential wget git lzop u-boot-tools binfmt-support qemu qemu-user-static multistrap parted dosfstools file udev zip curl
 COPY entrypoint.sh /
-RUN chmod 777 /entrypoint.sh
+USER root
 CMD /entrypoint.sh
 
