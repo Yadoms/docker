@@ -166,5 +166,8 @@ RUN echo 'Configuring Yadoms CMakeListsUserConfig.txt' \
 
 COPY entrypoint.sh /
 
+#ensure entrypoint is executable (force flags update, because file flags may change if a commit is made under Windows)
+RUN chmod +x /entrypoint.sh
+
 CMD /entrypoint.sh
 
