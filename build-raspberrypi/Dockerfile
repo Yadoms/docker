@@ -143,7 +143,7 @@ RUN cd $YADOMS_DEPS_PATH \
 	&& cd ../../../.. && rm -Rf postgresql-9.6.2/doc
 
 # Yadoms sources
-RUN git clone --depth=1 git://github.com/Yadoms/yadoms.git
+RUN git clone git://github.com/Yadoms/yadoms.git
 
 # Yadoms configuration file
 RUN echo 'Configuring Yadoms CMakeListsUserConfig.txt' \
