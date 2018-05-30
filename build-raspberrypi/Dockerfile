@@ -1,6 +1,6 @@
-FROM ubuntu:16.04
-MAINTAINER sgallou "https://github.com/sgallou"
-LABEL authors=sgallou
+FROM debian:stable
+MAINTAINER jano42 "https://github.com/jano42"
+LABEL authors=jano42
 
 ENV YADOMS_BUILD_BRANCH develop
 ENV MAKE_PACKAGE false
@@ -9,22 +9,19 @@ ENV YADOMS_DEPS_PATH /yadoms-deps/raspberry
 
 RUN apt-get update \
 	&& apt-get install -y g++ libbz2-dev python-dev wget build-essential libssl-dev \
-	libopencv-gpu-dev libgnutls-dev autoconf automake libtool curl make g++ unzip \
-	libudev-dev libpcre3 libpcre3-dev libreadline6 libreadline6-dev libpq5 \
+	libopencv-gpu-dev autoconf automake libtool curl make g++ unzip \
+	libudev-dev libpcre3 libpcre3-dev libreadline-dev libpq5 \
 	postgresql-server-dev-all git rpm zip
 
 RUN mkdir -p $YADOMS_BUILD_TOOLS_PATH
 RUN mkdir -p $YADOMS_DEPS_PATH
 
 # CMake
-RUN cd $YADOMS_BUILD_TOOLS_PATH \
+RUN cd $YADOMS_DEPS_PATH \
 	&& wget --no-verbose https://cmake.org/files/v3.11/cmake-3.11.0.tar.gz \
-	&& tar xzf cmake-3.11.0.tar.gz
-RUN cd $YADOMS_BUILD_TOOLS_PATH/cmake-3.11.0 \
-	&& ./bootstrap \
-	&& make \
-	&& make install
-RUN rm $YADOMS_BUILD_TOOLS_PATH/cmake-3.11.0.tar.gz
+	&& tar xzf cmake-3.11.0.tar.gz && cd cmake-3.11.0 \
+	&& ./bootstrap && make && make install \
+	&& cd .. && rm -Rf cmake-3.11.0 && rm $YADOMS_DEPS_PATH/cmake-3.11.0.tar.gz
 
 # Installing arm-linux-gnueabihf cross toolchain
 RUN cd $YADOMS_BUILD_TOOLS_PATH \
@@ -34,43 +31,50 @@ ENV PATH $PATH:$YADOMS_BUILD_TOOLS_PATH/tools/arm-bcm2708/arm-rpi-4.9.3-linux-gn
 # Check GCC version
 RUN arm-linux-gnueabihf-gcc --version
 
+
 # Boost
 RUN cd $YADOMS_DEPS_PATH \
 	&& wget --no-verbose http://netcologne.dl.sourceforge.net/project/boost/boost/1.66.0/boost_1_66_0.tar.bz2 \
-	&& tar xjf boost_1_66_0.tar.bz2
-COPY boost/user-config.jam /root
-RUN cd $YADOMS_DEPS_PATH/boost_1_66_0 \
+	&& tar xjf boost_1_66_0.tar.bz2 && cd boost_1_66_0 \
+	&& echo "using gcc : arm : arm-linux-gnueabihf-g++ ;" > /root/user-config.jam \
 	&& ./bootstrap.sh \
-	&& ./b2 --with-atomic --with-chrono --with-date_time --with-filesystem --with-regex --with-thread --with-system link=static --no-samples --no-tests toolset=gcc-arm cxxflags=-fPIC
-RUN rm $YADOMS_DEPS_PATH/boost_1_66_0.tar.bz2
+	&& ./b2 --with-atomic --with-chrono --with-date_time --with-filesystem --with-regex --with-thread --with-system link=static runtime-link=static --no-samples --no-tests toolset=gcc-arm cxxflags=-fPIC \
+	&& rm -Rf bin.v2 \
+	&& rm -Rf doc \
+	&& rm -Rf libs \
+	&& rm -Rf tools \
+	&& cd .. && rm $YADOMS_DEPS_PATH/boost_1_66_0.tar.bz2
+	
 
 # OpenSSL
 RUN cd $YADOMS_DEPS_PATH \
 	&& wget --no-verbose https://www.openssl.org/source/openssl-1.1.0g.tar.gz \
-	&& tar xzf openssl-1.1.0g.tar.gz
-RUN cd $YADOMS_DEPS_PATH/openssl-1.1.0g \
+	&& tar xzf openssl-1.1.0g.tar.gz && cd openssl-1.1.0g \
 	&& ./Configure linux-generic32 --prefix=$YADOMS_DEPS_PATH/openssl --cross-compile-prefix=$YADOMS_BUILD_TOOLS_PATH/tools/arm-bcm2708/arm-rpi-4.9.3-linux-gnueabihf/bin/arm-linux-gnueabihf- \
 	&& make CC="arm-linux-gnueabihf-gcc" AR="arm-linux-gnueabihf-ar r" RANLIB="arm-linux-gnueabihf-ranlib" \
-	&& make install
-RUN rm $YADOMS_DEPS_PATH/openssl-1.1.0g.tar.gz
+	&& make install \
+	&& cd .. && rm -Rf openssl-1.1.0g && rm $YADOMS_DEPS_PATH/openssl-1.1.0g.tar.gz
+	
 
 # Poco
 RUN cd $YADOMS_DEPS_PATH \
 	&& wget --no-verbose http://pocoproject.org/releases/poco-1.8.1/poco-1.8.1-all.tar.gz \
-	&& tar xzf poco-1.8.1-all.tar.gz
-RUN cd $YADOMS_DEPS_PATH/poco-1.8.1-all \
+	&& tar xzf poco-1.8.1-all.tar.gz && cd poco-1.8.1-all \
 	&& echo 'TOOL = arm-linux-gnueabihf' > build/config/RaspberryPI \
 	&& cat build/config/ARM-Linux >> build/config/RaspberryPI \
 	&& echo 'STATICOPT_CC = -fPIC' >> build/config/RaspberryPI \
 	&& echo 'STATICOPT_CXX = -fPIC' >> build/config/RaspberryPI \
 	&& ./configure --static --config=RaspberryPI --no-samples --no-tests --omit=CppUnit,CppUnit/WinTestRunner,Data,Data/SQLite,Data/ODBCData/MySQL,MongoDB,PageCompiler,PageCompiler/File2Page --include-path=$YADOMS_DEPS_PATH/openssl/include --library-path=$YADOMS_DEPS_PATH/openssl/lib \
-	&& make
-RUN rm $YADOMS_DEPS_PATH/poco-1.8.1-all.tar.gz
+	&& make \
+	&& cd .. \
+	&& find . -name obj -type d -print0 | xargs -0 rm -rf \
+	&& rm $YADOMS_DEPS_PATH/poco-1.8.1-all.tar.gz
+
 
 # Protobuf (Host)
 RUN wget --no-verbose https://github.com/google/protobuf/releases/download/v3.5.1/protobuf-cpp-3.5.1.tar.gz \
-	&& tar xzf protobuf-cpp-3.5.1.tar.gz
-RUN cp -R protobuf-3.5.1 $YADOMS_BUILD_TOOLS_PATH/protobuf-3.5.1-host \
+	&& tar xzf protobuf-cpp-3.5.1.tar.gz && rm protobuf-cpp-3.5.1.tar.gz\
+    && cp -R protobuf-3.5.1 $YADOMS_BUILD_TOOLS_PATH/protobuf-3.5.1-host \
 	&& cd $YADOMS_BUILD_TOOLS_PATH/protobuf-3.5.1-host \
 	&& mkdir build \
 	&& cd build \
@@ -84,63 +88,65 @@ RUN mv protobuf-3.5.1 $YADOMS_DEPS_PATH/protobuf-3.5.1 \
 	&& ./autogen.sh \
 	&& ./configure --enable-shared=no --host=arm-linux CC=arm-linux-gnueabihf-gcc CXX=arm-linux-gnueabihf-g++ AR=arm-linux-gnueabihf-ar STRIP=arm-linux-gnueabihf-strip RANLIB=arm-linux-gnueabihf-ranlib --prefix=$YADOMS_DEPS_PATH/protobuf --with-protoc=protoc --with-pic \
 	&& make \
-	&& make install
-RUN rm protobuf-cpp-3.5.1.tar.gz
+	&& make install \
+    && cd .. && rm -Rf $YADOMS_DEPS_PATH/protobuf-3.5.1
 
 
 # Libudev TODO : must be cross-compiled
 RUN cd $YADOMS_DEPS_PATH \
 	&& wget -U 'Yadoms/1.0.0' --no-verbose http://yadoms.com/builds/raspberry_pi/libs/libudev.tar.gz \
-	&& tar xzf libudev.tar.gz -C $YADOMS_DEPS_PATH
-RUN rm $YADOMS_DEPS_PATH/libudev.tar.gz
+	&& tar xzf libudev.tar.gz -C $YADOMS_DEPS_PATH \
+    && rm $YADOMS_DEPS_PATH/libudev.tar.gz
 
 
 # Swig
 RUN cd $YADOMS_DEPS_PATH \
 	&& wget --no-verbose http://prdownloads.sourceforge.net/swig/swig-3.0.12.tar.gz \
-	&& tar xzf swig-3.0.12.tar.gz
-RUN cd $YADOMS_DEPS_PATH/swig-3.0.12 \
+	&& tar xzf swig-3.0.12.tar.gz \
+	&& cd $YADOMS_DEPS_PATH/swig-3.0.12 \
 	&& ./configure \
 	&& make \
-	&& make install
-RUN rm $YADOMS_DEPS_PATH/swig-3.0.12.tar.gz
+	&& make install \
+	&& cd .. \
+	&& rm -f swig-3.0.12\Source\Modules\*.o \
+	&& rm -Rf swig-3.0.12\Examples \
+	&& rm -Rf swig-3.0.12\Docs \
+	&& rm $YADOMS_DEPS_PATH/swig-3.0.12.tar.gz
 
 # Python (Host)
 RUN wget --no-verbose https://www.python.org/ftp/python/2.7.13/Python-2.7.13.tgz \
-	&& tar xzf Python-2.7.13.tgz
-RUN cp -R Python-2.7.13 $YADOMS_BUILD_TOOLS_PATH/Python-2.7.13-host \
-	&& cd $YADOMS_BUILD_TOOLS_PATH/Python-2.7.13-host \
+	&& tar xzf Python-2.7.13.tgz && rm Python-2.7.13.tgz \
+    && cp -R Python-2.7.13 Python-2.7.13-host \
+	&& cd Python-2.7.13-host \
 	&& ./configure \
 	&& make python Parser/pgen \
 	&& make install \
 	&& mkdir -p $YADOMS_BUILD_TOOLS_PATH/pythonhost \
 	&& cp python $YADOMS_BUILD_TOOLS_PATH/pythonhost/ \
-	&& cp Parser/pgen $YADOMS_BUILD_TOOLS_PATH/pythonhost/
+	&& cp Parser/pgen $YADOMS_BUILD_TOOLS_PATH/pythonhost/ \
+	&& cd .. && rm -Rf Python-2.7.13-host
 # Python (Pi)
 RUN mv Python-2.7.13 $YADOMS_DEPS_PATH/Python-2.7.13 \
 	&& cd $YADOMS_DEPS_PATH/Python-2.7.13 \
 	&& CC=arm-linux-gnueabihf-gcc CXX=arm-linux-gnueabihf-g++ AR=arm-linux-gnueabihf-ar RANLIB=arm-linux-gnueabihf-ranlib ./configure --host=arm-linux-gnueabihf --target=arm-linux-gnueabihf --build=x86_64-linux-gnu --prefix=$YADOMS_DEPS_PATH/python --disable-ipv6 ac_cv_file__dev_ptmx=no ac_cv_file__dev_ptc=no ac_cv_have_long_long_format=yes --enable-shared \
 	&& make HOSTPYTHON=$YADOMS_BUILD_TOOLS_PATH/pythonhost/python HOSTPGEN=$YADOMS_BUILD_TOOLS_PATH/pythonhost/Parser/pgen BLDSHARED="arm-linux-gnueabihf-cc -shared" CROSS-COMPILE=arm-linux-gnueabihf- CROSS_COMPILE_TARGET=yes HOSTARCH=arm-linux BUILDARCH=arm-linux-gnueabihf
-RUN rm Python-2.7.13.tgz
-
 
 # PostgreSQL
 # TODO ne fonctionne pas, à voir...
 RUN cd $YADOMS_DEPS_PATH \
 	&& wget --no-verbose https://ftp.postgresql.org/pub/source/v9.6.2/postgresql-9.6.2.tar.bz2 \
-	&& tar xjf postgresql-9.6.2.tar.bz2
-RUN cd $YADOMS_DEPS_PATH/postgresql-9.6.2 \
+	&& tar xjf postgresql-9.6.2.tar.bz2 && rm postgresql-9.6.2.tar.bz2 \
+	&& cd postgresql-9.6.2 \
 	&& CC=arm-linux-gnueabihf-gcc CXX=arm-linux-gnueabihf-g++ AR=arm-linux-gnueabihf-ar RANLIB=arm-linux-gnueabihf-ranlib ./configure --host=arm-linux --build=arm-linux-gnueabihf --without-readline --without-zlib --disable-spinlocks \
 	&& cd src/interfaces/libpq \
-	&& make
-RUN rm $YADOMS_DEPS_PATH/postgresql-9.6.2.tar.bz2
+	&& make \
+	&& cd ../../../.. && rm -Rf postgresql-9.6.2/doc
 
 # Yadoms sources
-RUN git clone git://github.com/Yadoms/yadoms.git
+RUN git clone --depth=1 git://github.com/Yadoms/yadoms.git
 
 # Yadoms configuration file
 RUN echo 'Configuring Yadoms CMakeListsUserConfig.txt' \
-	&& echo 'set(ALTERNATIVE_CMAKE_ROOT "'$YADOMS_BUILD_TOOLS_PATH'/cmake-3.11.0")' > $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
 	&& echo 'set(BOOST_ROOT "'$YADOMS_DEPS_PATH'/boost_1_66_0")' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
 	&& echo 'set(POCO_ROOT "'$YADOMS_DEPS_PATH'/poco-1.8.1-all")' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
 	&& echo 'set(PROTOBUF_ROOT "'$YADOMS_DEPS_PATH'/protobuf")' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
@@ -170,4 +176,3 @@ COPY entrypoint.sh /
 RUN chmod +x /entrypoint.sh
 
 CMD /entrypoint.sh
-

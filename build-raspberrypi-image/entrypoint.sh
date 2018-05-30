@@ -16,5 +16,5 @@ cd yadoms-build_raspberrypi_image
 #upload it if credentials are provided
 if [ ! -z "$UPLOAD_FTP_CREDENTIALS" ]; then
    echo "Upload image"
-   curl --ftp-create-dirs -T Yadoms-$YADOMS_VERSION-RaspberryPI.img.zip -k sftp://$UPLOAD_FTP_CREDENTIALS@ssh.cluster010.ovh.net:22/~/travis_build/raspberry_pi/
+   curl --ftp-create-dirs -T Yadoms-$YADOMS_VERSION-RaspberryPI.img.zip -k sftp://$UPLOAD_FTP_CREDENTIALS@ssh.cluster010.ovh.net:22/~/builds/raspberry_pi/
 fi
