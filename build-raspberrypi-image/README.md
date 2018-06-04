@@ -1,5 +1,5 @@
 
-# Yadoms build docker image
+# Yadoms RaspberryPi SDCard creation docker image
 
 Image docker for building the RaspberryPI image builtin with [Yadoms](http://www.yadoms.com/) 
 
@@ -10,5 +10,5 @@ docker run --privileged -e CURBRANCH=${TRAVIS_BRANCH} -e YADOMS_VERSION=${YADOMS
 ```
 **The docker run must have the *--privileged* commutator to work**
 
-* YADOMS_VERSION : specify the yadoms version to build image for
+* YADOMS_VERSION : specify the yadoms version to build image for, like '2.1.0'
 * UPLOAD_FTP_CREDENTIALS : if defined, upload build results to www.yadoms.com FTP site (default not defined)
