@@ -49,6 +49,6 @@ if [ $MAKE_PACKAGE == "true" ]; then
 	
 	if [ ! -z "$UPLOAD_FTP_CREDENTIALS" ]; then
 		echo "Upload packages"
-		curl --ftp-create-dirs -T "{$(echo builds/package/* | tr ' ' ',')}" -u $UPLOAD_FTP_CREDENTIALS ftp://ftp.jano42.fr/builds/linux/
+		curl --ftp-create-dirs -T "{$(echo builds/package/* | tr ' ' ',')}" -k sftp://$UPLOAD_FTP_CREDENTIALS@ssh.cluster010.ovh.net:22/~/builds/linux/
 	fi
 fi
