@@ -2,7 +2,7 @@ FROM debian:stable
 MAINTAINER sgallou "https://github.com/sgallou"
 LABEL authors=sgallou
 
-ENV YADOMS_BUILD_BRANCH develop
+ENV YADOMS_BUILD_BRANCH feature/yadoms-conan
 ENV MAKE_PACKAGE false
 ENV YADOMS_DEPS_PATH /yadoms-deps
 
@@ -21,53 +21,14 @@ RUN cd $YADOMS_DEPS_PATH \
 	&& ./bootstrap && make && make install \
 	&& cd .. && rm -Rf cmake-3.11.0 && rm $YADOMS_DEPS_PATH/cmake-3.11.0.tar.gz
 
-# Boost
-RUN cd $YADOMS_DEPS_PATH \
-	&& wget --no-verbose http://netcologne.dl.sourceforge.net/project/boost/boost/1.66.0/boost_1_66_0.tar.bz2 \
-	&& tar xjf boost_1_66_0.tar.bz2 && cd boost_1_66_0 \
-	&& ./bootstrap.sh \
-	&& ./b2 --with-atomic --with-chrono --with-date_time --with-filesystem --with-regex --with-thread --with-system link=static runtime-link=static --no-samples --no-tests cxxflags=-fPIC \
-	&& rm -Rf bin.v2 \
-	&& rm -Rf doc \
-	&& rm -Rf libs \
-	&& rm -Rf tools \
-	&& cd .. && rm $YADOMS_DEPS_PATH/boost_1_66_0.tar.bz2
-
-# OpenSSL
-RUN cd $YADOMS_DEPS_PATH \
-	&& wget --no-verbose https://www.openssl.org/source/openssl-1.1.0g.tar.gz \
-	&& tar xzf openssl-1.1.0g.tar.gz && cd openssl-1.1.0g \
-	&& ./config --prefix=$HOME/depsBuild/openssl \
-	&& make \
-	&& make install \
-	&& cd .. && rm -Rf openssl-1.1.0g && rm $YADOMS_DEPS_PATH/openssl-1.1.0g.tar.gz
-
-# Poco
-RUN cd $YADOMS_DEPS_PATH \
-	&& wget --no-verbose http://pocoproject.org/releases/poco-1.8.1/poco-1.8.1-all.tar.gz \
-	&& tar xzf poco-1.8.1-all.tar.gz && cd poco-1.8.1-all \
-	&& echo 'STATICOPT_CC = -fPIC' >> build/config/Linux \
-	&& echo 'STATICOPT_CXX = -fPIC' >> build/config/Linux \
-	&& ./configure --static --config=Linux --no-samples --no-tests --omit=CppUnit,CppUnit/WinTestRunner,Data,Data/SQLite,Data/ODBCData/MySQL,MongoDB,PageCompiler,PageCompiler/File2Page --include-path=$HOME/depsBuild/openssl/include --library-path=$HOME/depsBuild/openssl/lib \
-	&& make \
-	&& cd .. \
-	&& find . -name obj -type d -print0 | xargs -0 rm -rf \
-	&& rm $YADOMS_DEPS_PATH/poco-1.8.1-all.tar.gz
-
-# Protobuf
-RUN cd $YADOMS_DEPS_PATH \
-	&& wget --no-verbose https://github.com/google/protobuf/releases/download/v3.5.1/protobuf-cpp-3.5.1.tar.gz \
-	&& tar xzf protobuf-cpp-3.5.1.tar.gz && cd protobuf-3.5.1 \
-	&& ./autogen.sh \
-	&& ./configure --enable-shared=no --prefix=$HOME/depsBuild/protobuf --with-pic \
-	&& make \
-	&& make install \
-	&& ldconfig \
-	&& cd .. && rm -Rf protobuf-3.5.1 && rm $YADOMS_DEPS_PATH/protobuf-cpp-3.5.1.tar.gz
+# Conan
+RUN apt-get install -y python-pip
+RUN pip install --upgrade pip
+RUN pip install conan
 
 # Swig
 RUN cd $YADOMS_DEPS_PATH \
-	&& wget --no-verbose http://prdownloads.sourceforge.net/swig/swig-3.0.12.tar.gz \
+	&& wget --no-verbose https://freefr.dl.sourceforge.net/project/swig/swig/swig-3.0.12/swig-3.0.12.tar.gz \
 	&& tar xzf swig-3.0.12.tar.gz \
 	&& cd swig-3.0.12 \
 	&& ./configure \
@@ -92,7 +53,7 @@ RUN cd $YADOMS_DEPS_PATH \
 	&& cd .. && rm -Rf postgresql-9.6.2/doc && rm $YADOMS_DEPS_PATH/postgresql-9.6.2.tar.bz2
 
 # Yadoms sources
-RUN git clone git://github.com/Yadoms/yadoms.git
+RUN git clone -b feature/yadoms-conan git://github.com/Yadoms/yadoms.git
 
 # Yadoms configuration file
 RUN echo 'Configuring Yadoms CMakeListsUserConfig.txt' \
@@ -113,6 +74,19 @@ RUN echo 'Configuring Yadoms CMakeListsUserConfig.txt' \
 	&& echo 'SET(COTIRE_USE ON)' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
 	&& echo 'SET(COTIRE_USE_UNITY ON)' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt
 
+RUN cd yadoms/projects \
+    && pip install conan \
+    && conan remote add other-conan-repo https://api.bintray.com/conan/bincrafters/public-conan
+	
+RUN cd yadoms/projects \
+	&& conan install --build missing -s build_type=Debug -o Poco:fPIC=True -o boost:fPIC=True ../sources \
+	&& cd ../..
+RUN cd yadoms/projects \
+	&& conan install --build missing -s build_type=Release -o Poco:fPIC=True -o boost:fPIC=True ../sources \
+	&& cd ../..
+	
+
+	
 COPY entrypoint.sh /
 
 #ensure entrypoint is executable (force flags update, because file flags may change if a commit is made under Windows)

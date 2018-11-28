@@ -1,2 +1,2 @@
-docker tag build_for_ubuntu yadoms/build_for_ubuntu
-docker push yadoms/build_for_ubuntu
+docker tag build_for_ubuntu_conan yadoms/build_for_ubuntu_conan
+docker push yadoms/build_for_ubuntu_conan
