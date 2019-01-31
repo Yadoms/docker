@@ -16,15 +16,10 @@ RUN mkdir $YADOMS_DEPS_PATH
 
 # CMake
 RUN cd $YADOMS_DEPS_PATH \
-	&& wget --no-verbose https://cmake.org/files/v3.11/cmake-3.11.0.tar.gz \
-	&& tar xzf cmake-3.11.0.tar.gz && cd cmake-3.11.0 \
+	&& wget --no-verbose https://github.com/Kitware/CMake/releases/download/v3.13.1/cmake-3.13.1.tar.gz \
+	&& tar xzf cmake-3.13.1.tar.gz && cd cmake-3.13.1 \
 	&& ./bootstrap && make && make install \
-	&& cd .. && rm -Rf cmake-3.11.0 && rm $YADOMS_DEPS_PATH/cmake-3.11.0.tar.gz
-
-# Conan
-RUN apt-get install -y python-pip
-RUN pip install --upgrade pip
-RUN pip install conan
+	&& cd .. && rm -Rf cmake-3.13.1 && rm $YADOMS_DEPS_PATH/cmake-3.13.1.tar.gz
 
 # Swig
 RUN cd $YADOMS_DEPS_PATH \
@@ -52,17 +47,24 @@ RUN cd $YADOMS_DEPS_PATH \
 	&& make \
 	&& cd .. && rm -Rf postgresql-9.6.2/doc && rm $YADOMS_DEPS_PATH/postgresql-9.6.2.tar.bz2
 
+# Conan
+RUN apt-get install -y python-pip
+RUN pip install --upgrade pip
+RUN pip install conan --upgrade
+RUN conan remote add other-conan-repo https://api.bintray.com/conan/bincrafters/public-conan
+
 # Yadoms sources
 RUN git clone -b feature/yadoms-conan git://github.com/Yadoms/yadoms.git
+	
+RUN cd yadoms/projects \
+	&& conan install --build missing -s build_type=Debug -o Poco:fPIC=True -o boost:fPIC=True ../sources \
+	&& cd ../..
+RUN cd yadoms/projects \
+	&& conan install --build missing -s build_type=Release -o Poco:fPIC=True -o boost:fPIC=True ../sources \
+	&& cd ../..
 
 # Yadoms configuration file
 RUN echo 'Configuring Yadoms CMakeListsUserConfig.txt' \
-	&& echo 'set(BOOST_ROOT "'$YADOMS_DEPS_PATH'/boost_1_66_0")' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
-	&& echo 'set(POCO_ROOT "'$YADOMS_DEPS_PATH'/poco-1.8.1-all")' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
-	&& echo 'set(PROTOBUF_ROOT "'$HOME'/depsBuild/protobuf")' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
-	&& echo 'set(PROTOBUF_PROTOC_EXECUTABLE "'$HOME'/depsBuild/protobuf/bin/protoc")' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
-	&& echo 'set(PROTOBUF_INSTALLED_TO_CUSTOM_DIRECTORY ON)' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
-	&& echo 'set(OPENSSL_ROOT "'$HOME'/depsBuild/openssl")' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
 	&& echo 'set(DEBUG_WITH_GCC OFF)' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
 	&& echo 'set(PYTHON_USE_PKGCONFIG ON)' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
 	&& echo 'set(PYTHON_USE_SOURCES OFF)' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
@@ -73,19 +75,6 @@ RUN echo 'Configuring Yadoms CMakeListsUserConfig.txt' \
 	&& echo 'set(SWIG_ROOT "'$YADOMS_DEPS_PATH'/swig-3.0.12")' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
 	&& echo 'SET(COTIRE_USE ON)' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
 	&& echo 'SET(COTIRE_USE_UNITY ON)' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt
-
-RUN cd yadoms/projects \
-    && pip install conan \
-    && conan remote add other-conan-repo https://api.bintray.com/conan/bincrafters/public-conan
-	
-RUN cd yadoms/projects \
-	&& conan install --build missing -s build_type=Debug -o Poco:fPIC=True -o boost:fPIC=True ../sources \
-	&& cd ../..
-RUN cd yadoms/projects \
-	&& conan install --build missing -s build_type=Release -o Poco:fPIC=True -o boost:fPIC=True ../sources \
-	&& cd ../..
-	
-
 	
 COPY entrypoint.sh /
 

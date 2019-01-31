@@ -1,20 +1,31 @@
 #!/bin/bash
 set -e
+echo "==================================================="
+echo "================ Docker Entrypoint ================"
+echo "==================================================="
+
+echo "Update conan"
+pip install conan --upgrade
 
 cd yadoms
 
 echo "Update Yadoms Git repository for $YADOMS_BUILD_BRANCH branch"
-git fetch --depth=1
+git fetch
 git checkout $YADOMS_BUILD_BRANCH
 git clean -d -x -f
 git pull
 
+echo "redo conan (simple formality, already done in donctainer => regnerate conanfiles)"
+cd projects
+conan install --build missing -s build_type=Debug -o Poco:fPIC=True -o boost:fPIC=True ../sources
+conan install --build missing -s build_type=Release -o Poco:fPIC=True -o boost:fPIC=True ../sources
+cd ..
 
 echo "Copy build config file"
 cp $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt sources/
 
 echo "Create makefile"
-sh cmake_linux.sh m
+sh cmake_linux.sh r
 
 echo "Build Yadoms"
 cd projects
