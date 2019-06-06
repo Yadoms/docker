@@ -1,4 +1,4 @@
-FROM debian:stable
+FROM debian:latest
 MAINTAINER jano42 "https://github.com/jano42"
 LABEL authors=jano42
 
@@ -11,17 +11,17 @@ RUN apt-get update \
 	&& apt-get install -y g++ libbz2-dev python-dev wget build-essential libssl-dev \
 	libopencv-gpu-dev autoconf automake libtool curl make g++ unzip \
 	libudev-dev libpcre3 libpcre3-dev libreadline-dev libpq5 \
-	postgresql-server-dev-all git rpm zip
+	postgresql-server-dev-all git rpm zip gcc gcc-doc libc6-dev
 
 RUN mkdir -p $YADOMS_BUILD_TOOLS_PATH
 RUN mkdir -p $YADOMS_DEPS_PATH
 
 # CMake
 RUN cd $YADOMS_DEPS_PATH \
-	&& wget --no-verbose https://cmake.org/files/v3.11/cmake-3.11.0.tar.gz \
-	&& tar xzf cmake-3.11.0.tar.gz && cd cmake-3.11.0 \
+	&& wget --no-verbose https://github.com/Kitware/CMake/releases/download/v3.14.5/cmake-3.14.5.tar.gz \
+	&& tar xzf cmake-3.14.5.tar.gz && cd cmake-3.14.5 \
 	&& ./bootstrap && make && make install \
-	&& cd .. && rm -Rf cmake-3.11.0 && rm $YADOMS_DEPS_PATH/cmake-3.11.0.tar.gz
+	&& cd .. && rm -Rf cmake-3.14.5 && rm $YADOMS_DEPS_PATH/cmake-3.14.5.tar.gz
 
 # Installing arm-linux-gnueabihf cross toolchain
 RUN cd $YADOMS_BUILD_TOOLS_PATH \
@@ -34,8 +34,8 @@ RUN arm-linux-gnueabihf-gcc --version
 
 # Boost
 RUN cd $YADOMS_DEPS_PATH \
-	&& wget --no-verbose http://netcologne.dl.sourceforge.net/project/boost/boost/1.66.0/boost_1_66_0.tar.bz2 \
-	&& tar xjf boost_1_66_0.tar.bz2 && cd boost_1_66_0 \
+	&& wget --no-verbose https://dl.bintray.com/boostorg/release/1.70.0/source/boost_1_70_0.tar.bz2 \
+	&& tar xjf boost_1_70_0.tar.bz2 && cd boost_1_70_0 \
 	&& echo "using gcc : arm : arm-linux-gnueabihf-g++ ;" > /root/user-config.jam \
 	&& ./bootstrap.sh \
 	&& ./b2 --with-atomic --with-chrono --with-date_time --with-filesystem --with-regex --with-thread --with-system link=static runtime-link=static --no-samples --no-tests toolset=gcc-arm cxxflags=-fPIC \
@@ -43,7 +43,7 @@ RUN cd $YADOMS_DEPS_PATH \
 	&& rm -Rf doc \
 	&& rm -Rf libs \
 	&& rm -Rf tools \
-	&& cd .. && rm $YADOMS_DEPS_PATH/boost_1_66_0.tar.bz2
+	&& cd .. && rm $YADOMS_DEPS_PATH/boost_1_70_0.tar.bz2
 	
 
 # OpenSSL
@@ -58,8 +58,8 @@ RUN cd $YADOMS_DEPS_PATH \
 
 # Poco
 RUN cd $YADOMS_DEPS_PATH \
-	&& wget --no-verbose http://pocoproject.org/releases/poco-1.8.1/poco-1.8.1-all.tar.gz \
-	&& tar xzf poco-1.8.1-all.tar.gz && cd poco-1.8.1-all \
+	&& wget --no-verbose http://pocoproject.org/releases/poco-1.9.0/poco-1.9.0-all.tar.gz \
+	&& tar xzf poco-1.9.0-all.tar.gz && cd poco-1.9.0-all \
 	&& echo 'TOOL = arm-linux-gnueabihf' > build/config/RaspberryPI \
 	&& cat build/config/ARM-Linux >> build/config/RaspberryPI \
 	&& echo 'STATICOPT_CC = -fPIC' >> build/config/RaspberryPI \
@@ -68,14 +68,14 @@ RUN cd $YADOMS_DEPS_PATH \
 	&& make \
 	&& cd .. \
 	&& find . -name obj -type d -print0 | xargs -0 rm -rf \
-	&& rm $YADOMS_DEPS_PATH/poco-1.8.1-all.tar.gz
+	&& rm $YADOMS_DEPS_PATH/poco-1.9.0-all.tar.gz
 
 
 # Protobuf (Host)
-RUN wget --no-verbose https://github.com/google/protobuf/releases/download/v3.5.1/protobuf-cpp-3.5.1.tar.gz \
-	&& tar xzf protobuf-cpp-3.5.1.tar.gz && rm protobuf-cpp-3.5.1.tar.gz\
-    && cp -R protobuf-3.5.1 $YADOMS_BUILD_TOOLS_PATH/protobuf-3.5.1-host \
-	&& cd $YADOMS_BUILD_TOOLS_PATH/protobuf-3.5.1-host \
+RUN wget --no-verbose https://github.com/google/protobuf/releases/download/v3.7.1/protobuf-cpp-3.7.1.tar.gz \
+	&& tar xzf protobuf-cpp-3.7.1.tar.gz && rm protobuf-cpp-3.7.1.tar.gz\
+    && cp -R protobuf-3.7.1 $YADOMS_BUILD_TOOLS_PATH/protobuf-3.7.1-host \
+	&& cd $YADOMS_BUILD_TOOLS_PATH/protobuf-3.7.1-host \
 	&& mkdir build \
 	&& cd build \
 	&& cmake -Dprotobuf_BUILD_TESTS=OFF ../cmake \
@@ -83,13 +83,13 @@ RUN wget --no-verbose https://github.com/google/protobuf/releases/download/v3.5.
 	&& make install \
 	&& ldconfig
 # Protobuf (Pi)
-RUN mv protobuf-3.5.1 $YADOMS_DEPS_PATH/protobuf-3.5.1 \
-	&& cd $YADOMS_DEPS_PATH/protobuf-3.5.1 \
+RUN mv protobuf-3.7.1 $YADOMS_DEPS_PATH/protobuf-3.7.1 \
+	&& cd $YADOMS_DEPS_PATH/protobuf-3.7.1 \
 	&& ./autogen.sh \
 	&& ./configure --enable-shared=no --host=arm-linux CC=arm-linux-gnueabihf-gcc CXX=arm-linux-gnueabihf-g++ AR=arm-linux-gnueabihf-ar STRIP=arm-linux-gnueabihf-strip RANLIB=arm-linux-gnueabihf-ranlib --prefix=$YADOMS_DEPS_PATH/protobuf --with-protoc=protoc --with-pic \
 	&& make \
 	&& make install \
-    && cd .. && rm -Rf $YADOMS_DEPS_PATH/protobuf-3.5.1
+    && cd .. && rm -Rf $YADOMS_DEPS_PATH/protobuf-3.7.1
 
 
 # Libudev TODO : must be cross-compiled
@@ -147,8 +147,8 @@ RUN git clone git://github.com/Yadoms/yadoms.git
 
 # Yadoms configuration file
 RUN echo 'Configuring Yadoms CMakeListsUserConfig.txt' \
-	&& echo 'set(BOOST_ROOT "'$YADOMS_DEPS_PATH'/boost_1_66_0")' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
-	&& echo 'set(POCO_ROOT "'$YADOMS_DEPS_PATH'/poco-1.8.1-all")' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
+	&& echo 'set(BOOST_ROOT "'$YADOMS_DEPS_PATH'/boost_1_70_0")' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
+	&& echo 'set(POCO_ROOT "'$YADOMS_DEPS_PATH'/poco-1.9.0-all")' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
 	&& echo 'set(PROTOBUF_ROOT "'$YADOMS_DEPS_PATH'/protobuf")' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
 	&& echo 'set(PROTOBUF_PROTOC_EXECUTABLE "'`which protoc`'")' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
 	&& echo 'set(PROTOBUF_INSTALLED_TO_CUSTOM_DIRECTORY ON)' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \

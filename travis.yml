@@ -1,0 +1,11 @@
+dist: trusty
+
+jobs:
+  include:
+    - stage: build docker image
+      script:
+      - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+      - cd build-raspberrypi
+      - docker build -t build_for_raspberrypi .
+      - docker tag build_for_raspberrypi yadoms/build_for_raspberrypi
+      - docker push yadoms/build_for_raspberrypi
