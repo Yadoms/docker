@@ -8,10 +8,10 @@ ENV YADOMS_BUILD_TOOLS_PATH /yadoms-build-tools
 ENV YADOMS_DEPS_PATH /yadoms-deps/raspberry
 
 RUN cat /etc/apt/sources.list
-RUN echo "deb http://deb.debian.org/debian/ stretch main contrib non-free" > /etc/apt/sources.list \
-&&  echo "deb http://security.debian.org/ stretch/updates main contrib non-free" > /etc/apt/sources.list \
-&& echo "deb http://deb.debian.org/debian/ stretch-updates main contrib non-free" > /etc/apt/sources.list \
-&& echo "deb http://deb.debian.org/debian stretch-backports main contrib non-free" > /etc/apt/sources.list
+RUN echo "deb http://deb.debian.org/debian/ stretch main contrib non-free" | sudo tee -a /etc/apt/sources.list \
+&&  echo "deb http://security.debian.org/ stretch/updates main contrib non-free" | sudo tee -a /etc/apt/sources.list \
+&& echo "deb http://deb.debian.org/debian/ stretch-updates main contrib non-free" | sudo tee -a /etc/apt/sources.list \
+&& echo "deb http://deb.debian.org/debian stretch-backports main contrib non-free" | sudo tee -a /etc/apt/sources.list
 
 RUN cat /etc/apt/sources.list
  
