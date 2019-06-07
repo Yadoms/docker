@@ -7,9 +7,9 @@ script:
   - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
   
   - if [ ${GENERATE_RPI_TOOLCHAIN} = true ]; then cd raspberrypi-croos-toolchain; fi
-  - if [ ${GENERATE_RPI_TOOLCHAIN} = true ]; then travis_wait 900 docker build -t raspberrypi_croos_toolchain .; fi
-  - if [ ${GENERATE_RPI_TOOLCHAIN} = true ]; then docker tag raspberrypi_croos_toolchain yadoms/raspberrypi_croos_toolchain; fi
-  - if [ ${GENERATE_RPI_TOOLCHAIN} = true ]; then docker push yadoms/raspberrypi_croos_toolchain; fi
+  - if [ ${GENERATE_RPI_TOOLCHAIN} = true ]; then travis_wait 900 docker build -t raspberrypi-cross-toolchain .; fi
+  - if [ ${GENERATE_RPI_TOOLCHAIN} = true ]; then docker tag raspberrypi-cross-toolchain yadoms/raspberrypi-cross-toolchain; fi
+  - if [ ${GENERATE_RPI_TOOLCHAIN} = true ]; then docker push yadoms/raspberrypi-cross-toolchain; fi
   - if [ ${GENERATE_RPI_TOOLCHAIN} = true ]; then cd ..; fi
 
   
