@@ -5,7 +5,16 @@ services:
   
 script:
   - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
-  - cd build-raspberrypi
-  - travis_wait 900 docker build -t build_for_raspberrypi .
-  - docker tag build_for_raspberrypi yadoms/build_for_raspberrypi
-  - docker push yadoms/build_for_raspberrypi
+  
+  - if [ ${GENERATE_RPI_TOOLCHAIN} = true ]; then cd raspberrypi-croos-toolchain; fi
+  - if [ ${GENERATE_RPI_TOOLCHAIN} = true ]; then travis_wait 900 docker build -t raspberrypi_croos_toolchain .; fi
+  - if [ ${GENERATE_RPI_TOOLCHAIN} = true ]; then docker tag raspberrypi_croos_toolchain yadoms/raspberrypi_croos_toolchain; fi
+  - if [ ${GENERATE_RPI_TOOLCHAIN} = true ]; then docker push yadoms/raspberrypi_croos_toolchain; fi
+  - if [ ${GENERATE_RPI_TOOLCHAIN} = true ]; then cd ..; fi
+
+  
+  - if [ ${GENERATE_RPI_BUILD} = true ]; then cd build-raspberrypi; fi
+  - if [ ${GENERATE_RPI_BUILD} = true ]; then travis_wait 900 docker build -t build_for_raspberrypi .; fi
+  - if [ ${GENERATE_RPI_BUILD} = true ]; then docker tag build_for_raspberrypi yadoms/build_for_raspberrypi; fi
+  - if [ ${GENERATE_RPI_BUILD} = true ]; then docker push yadoms/build_for_raspberrypi; fi
+  - if [ ${GENERATE_RPI_BUILD} = true ]; then cd ..; fi
