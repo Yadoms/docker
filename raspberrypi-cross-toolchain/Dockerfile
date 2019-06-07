@@ -18,9 +18,10 @@ WORKDIR /tmp
 RUN curl -sLO http://crosstool-ng.org/download/crosstool-ng/crosstool-ng-1.24.0.tar.xz \
  && tar xvJf crosstool-ng-1.24.0.tar.xz \
  && cd crosstool-ng-1.24.0 \
- && ./configure \
- && make \
- && make install \
+ && ./configure
+ 
+ RUN make
+ RUN make install \
  && cd .. \
  && rm -rf crosstool-ng-1.24.0 crosstool-ng-1.24.0.tar.xz
 
