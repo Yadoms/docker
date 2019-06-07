@@ -25,7 +25,7 @@ RUN mkdir -p $YADOMS_DEPS_PATH
 RUN cd $YADOMS_DEPS_PATH \
 	&& wget --no-verbose https://github.com/Kitware/CMake/releases/download/v3.14.5/cmake-3.14.5.tar.gz  > /dev/null\
 	&& tar xzf cmake-3.14.5.tar.gz && cd cmake-3.14.5  > /dev/null\
-	&& travis_wait ./bootstrap > /dev/null && travis_wait make > /dev/null && travis_wait make install > /dev/null\
+	&& ./bootstrap > /dev/null && make > /dev/null && make install > /dev/null\
 	&& cd .. && rm -Rf cmake-3.14.5 && rm $YADOMS_DEPS_PATH/cmake-3.14.5.tar.gz
 
 # Installing arm-linux-gnueabihf cross toolchain
@@ -43,7 +43,7 @@ RUN cd $YADOMS_DEPS_PATH \
 	&& tar xjf boost_1_70_0.tar.bz2 && cd boost_1_70_0  > /dev/null\
 	&& echo "using gcc : arm : arm-linux-gnueabihf-g++ ;" > /root/user-config.jam \
 	&& ./bootstrap.sh > /dev/null\
-	&& travis_wait ./b2 --with-atomic --with-chrono --with-date_time --with-filesystem --with-regex --with-thread --with-system link=static runtime-link=static --no-samples --no-tests toolset=gcc-arm cxxflags=-fPIC  > /dev/null\
+	&& ./b2 --with-atomic --with-chrono --with-date_time --with-filesystem --with-regex --with-thread --with-system link=static runtime-link=static --no-samples --no-tests toolset=gcc-arm cxxflags=-fPIC  > /dev/null\
 	&& rm -Rf bin.v2 \
 	&& rm -Rf doc \
 	&& rm -Rf libs \
@@ -55,9 +55,9 @@ RUN cd $YADOMS_DEPS_PATH \
 RUN cd $YADOMS_DEPS_PATH \
 	&& wget --no-verbose https://www.openssl.org/source/openssl-1.1.0g.tar.gz  > /dev/null\
 	&& tar xzf openssl-1.1.0g.tar.gz && cd openssl-1.1.0g  > /dev/null\
-	&& travis_wait ./Configure linux-generic32 --prefix=$YADOMS_DEPS_PATH/openssl --cross-compile-prefix=$YADOMS_BUILD_TOOLS_PATH/tools/arm-bcm2708/arm-rpi-4.9.3-linux-gnueabihf/bin/arm-linux-gnueabihf-  > /dev/null\
-	&& travis_wait make CC="arm-linux-gnueabihf-gcc" AR="arm-linux-gnueabihf-ar r" RANLIB="arm-linux-gnueabihf-ranlib"  > /dev/null\
-	&& travis_wait make install  > /dev/null\
+	&& ./Configure linux-generic32 --prefix=$YADOMS_DEPS_PATH/openssl --cross-compile-prefix=$YADOMS_BUILD_TOOLS_PATH/tools/arm-bcm2708/arm-rpi-4.9.3-linux-gnueabihf/bin/arm-linux-gnueabihf-  > /dev/null\
+	&& make CC="arm-linux-gnueabihf-gcc" AR="arm-linux-gnueabihf-ar r" RANLIB="arm-linux-gnueabihf-ranlib"  > /dev/null\
+	&& make install  > /dev/null\
 	&& cd .. && rm -Rf openssl-1.1.0g && rm $YADOMS_DEPS_PATH/openssl-1.1.0g.tar.gz
 	
 
@@ -69,8 +69,8 @@ RUN cd $YADOMS_DEPS_PATH \
 	&& cat build/config/ARM-Linux >> build/config/RaspberryPI \
 	&& echo 'STATICOPT_CC = -fPIC' >> build/config/RaspberryPI \
 	&& echo 'STATICOPT_CXX = -fPIC' >> build/config/RaspberryPI \
-	&& travis_wait ./configure --static --config=RaspberryPI --no-samples --no-tests --omit=CppUnit,CppUnit/WinTestRunner,Data,Data/SQLite,Data/ODBCData/MySQL,MongoDB,PageCompiler,PageCompiler/File2Page --include-path=$YADOMS_DEPS_PATH/openssl/include --library-path=$YADOMS_DEPS_PATH/openssl/lib  > /dev/null\
-	&& travis_wait make  > /dev/null\
+	&& ./configure --static --config=RaspberryPI --no-samples --no-tests --omit=CppUnit,CppUnit/WinTestRunner,Data,Data/SQLite,Data/ODBCData/MySQL,MongoDB,PageCompiler,PageCompiler/File2Page --include-path=$YADOMS_DEPS_PATH/openssl/include --library-path=$YADOMS_DEPS_PATH/openssl/lib  > /dev/null\
+	&& make  > /dev/null\
 	&& cd .. \
 	&& find . -name obj -type d -print0 | xargs -0 rm -rf  > /dev/null\
 	&& rm $YADOMS_DEPS_PATH/poco-1.9.0-all.tar.gz
@@ -83,17 +83,17 @@ RUN wget --no-verbose https://github.com/google/protobuf/releases/download/v3.7.
 	&& cd $YADOMS_BUILD_TOOLS_PATH/protobuf-3.7.1-host \
 	&& mkdir build \
 	&& cd build \
-	&& travis_wait cmake -Dprotobuf_BUILD_TESTS=OFF ../cmake  > /dev/null\
-	&& travis_wait cmake -Dprotobuf_BUILD_TESTS=OFF --build .  > /dev/null\
-	&& travis_wait make install  > /dev/null\
+	&& cmake -Dprotobuf_BUILD_TESTS=OFF ../cmake  > /dev/null\
+	&& cmake -Dprotobuf_BUILD_TESTS=OFF --build .  > /dev/null\
+	&& make install  > /dev/null\
 	&& ldconfig  > /dev/null
 # Protobuf (Pi)
 RUN mv protobuf-3.7.1 $YADOMS_DEPS_PATH/protobuf-3.7.1 \
 	&& cd $YADOMS_DEPS_PATH/protobuf-3.7.1 \
-	&& travis_wait ./autogen.sh  > /dev/null\
-	&& travis_wait ./configure --enable-shared=no --host=arm-linux CC=arm-linux-gnueabihf-gcc CXX=arm-linux-gnueabihf-g++ AR=arm-linux-gnueabihf-ar STRIP=arm-linux-gnueabihf-strip RANLIB=arm-linux-gnueabihf-ranlib --prefix=$YADOMS_DEPS_PATH/protobuf --with-protoc=protoc --with-pic  > /dev/null\
-	&& travis_wait make  > /dev/null\
-	&& travis_wait make install  > /dev/null\
+	&& ./autogen.sh  > /dev/null\
+	&& ./configure --enable-shared=no --host=arm-linux CC=arm-linux-gnueabihf-gcc CXX=arm-linux-gnueabihf-g++ AR=arm-linux-gnueabihf-ar STRIP=arm-linux-gnueabihf-strip RANLIB=arm-linux-gnueabihf-ranlib --prefix=$YADOMS_DEPS_PATH/protobuf --with-protoc=protoc --with-pic  > /dev/null\
+	&& make  > /dev/null\
+	&& make install  > /dev/null\
     && cd .. && rm -Rf $YADOMS_DEPS_PATH/protobuf-3.7.1
 
 
@@ -109,9 +109,9 @@ RUN cd $YADOMS_DEPS_PATH \
 	&& wget --no-verbose http://prdownloads.sourceforge.net/swig/swig-3.0.12.tar.gz  > /dev/null\
 	&& tar xzf swig-3.0.12.tar.gz  > /dev/null\
 	&& cd $YADOMS_DEPS_PATH/swig-3.0.12  > /dev/null\
-	&& travis_wait ./configure  > /dev/null\
-	&& travis_wait make  > /dev/null\
-	&& travis_wait make install  > /dev/null\
+	&& ./configure  > /dev/null\
+	&& make  > /dev/null\
+	&& make install  > /dev/null\
 	&& cd .. \
 	&& rm -f swig-3.0.12\Source\Modules\*.o \
 	&& rm -Rf swig-3.0.12\Examples \
@@ -123,9 +123,9 @@ RUN wget --no-verbose https://www.python.org/ftp/python/2.7.13/Python-2.7.13.tgz
 	&& tar xzf Python-2.7.13.tgz && rm Python-2.7.13.tgz  > /dev/null\
     && cp -R Python-2.7.13 Python-2.7.13-host  > /dev/null\
 	&& cd Python-2.7.13-host  > /dev/null\
-	&& travis_wait ./configure  > /dev/null\
-	&& travis_wait make python Parser/pgen  > /dev/null\
-	&& travis_wait make install  > /dev/null\
+	&& ./configure  > /dev/null\
+	&& make python Parser/pgen  > /dev/null\
+	&& make install  > /dev/null\
 	&& mkdir -p $YADOMS_BUILD_TOOLS_PATH/pythonhost \
 	&& cp python $YADOMS_BUILD_TOOLS_PATH/pythonhost/ \
 	&& cp Parser/pgen $YADOMS_BUILD_TOOLS_PATH/pythonhost/ \
@@ -133,8 +133,8 @@ RUN wget --no-verbose https://www.python.org/ftp/python/2.7.13/Python-2.7.13.tgz
 # Python (Pi)
 RUN mv Python-2.7.13 $YADOMS_DEPS_PATH/Python-2.7.13  > /dev/null\
 	&& cd $YADOMS_DEPS_PATH/Python-2.7.13  > /dev/null\
-	&& travis_wait CC=arm-linux-gnueabihf-gcc CXX=arm-linux-gnueabihf-g++ AR=arm-linux-gnueabihf-ar RANLIB=arm-linux-gnueabihf-ranlib ./configure --host=arm-linux-gnueabihf --target=arm-linux-gnueabihf --build=x86_64-linux-gnu --prefix=$YADOMS_DEPS_PATH/python --disable-ipv6 ac_cv_file__dev_ptmx=no ac_cv_file__dev_ptc=no ac_cv_have_long_long_format=yes --enable-shared  > /dev/null\
-	&& travis_wait make HOSTPYTHON=$YADOMS_BUILD_TOOLS_PATH/pythonhost/python HOSTPGEN=$YADOMS_BUILD_TOOLS_PATH/pythonhost/Parser/pgen BLDSHARED="arm-linux-gnueabihf-cc -shared" CROSS-COMPILE=arm-linux-gnueabihf- CROSS_COMPILE_TARGET=yes HOSTARCH=arm-linux BUILDARCH=arm-linux-gnueabihf  > /dev/null
+	&& CC=arm-linux-gnueabihf-gcc CXX=arm-linux-gnueabihf-g++ AR=arm-linux-gnueabihf-ar RANLIB=arm-linux-gnueabihf-ranlib ./configure --host=arm-linux-gnueabihf --target=arm-linux-gnueabihf --build=x86_64-linux-gnu --prefix=$YADOMS_DEPS_PATH/python --disable-ipv6 ac_cv_file__dev_ptmx=no ac_cv_file__dev_ptc=no ac_cv_have_long_long_format=yes --enable-shared  > /dev/null\
+	&& make HOSTPYTHON=$YADOMS_BUILD_TOOLS_PATH/pythonhost/python HOSTPGEN=$YADOMS_BUILD_TOOLS_PATH/pythonhost/Parser/pgen BLDSHARED="arm-linux-gnueabihf-cc -shared" CROSS-COMPILE=arm-linux-gnueabihf- CROSS_COMPILE_TARGET=yes HOSTARCH=arm-linux BUILDARCH=arm-linux-gnueabihf  > /dev/null
 
 # PostgreSQL
 # TODO ne fonctionne pas, à voir...
@@ -142,9 +142,9 @@ RUN cd $YADOMS_DEPS_PATH \
 	&& wget --no-verbose https://ftp.postgresql.org/pub/source/v9.6.2/postgresql-9.6.2.tar.bz2  > /dev/null\
 	&& tar xjf postgresql-9.6.2.tar.bz2 && rm postgresql-9.6.2.tar.bz2  > /dev/null\
 	&& cd postgresql-9.6.2  > /dev/null\
-	&& travis_wait CC=arm-linux-gnueabihf-gcc CXX=arm-linux-gnueabihf-g++ AR=arm-linux-gnueabihf-ar RANLIB=arm-linux-gnueabihf-ranlib ./configure --host=arm-linux --build=arm-linux-gnueabihf --without-readline --without-zlib --disable-spinlocks  > /dev/null\
+	&& CC=arm-linux-gnueabihf-gcc CXX=arm-linux-gnueabihf-g++ AR=arm-linux-gnueabihf-ar RANLIB=arm-linux-gnueabihf-ranlib ./configure --host=arm-linux --build=arm-linux-gnueabihf --without-readline --without-zlib --disable-spinlocks  > /dev/null\
 	&& cd src/interfaces/libpq \
-	&& travis_wait make  > /dev/null\
+	&& make  > /dev/null\
 	&& cd ../../../.. && rm -Rf postgresql-9.6.2/doc
 
 # Yadoms sources
