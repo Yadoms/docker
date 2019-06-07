@@ -25,7 +25,7 @@ RUN mkdir -p $YADOMS_DEPS_PATH
 RUN cd $YADOMS_DEPS_PATH \
 	&& wget --no-verbose https://github.com/Kitware/CMake/releases/download/v3.14.5/cmake-3.14.5.tar.gz  > /dev/null\
 	&& tar xzf cmake-3.14.5.tar.gz && cd cmake-3.14.5  > /dev/null\
-	&& ./bootstrap && make && make install  > /dev/null\
+	&& ./bootstrap > /dev/null && make > /dev/null && make install > /dev/null\
 	&& cd .. && rm -Rf cmake-3.14.5 && rm $YADOMS_DEPS_PATH/cmake-3.14.5.tar.gz
 
 # Installing arm-linux-gnueabihf cross toolchain
