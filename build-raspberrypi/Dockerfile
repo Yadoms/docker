@@ -7,7 +7,15 @@ ENV MAKE_PACKAGE false
 ENV YADOMS_BUILD_TOOLS_PATH /yadoms-build-tools
 ENV YADOMS_DEPS_PATH /yadoms-deps/raspberry
 
-RUN echo "deb http://ftp.uk.debian.org/debian/ stretch contrib non-free" > /etc/apt/sources.list
+RUN cat /etc/apt/sources.list
+RUN echo "deb http://deb.debian.org/debian/ stretch main contrib non-free" > /etc/apt/sources.list \
+&&  echo "deb http://security.debian.org/ stretch/updates main contrib non-free" > /etc/apt/sources.list \
+&& echo "deb http://deb.debian.org/debian/ stretch-updates main contrib non-free" > /etc/apt/sources.list \
+&& echo "deb http://deb.debian.org/debian stretch-backports main contrib non-free" > /etc/apt/sources.list
+
+RUN cat /etc/apt/sources.list
+ 
+ 
  
 RUN apt-get update \
 	&& apt-get install -y g++ libbz2-dev python-dev wget build-essential libssl-dev \
