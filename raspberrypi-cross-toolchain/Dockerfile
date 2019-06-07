@@ -11,7 +11,7 @@ RUN apt-get update \
       gperf bison flex texinfo bzip2 xz-utils help2man gawk make libncurses5-dev \
       python python-dev python-pip \
       python3 python3-dev python3-pip \
-      htop apt-utils locales ca-certificates unzip\
+      htop apt-utils locales ca-certificates unzip ibtool libtool-bin\
  && apt-get clean && rm -rf /var/cache/apt/archives/* /var/lib/apt/lists/*
 
 WORKDIR /tmp
