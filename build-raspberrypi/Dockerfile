@@ -7,8 +7,8 @@ ENV MAKE_PACKAGE false
 ENV YADOMS_BUILD_TOOLS_PATH /yadoms-build-tools
 ENV YADOMS_DEPS_PATH /yadoms-deps/raspberry
 
-RUN deb http://ftp.uk.debian.org/debian/ stretch non-free
-
+RUN echo "deb http://ftp.uk.debian.org/debian/ stretch contrib non-free" > /etc/apt/sources.list
+ 
 RUN apt-get update \
 	&& apt-get install -y g++ libbz2-dev python-dev wget build-essential libssl-dev \
 	libopencv-gpu-dev autoconf automake libtool curl make g++ unzip \
