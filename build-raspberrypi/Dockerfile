@@ -150,9 +150,6 @@ RUN cd $YADOMS_DEPS_PATH \
 	&& make  > /dev/null\
 	&& cd ../../../.. && rm -Rf postgresql-9.6.2/doc
 
-# Yadoms sources
-RUN git clone https://github.com/Yadoms/yadoms.git  > /dev/null
-
 # Yadoms configuration file
 RUN echo 'Configuring Yadoms CMakeListsUserConfig.txt' \
 	&& echo 'set(BOOST_ROOT "'$YADOMS_DEPS_PATH'/boost_1_70_0")' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
