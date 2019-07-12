@@ -150,6 +150,21 @@ RUN cd $YADOMS_DEPS_PATH \
 	&& make  > /dev/null\
 	&& cd ../../../.. && rm -Rf postgresql-9.6.2/doc
 
+# Gammu
+#copy cross compile toolchain
+COPY raspberrypi.cmake /
+
+RUN cd $YADOMS_DEPS_PATH \
+	&& wget --no-verbose https://dl.cihar.com/gammu/releases/gammu-1.40.0.tar.bz2  > /dev/null\
+	&& tar xjf gammu-1.40.0.tar.bz2  > /dev/null\
+	&& cd gammu-1.40.0 \
+	&& mkdir rpicc \
+	&& cd rpicc \
+	&& cmake -DCC_RPI_GCC=armv6-rpi-linux-gnueabihf-gcc -DCC_RPI_GXX=armv6-rpi-linux-gnueabihf-g++ -DBUILD_SHARED_LIBS=OFF -DCMAKE_TOOLCHAIN_FILE=/raspberrypi.cmake -DCMAKE_STAGING_PREFIX=$YADOMS_DEPS_PATH/gammu ..  > /dev/null\
+	&& make  > /dev/null\
+	&& make install  > /dev/null\
+	&& cd ../.. && rm -Rf gammu-1.40.*
+
 # Yadoms sources
 RUN git clone https://github.com/Yadoms/yadoms.git  > /dev/null
 
@@ -169,7 +184,7 @@ RUN echo 'Configuring Yadoms CMakeListsUserConfig.txt' \
 	&& echo 'set(PostgreSQL_ROOT ' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
 	&& echo '       "'$YADOMS_DEPS_PATH'/postgresql-9.6.2/src/interfaces/libpq"' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
 	&& echo '       "'$YADOMS_DEPS_PATH'/postgresql-9.6.2/src/include")' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
-	&& echo 'set(GAMMU_ROOT "'$YADOMS_DEPS_PATH'/gammu-1.38.4")' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
+	&& echo 'set(GAMMU_ROOT "'$YADOMS_DEPS_PATH'/gammu")' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
 	&& echo 'set(SWIG_ROOT "'$YADOMS_DEPS_PATH'/swig-3.0.12")' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
 	&& echo 'SET(COTIRE_USE ON)' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
 	&& echo 'SET(COTIRE_USE_UNITY ON)' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \

@@ -112,6 +112,19 @@ RUN cd $YADOMS_DEPS_PATH \
 	&& make \
 	&& cd .. && rm -Rf postgresql-9.6.2/doc && rm $YADOMS_DEPS_PATH/postgresql-9.6.2.tar.bz2
 
+# Gammu
+RUN cd $YADOMS_DEPS_PATH \
+	&& wget --no-verbose https://dl.cihar.com/gammu/releases/gammu-1.40.0.tar.bz2 \
+	&& tar xjf gammu-1.40.0.tar.bz2 \
+	&& cd gammu-1.40.0 \
+	&& mkdir rpicc \
+	&& cd rpicc \
+	&& cmake -DBUILD_SHARED_LIBS=OFF -DCMAKE_STAGING_PREFIX=$YADOMS_DEPS_PATH/gammu .. \
+	&& make \
+	&& make install \
+	&& cd ../.. && rm -Rf gammu-1.40.*
+
+
 # Yadoms configuration file
 RUN echo 'Configuring Yadoms CMakeListsUserConfig.txt' \
 	&& echo 'set(BOOST_ROOT "'$YADOMS_DEPS_PATH'/boost_1_70_0")' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
@@ -132,7 +145,7 @@ RUN echo 'Configuring Yadoms CMakeListsUserConfig.txt' \
 	&& echo 'set(PostgreSQL_ROOT ' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
 	&& echo '       "'$YADOMS_DEPS_PATH'/postgresql-9.6.2/src/interfaces/libpq"' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
 	&& echo '       "'$YADOMS_DEPS_PATH'/postgresql-9.6.2/src/include")' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
-	&& echo 'set(GAMMU_ROOT "'$YADOMS_DEPS_PATH'/gammu-1.38.4")' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
+	&& echo 'set(GAMMU_ROOT "'$YADOMS_DEPS_PATH'/gammu")' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
 	&& echo 'set(SWIG_ROOT "'$YADOMS_DEPS_PATH'/swig-4.0.0")' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
 	&& echo 'SET(COTIRE_USE ON)' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
 	&& echo 'SET(COTIRE_USE_UNITY ON)' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt
