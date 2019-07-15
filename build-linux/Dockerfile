@@ -114,14 +114,14 @@ RUN cd $YADOMS_DEPS_PATH \
 
 # Gammu
 RUN cd $YADOMS_DEPS_PATH \
-	&& wget --no-verbose https://dl.cihar.com/gammu/releases/gammu-1.40.0.tar.bz2 \
-	&& tar xjf gammu-1.40.0.tar.bz2 \
+	&& wget --no-verbose https://dl.cihar.com/gammu/releases/gammu-1.40.0.tar.bz2  > /dev/null\
+	&& tar xjf gammu-1.40.0.tar.bz2  > /dev/null\
 	&& cd gammu-1.40.0 \
 	&& mkdir rpicc \
 	&& cd rpicc \
-	&& cmake -DBUILD_SHARED_LIBS=OFF -DCMAKE_STAGING_PREFIX=$YADOMS_DEPS_PATH/gammu .. \
-	&& make \
-	&& make install \
+	&& cmake -DBUILD_SHARED_LIBS=OFF -DCMAKE_STAGING_PREFIX=$YADOMS_DEPS_PATH/gammu ..  > /dev/null\
+	&& make  > /dev/null\
+	&& make install  > /dev/null\
 	&& cd ../.. && rm -Rf gammu-1.40.*
 
 
