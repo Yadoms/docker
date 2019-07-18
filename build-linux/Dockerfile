@@ -39,7 +39,7 @@ RUN cd $YADOMS_DEPS_PATH \
 RUN cd $YADOMS_DEPS_PATH \
 	&& wget --no-verbose https://www.openssl.org/source/openssl-1.1.0k.tar.gz \
 	&& tar xzf openssl-1.1.0k.tar.gz && cd openssl-1.1.0k \
-	&& ./config --prefix=$HOME/depsBuild/openssl \
+	&& ./Configure --prefix=$HOME/depsBuild/openssl -fPIC linux-x86_64\
 	&& make \
 	&& make install \
 	&& cd .. && rm -Rf openssl-1.1.0k && rm $YADOMS_DEPS_PATH/openssl-1.1.0k.tar.gz
@@ -85,7 +85,7 @@ RUN cd $YADOMS_DEPS_PATH \
 RUN wget --no-verbose https://www.python.org/ftp/python/2.7.16/Python-2.7.16.tgz  > /dev/null\
 	&& tar xzf Python-2.7.16.tgz && rm Python-2.7.16.tgz  > /dev/null\
 	&& cd Python-2.7.16 \
-	&& ./configure --prefix=$YADOMS_DEPS_PATH/python27 > /dev/null\
+	&& ./configure --enable-shared --prefix=$YADOMS_DEPS_PATH/python27 > /dev/null\
 	&& make > /dev/null\
 	&& make install  > /dev/null\
 	&& cd ..
@@ -95,7 +95,7 @@ RUN apt-get install -y libffi-dev
 RUN wget --no-verbose https://www.python.org/ftp/python/3.7.3/Python-3.7.3.tgz  > /dev/null\
 	&& tar xzf Python-3.7.3.tgz && rm Python-3.7.3.tgz  > /dev/null\
 	&& cd Python-3.7.3 \
-	&& ./configure --prefix=$YADOMS_DEPS_PATH/python37 > /dev/null\
+	&& ./configure --enable-shared --without-pymalloc --prefix=$YADOMS_DEPS_PATH/python37 > /dev/null\
 	&& make > /dev/null\
 	&& make install  > /dev/null\
 	&& cd ..
@@ -138,9 +138,10 @@ RUN echo 'Configuring Yadoms CMakeListsUserConfig.txt' \
 	&& echo 'set(PYTHON_USE_SOURCES ON)' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
 	&& echo 'set(PYTHON_ROOT "'$YADOMS_DEPS_PATH'/Python-2.7.16")' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
 	&& echo 'set(PYTHON_LIBRARIES "'$YADOMS_DEPS_PATH'/Python-2.7.16/libpython2.7.so")' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
-	&& echo 'set(PYTHON27_ROOT "'$YADOMS_DEPS_PATH'/Python-2.7.16")' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
+	&& echo 'set(Python2_ROOT "'$YADOMS_DEPS_PATH'/Python-2.7.16")' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
 	&& echo 'set(PYTHON27_LIBRARIES "'$YADOMS_DEPS_PATH'/Python-2.7.16/libpython2.7.so")' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
-	&& echo 'set(PYTHON3_ROOT "'$YADOMS_DEPS_PATH'/Python-3.7.3")' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
+	&& echo 'set(Python3_ROOT "'$YADOMS_DEPS_PATH'/Python-3.7.3")' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
+	&& echo 'set(Python3_ROOT_DIR "'$YADOMS_DEPS_PATH'/Python-2.7.16")' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
 	&& echo 'set(PYTHON3_LIBRARIES "'$YADOMS_DEPS_PATH'/Python-3.7.3/libpython3.7.so")' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
 	&& echo 'set(PostgreSQL_ROOT ' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
 	&& echo '       "'$YADOMS_DEPS_PATH'/postgresql-9.6.2/src/interfaces/libpq"' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
