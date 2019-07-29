@@ -18,10 +18,10 @@ RUN echo "check_certificate = off" >> ~/.wgetrc
 
 # CMake
 RUN cd $YADOMS_DEPS_PATH \
-	&& wget --no-verbose https://github.com/Kitware/CMake/releases/download/v3.14.5/cmake-3.14.5.tar.gz \
-	&& tar xzf cmake-3.14.5.tar.gz && cd cmake-3.14.5 \
+	&& wget --no-verbose https://github.com/Kitware/CMake/releases/download/v3.15.1/cmake-3.15.1.tar.gz \
+	&& tar xzf cmake-3.15.1.tar.gz && cd cmake-3.15.1 \
 	&& ./bootstrap && make && make install \
-	&& cd .. && rm -Rf cmake-3.14.5 && rm $YADOMS_DEPS_PATH/cmake-3.14.5.tar.gz
+	&& cd .. && rm -Rf cmake-3.15.1 && rm $YADOMS_DEPS_PATH/cmake-3.15.1.tar.gz
 
 # Boost
 RUN cd $YADOMS_DEPS_PATH \
@@ -58,14 +58,14 @@ RUN cd $YADOMS_DEPS_PATH \
 
 # Protobuf
 RUN cd $YADOMS_DEPS_PATH \
-	&& wget --no-verbose https://github.com/google/protobuf/releases/download/v3.8.0/protobuf-cpp-3.8.0.tar.gz \
-	&& tar xzf protobuf-cpp-3.8.0.tar.gz && cd protobuf-3.8.0 \
+	&& wget --no-verbose https://github.com/google/protobuf/releases/download/v3.9.0/protobuf-cpp-3.9.0.tar.gz \
+	&& tar xzf protobuf-cpp-3.9.0.tar.gz && cd protobuf-3.9.0 \
 	&& ./autogen.sh \
 	&& ./configure --enable-shared=no --prefix=$HOME/depsBuild/protobuf --with-pic \
 	&& make \
 	&& make install \
 	&& ldconfig \
-	&& cd .. && rm -Rf protobuf-3.8.0 && rm $YADOMS_DEPS_PATH/protobuf-cpp-3.8.0.tar.gz
+	&& cd .. && rm -Rf protobuf-3.9.0 && rm $YADOMS_DEPS_PATH/protobuf-cpp-3.9.0.tar.gz
 
 # Swig
 RUN cd $YADOMS_DEPS_PATH \
