@@ -1,0 +1,269 @@
+total 983700
+drwxr-xr-x 2 root root    16384 Aug  9 10:33 .
+drwxr-xr-x 9 root root     4096 Aug  9 11:35 ..
+-rwxr-xr-x 1 root root 56938128 Aug  9 10:08 bugpoint
+-rwxr-xr-x 1 root root 21508264 Aug  9 10:11 c-index-test
+lrwxrwxrwx 1 root root        7 Aug  9 10:33 clang -> clang-8
+lrwxrwxrwx 1 root root        5 Aug  9 10:33 clang++ -> clang
+-rwxr-xr-x 1 root root 92460096 Aug  9 10:11 clang-8
+-rwxr-xr-x 1 root root 68839968 Aug  9 10:11 clang-check
+lrwxrwxrwx 1 root root        5 Aug  9 10:33 clang-cl -> clang
+lrwxrwxrwx 1 root root        5 Aug  9 10:33 clang-cpp -> clang
+-rwxr-xr-x 1 root root 20411048 Aug  9 10:07 clang-extdef-mapping
+-rwxr-xr-x 1 root root  2107864 Aug  9 10:07 clang-format
+-rwxr-xr-x 1 root root 25596000 Aug  9 10:07 clang-import-test
+-rwxr-xr-x 1 root root  3348912 Aug  9 10:06 clang-offload-bundler
+-rwxr-xr-x 1 root root 21713520 Aug  9 10:07 clang-refactor
+-rwxr-xr-x 1 root root 20832728 Aug  9 10:07 clang-rename
+-rwxr-xr-x 1 root root  4573416 Aug  9 10:06 diagtool
+-rwxr-xr-x 1 root root 42123256 Aug  9 10:08 dsymutil
+-rwxr-xr-x 1 root root    21838 Dec 18  2018 git-clang-format
+-rwxr-xr-x 1 root root     9974 Dec 18  2018 hmaptool
+lrwxrwxrwx 1 root root       34 Aug  5 14:24 i386-apple-darwin17-ObjectDump -> ./x86_64-apple-darwin17-ObjectDump
+lrwxrwxrwx 1 root root       26 Aug  5 14:24 i386-apple-darwin17-ar -> ./x86_64-apple-darwin17-ar
+lrwxrwxrwx 1 root root       26 Aug  5 14:24 i386-apple-darwin17-as -> ./x86_64-apple-darwin17-as
+lrwxrwxrwx 1 root root       30 Aug  6 05:37 i386-apple-darwin17-base-g++ -> x86_64-apple-darwin17-base-g++
+lrwxrwxrwx 1 root root       30 Aug  6 05:37 i386-apple-darwin17-base-gcc -> x86_64-apple-darwin17-base-gcc
+lrwxrwxrwx 1 root root       37 Aug  5 14:24 i386-apple-darwin17-bitcode_strip -> ./x86_64-apple-darwin17-bitcode_strip
+lrwxrwxrwx 1 root root       29 Aug  6 05:37 i386-apple-darwin17-c++ -> x86_64-apple-darwin17-wrapper
+lrwxrwxrwx 1 root root       29 Aug  6 05:37 i386-apple-darwin17-cc -> x86_64-apple-darwin17-wrapper
+lrwxrwxrwx 1 root root       35 Aug  5 14:24 i386-apple-darwin17-check_dylib -> ./x86_64-apple-darwin17-check_dylib
+lrwxrwxrwx 1 root root       33 Aug  5 14:24 i386-apple-darwin17-checksyms -> ./x86_64-apple-darwin17-checksyms
+lrwxrwxrwx 1 root root       29 Aug  5 14:24 i386-apple-darwin17-clang -> x86_64-apple-darwin17-wrapper
+lrwxrwxrwx 1 root root       29 Aug  5 14:24 i386-apple-darwin17-clang++ -> x86_64-apple-darwin17-wrapper
+lrwxrwxrwx 1 root root       29 Aug  5 14:24 i386-apple-darwin17-clang++-gstdc++ -> x86_64-apple-darwin17-wrapper
+lrwxrwxrwx 1 root root       29 Aug  5 14:24 i386-apple-darwin17-clang++-libc++ -> x86_64-apple-darwin17-wrapper
+lrwxrwxrwx 1 root root       29 Aug  5 14:24 i386-apple-darwin17-clang++-stdc++ -> x86_64-apple-darwin17-wrapper
+lrwxrwxrwx 1 root root       14 Aug  5 14:24 i386-apple-darwin17-cmake -> osxcross-cmake
+lrwxrwxrwx 1 root root       32 Aug  5 14:24 i386-apple-darwin17-cmpdylib -> ./x86_64-apple-darwin17-cmpdylib
+lrwxrwxrwx 1 root root       41 Aug  5 14:24 i386-apple-darwin17-codesign_allocate -> ./x86_64-apple-darwin17-codesign_allocate
+lrwxrwxrwx 1 root root       34 Aug  5 14:24 i386-apple-darwin17-ctf_insert -> ./x86_64-apple-darwin17-ctf_insert
+lrwxrwxrwx 1 root root       29 Aug  6 05:37 i386-apple-darwin17-dsymutil -> x86_64-apple-darwin17-wrapper
+lrwxrwxrwx 1 root root       32 Aug  5 14:24 i386-apple-darwin17-dyldinfo -> ./x86_64-apple-darwin17-dyldinfo
+lrwxrwxrwx 1 root root       29 Aug  6 05:37 i386-apple-darwin17-g++ -> x86_64-apple-darwin17-wrapper
+lrwxrwxrwx 1 root root       29 Aug  6 05:37 i386-apple-darwin17-g++-libc++ -> x86_64-apple-darwin17-wrapper
+lrwxrwxrwx 1 root root       29 Aug  6 05:37 i386-apple-darwin17-gcc -> x86_64-apple-darwin17-wrapper
+lrwxrwxrwx 1 root root       28 Aug  5 14:24 i386-apple-darwin17-indr -> ./x86_64-apple-darwin17-indr
+lrwxrwxrwx 1 root root       29 Aug  5 14:24 i386-apple-darwin17-inout -> ./x86_64-apple-darwin17-inout
+lrwxrwxrwx 1 root root       41 Aug  5 14:24 i386-apple-darwin17-install_name_tool -> ./x86_64-apple-darwin17-install_name_tool
+lrwxrwxrwx 1 root root       26 Aug  5 14:24 i386-apple-darwin17-ld -> ./x86_64-apple-darwin17-ld
+lrwxrwxrwx 1 root root       31 Aug  5 14:24 i386-apple-darwin17-libtool -> ./x86_64-apple-darwin17-libtool
+lrwxrwxrwx 1 root root       28 Aug  5 14:24 i386-apple-darwin17-lipo -> ./x86_64-apple-darwin17-lipo
+lrwxrwxrwx 1 root root       34 Aug  5 14:24 i386-apple-darwin17-machocheck -> ./x86_64-apple-darwin17-machocheck
+lrwxrwxrwx 1 root root       26 Aug  5 14:24 i386-apple-darwin17-nm -> ./x86_64-apple-darwin17-nm
+lrwxrwxrwx 1 root root       30 Aug  5 14:24 i386-apple-darwin17-nmedit -> ./x86_64-apple-darwin17-nmedit
+lrwxrwxrwx 1 root root       29 Aug  6 05:37 i386-apple-darwin17-osxcross -> x86_64-apple-darwin17-wrapper
+lrwxrwxrwx 1 root root       29 Aug  6 05:37 i386-apple-darwin17-osxcross-cmp -> x86_64-apple-darwin17-wrapper
+lrwxrwxrwx 1 root root       29 Aug  6 05:37 i386-apple-darwin17-osxcross-conf -> x86_64-apple-darwin17-wrapper
+lrwxrwxrwx 1 root root       29 Aug  6 05:37 i386-apple-darwin17-osxcross-env -> x86_64-apple-darwin17-wrapper
+lrwxrwxrwx 1 root root       29 Aug  6 05:37 i386-apple-darwin17-osxcross-man -> x86_64-apple-darwin17-wrapper
+lrwxrwxrwx 1 root root       29 Aug  5 14:24 i386-apple-darwin17-otool -> ./x86_64-apple-darwin17-otool
+lrwxrwxrwx 1 root root       33 Aug  5 14:24 i386-apple-darwin17-pagestuff -> ./x86_64-apple-darwin17-pagestuff
+lrwxrwxrwx 1 root root       29 Aug  6 05:37 i386-apple-darwin17-pkg-config -> x86_64-apple-darwin17-wrapper
+lrwxrwxrwx 1 root root       30 Aug  5 14:24 i386-apple-darwin17-ranlib -> ./x86_64-apple-darwin17-ranlib
+lrwxrwxrwx 1 root root       39 Aug  5 14:24 i386-apple-darwin17-redo_prebinding -> ./x86_64-apple-darwin17-redo_prebinding
+lrwxrwxrwx 1 root root       38 Aug  5 14:24 i386-apple-darwin17-seg_addr_table -> ./x86_64-apple-darwin17-seg_addr_table
+lrwxrwxrwx 1 root root       32 Aug  5 14:24 i386-apple-darwin17-seg_hack -> ./x86_64-apple-darwin17-seg_hack
+lrwxrwxrwx 1 root root       31 Aug  5 14:24 i386-apple-darwin17-segedit -> ./x86_64-apple-darwin17-segedit
+lrwxrwxrwx 1 root root       28 Aug  5 14:24 i386-apple-darwin17-size -> ./x86_64-apple-darwin17-size
+lrwxrwxrwx 1 root root       31 Aug  5 14:24 i386-apple-darwin17-strings -> ./x86_64-apple-darwin17-strings
+lrwxrwxrwx 1 root root       29 Aug  5 14:24 i386-apple-darwin17-strip -> ./x86_64-apple-darwin17-strip
+lrwxrwxrwx 1 root root       29 Aug  6 05:37 i386-apple-darwin17-sw_vers -> x86_64-apple-darwin17-wrapper
+lrwxrwxrwx 1 root root       34 Aug  5 14:24 i386-apple-darwin17-unwinddump -> ./x86_64-apple-darwin17-unwinddump
+lrwxrwxrwx 1 root root       29 Aug  6 05:37 i386-apple-darwin17-xcrun -> x86_64-apple-darwin17-wrapper
+-rwxr-xr-x 1 root root 55462120 Aug  9 10:08 llc
+-rwxr-xr-x 1 root root 26901680 Aug  9 09:39 lli
+-rwxr-xr-x 1 root root 16841512 Aug  9 10:10 llvm-ar
+-rwxr-xr-x 1 root root  3132712 Aug  9 09:39 llvm-as
+-rwxr-xr-x 1 root root   297184 Aug  9 09:39 llvm-bcanalyzer
+-rwxr-xr-x 1 root root 42577784 Aug  9 10:09 llvm-c-test
+-rwxr-xr-x 1 root root  2804576 Aug  9 09:39 llvm-cat
+-rwxr-xr-x 1 root root 20346240 Aug  9 10:09 llvm-cfi-verify
+-rwxr-xr-x 1 root root   218512 Aug  9 08:59 llvm-config
+-rwxr-xr-x 1 root root  3637328 Aug  9 09:40 llvm-cov
+-rwxr-xr-x 1 root root  2965536 Aug  9 09:39 llvm-cvtres
+-rwxr-xr-x 1 root root  2997432 Aug  9 10:09 llvm-cxxdump
+-rwxr-xr-x 1 root root   361624 Aug  9 08:59 llvm-cxxfilt
+-rwxr-xr-x 1 root root   442712 Aug  9 09:39 llvm-cxxmap
+-rwxr-xr-x 1 root root  2487792 Aug  9 09:40 llvm-diff
+-rwxr-xr-x 1 root root  2178320 Aug  9 09:40 llvm-dis
+lrwxrwxrwx 1 root root        7 Aug  9 10:33 llvm-dlltool -> llvm-ar
+-rwxr-xr-x 1 root root 13416128 Aug  9 10:09 llvm-dwarfdump
+-rwxr-xr-x 1 root root 41435680 Aug  9 10:09 llvm-dwp
+-rwxr-xr-x 1 root root  2985136 Aug  9 09:40 llvm-elfabi
+-rwxr-xr-x 1 root root 21874768 Aug  9 10:11 llvm-exegesis
+-rwxr-xr-x 1 root root  3899488 Aug  9 09:40 llvm-extract
+lrwxrwxrwx 1 root root        7 Aug  9 10:33 llvm-lib -> llvm-ar
+-rwxr-xr-x 1 root root  3582248 Aug  9 09:40 llvm-link
+-rwxr-xr-x 1 root root 50808816 Aug  9 10:10 llvm-lto
+-rwxr-xr-x 1 root root 52482776 Aug  9 10:09 llvm-lto2
+-rwxr-xr-x 1 root root 17873024 Aug  9 10:09 llvm-mc
+-rwxr-xr-x 1 root root 14773144 Aug  9 10:10 llvm-mca
+-rwxr-xr-x 1 root root  2844360 Aug  9 09:40 llvm-modextract
+-rwxr-xr-x 1 root root   247152 Aug  9 09:09 llvm-mt
+-rwxr-xr-x 1 root root 17001536 Aug  9 10:09 llvm-nm
+-rwxr-xr-x 1 root root  3306408 Aug  9 09:40 llvm-objcopy
+-rwxr-xr-x 1 root root 17120112 Aug  9 10:10 llvm-objdump
+-rwxr-xr-x 1 root root   478944 Aug  9 09:40 llvm-opt-report
+-rwxr-xr-x 1 root root  5315968 Aug  9 09:41 llvm-pdbutil
+-rwxr-xr-x 1 root root  1513384 Aug  9 09:39 llvm-profdata
+lrwxrwxrwx 1 root root        7 Aug  9 10:33 llvm-ranlib -> llvm-ar
+-rwxr-xr-x 1 root root   375712 Aug  9 09:09 llvm-rc
+lrwxrwxrwx 1 root root       12 Aug  9 10:33 llvm-readelf -> llvm-readobj
+-rwxr-xr-x 1 root root  4505976 Aug  9 09:41 llvm-readobj
+-rwxr-xr-x 1 root root 14551472 Aug  9 10:10 llvm-rtdyld
+-rwxr-xr-x 1 root root  2981848 Aug  9 09:41 llvm-size
+-rwxr-xr-x 1 root root  3362176 Aug  9 09:41 llvm-split
+-rwxr-xr-x 1 root root  3764200 Aug  9 09:41 llvm-stress
+-rwxr-xr-x 1 root root   239568 Aug  9 09:41 llvm-strings
+lrwxrwxrwx 1 root root       12 Aug  9 10:33 llvm-strip -> llvm-objcopy
+-rwxr-xr-x 1 root root  3613288 Aug  9 09:41 llvm-symbolizer
+-rwxr-xr-x 1 root root  3071792 Aug  9 08:59 llvm-tblgen
+-rwxr-xr-x 1 root root   307600 Aug  9 08:59 llvm-undname
+-rwxr-xr-x 1 root root  4130360 Aug  9 10:10 llvm-xray
+lrwxrwxrwx 1 root root       29 Aug  5 14:24 o32-clang -> x86_64-apple-darwin17-wrapper
+lrwxrwxrwx 1 root root       29 Aug  5 14:24 o32-clang++ -> x86_64-apple-darwin17-wrapper
+lrwxrwxrwx 1 root root       29 Aug  5 14:24 o32-clang++-gstdc++ -> x86_64-apple-darwin17-wrapper
+lrwxrwxrwx 1 root root       29 Aug  5 14:24 o32-clang++-libc++ -> x86_64-apple-darwin17-wrapper
+lrwxrwxrwx 1 root root       29 Aug  5 14:24 o32-clang++-stdc++ -> x86_64-apple-darwin17-wrapper
+lrwxrwxrwx 1 root root       29 Aug  6 05:37 o32-g++ -> x86_64-apple-darwin17-wrapper
+lrwxrwxrwx 1 root root       29 Aug  6 05:37 o32-g++-libc++ -> x86_64-apple-darwin17-wrapper
+lrwxrwxrwx 1 root root       29 Aug  6 05:37 o32-gcc -> x86_64-apple-darwin17-wrapper
+lrwxrwxrwx 1 root root       29 Aug  5 14:24 o64-clang -> x86_64-apple-darwin17-wrapper
+lrwxrwxrwx 1 root root       29 Aug  5 14:24 o64-clang++ -> x86_64-apple-darwin17-wrapper
+lrwxrwxrwx 1 root root       29 Aug  5 14:24 o64-clang++-gstdc++ -> x86_64-apple-darwin17-wrapper
+lrwxrwxrwx 1 root root       29 Aug  5 14:24 o64-clang++-libc++ -> x86_64-apple-darwin17-wrapper
+lrwxrwxrwx 1 root root       29 Aug  5 14:24 o64-clang++-stdc++ -> x86_64-apple-darwin17-wrapper
+lrwxrwxrwx 1 root root       29 Aug  6 05:37 o64-g++ -> x86_64-apple-darwin17-wrapper
+lrwxrwxrwx 1 root root       29 Aug  6 05:37 o64-g++-libc++ -> x86_64-apple-darwin17-wrapper
+lrwxrwxrwx 1 root root       29 Aug  6 05:37 o64-gcc -> x86_64-apple-darwin17-wrapper
+lrwxrwxrwx 1 root root       29 Aug  5 14:24 o64h-clang -> x86_64-apple-darwin17-wrapper
+lrwxrwxrwx 1 root root       29 Aug  5 14:24 o64h-clang++ -> x86_64-apple-darwin17-wrapper
+lrwxrwxrwx 1 root root       29 Aug  5 14:24 o64h-clang++-libc++ -> x86_64-apple-darwin17-wrapper
+lrwxrwxrwx 1 root root       29 Aug  5 14:24 o64h-clang++-stdc++ -> x86_64-apple-darwin17-wrapper
+-rwxr-xr-x 1 root root  4763640 Aug  9 09:41 obj2yaml
+lrwxrwxrwx 1 root root       17 Aug  5 14:24 omp -> osxcross-macports
+-rwxr-xr-x 1 root root 58162960 Aug  9 10:10 opt
+lrwxrwxrwx 1 root root       29 Aug  6 05:37 osxcross -> x86_64-apple-darwin17-wrapper
+-rwxr-xr-x 1 root root      335 Aug  5 14:24 osxcross-cmake
+lrwxrwxrwx 1 root root       29 Aug  6 05:37 osxcross-cmp -> x86_64-apple-darwin17-wrapper
+lrwxrwxrwx 1 root root       29 Aug  6 05:37 osxcross-conf -> x86_64-apple-darwin17-wrapper
+lrwxrwxrwx 1 root root       29 Aug  6 05:37 osxcross-env -> x86_64-apple-darwin17-wrapper
+-rwxr-xr-x 1 root root    12230 Aug  5 14:24 osxcross-macports
+lrwxrwxrwx 1 root root       29 Aug  6 05:37 osxcross-man -> x86_64-apple-darwin17-wrapper
+lrwxrwxrwx 1 root root       17 Aug  5 14:24 osxcross-mp -> osxcross-macports
+-rwxr-xr-x 1 root root 16560392 Aug  9 10:10 sancov
+-rwxr-xr-x 1 root root  3546608 Aug  9 09:41 sanstats
+-rwxr-xr-x 1 root root    55075 Dec 13  2018 scan-build
+-rwxr-xr-x 1 root root     4702 Dec 19  2018 scan-view
+lrwxrwxrwx 1 root root       29 Aug  6 05:37 sw_vers -> x86_64-apple-darwin17-wrapper
+-rwxr-xr-x 1 root root  3325328 Aug  9 09:41 verify-uselistorder
+-rwxr-xr-x 1 root root   680104 Aug  5 14:24 x86_64-apple-darwin17-ObjectDump
+-rwxr-xr-x 1 root root    34912 Aug  5 14:24 x86_64-apple-darwin17-ar
+-rwxr-xr-x 1 root root    28408 Aug  5 14:24 x86_64-apple-darwin17-as
+-rwxr-xr-x 1 root root  5300984 Aug  6 05:37 x86_64-apple-darwin17-base-g++
+-rwxr-xr-x 2 root root  5279696 Aug  6 05:37 x86_64-apple-darwin17-base-gcc
+-rwxr-xr-x 1 root root   184992 Aug  5 14:24 x86_64-apple-darwin17-bitcode_strip
+lrwxrwxrwx 1 root root       29 Aug  6 05:37 x86_64-apple-darwin17-c++ -> x86_64-apple-darwin17-wrapper
+lrwxrwxrwx 1 root root       29 Aug  6 05:37 x86_64-apple-darwin17-cc -> x86_64-apple-darwin17-wrapper
+-rwxr-xr-x 1 root root   145952 Aug  5 14:24 x86_64-apple-darwin17-check_dylib
+-rwxr-xr-x 1 root root   163448 Aug  5 14:24 x86_64-apple-darwin17-checksyms
+lrwxrwxrwx 1 root root       29 Aug  5 14:24 x86_64-apple-darwin17-clang -> x86_64-apple-darwin17-wrapper
+lrwxrwxrwx 1 root root       29 Aug  5 14:24 x86_64-apple-darwin17-clang++ -> x86_64-apple-darwin17-wrapper
+lrwxrwxrwx 1 root root       29 Aug  5 14:24 x86_64-apple-darwin17-clang++-gstdc++ -> x86_64-apple-darwin17-wrapper
+lrwxrwxrwx 1 root root       29 Aug  5 14:24 x86_64-apple-darwin17-clang++-libc++ -> x86_64-apple-darwin17-wrapper
+lrwxrwxrwx 1 root root       29 Aug  5 14:24 x86_64-apple-darwin17-clang++-stdc++ -> x86_64-apple-darwin17-wrapper
+lrwxrwxrwx 1 root root       14 Aug  5 14:24 x86_64-apple-darwin17-cmake -> osxcross-cmake
+-rwxr-xr-x 1 root root   146056 Aug  5 14:24 x86_64-apple-darwin17-cmpdylib
+-rwxr-xr-x 1 root root   176208 Aug  5 14:24 x86_64-apple-darwin17-codesign_allocate
+-rwxr-xr-x 1 root root  5298208 Aug  6 05:37 x86_64-apple-darwin17-cpp
+-rwxr-xr-x 1 root root   176136 Aug  5 14:24 x86_64-apple-darwin17-ctf_insert
+lrwxrwxrwx 1 root root       29 Aug  6 05:37 x86_64-apple-darwin17-dsymutil -> x86_64-apple-darwin17-wrapper
+-rwxr-xr-x 1 root root   248248 Aug  5 14:24 x86_64-apple-darwin17-dyldinfo
+lrwxrwxrwx 1 root root       29 Aug  6 05:37 x86_64-apple-darwin17-g++ -> x86_64-apple-darwin17-wrapper
+lrwxrwxrwx 1 root root       29 Aug  6 05:37 x86_64-apple-darwin17-g++-libc++ -> x86_64-apple-darwin17-wrapper
+lrwxrwxrwx 1 root root       29 Aug  6 05:37 x86_64-apple-darwin17-gcc -> x86_64-apple-darwin17-wrapper
+-rwxr-xr-x 2 root root  5279696 Aug  6 05:37 x86_64-apple-darwin17-gcc-9.1.0
+-rwxr-xr-x 1 root root   148152 Aug  6 05:37 x86_64-apple-darwin17-gcc-ar
+-rwxr-xr-x 1 root root   148112 Aug  6 05:37 x86_64-apple-darwin17-gcc-nm
+-rwxr-xr-x 1 root root   148128 Aug  6 05:37 x86_64-apple-darwin17-gcc-ranlib
+-rwxr-xr-x 1 root root  5010176 Aug  6 05:37 x86_64-apple-darwin17-gcov
+-rwxr-xr-x 1 root root  2934120 Aug  6 05:37 x86_64-apple-darwin17-gcov-dump
+-rwxr-xr-x 1 root root  3161104 Aug  6 05:37 x86_64-apple-darwin17-gcov-tool
+-rwxr-xr-x 1 root root   189304 Aug  5 14:24 x86_64-apple-darwin17-indr
+-rwxr-xr-x 1 root root   171784 Aug  5 14:24 x86_64-apple-darwin17-inout
+-rwxr-xr-x 1 root root   163200 Aug  5 14:24 x86_64-apple-darwin17-install_name_tool
+-rwxr-xr-x 1 root root  2715040 Aug  5 14:24 x86_64-apple-darwin17-ld
+-rwxr-xr-x 1 root root   181360 Aug  5 14:24 x86_64-apple-darwin17-libtool
+-rwxr-xr-x 1 root root    84424 Aug  5 14:24 x86_64-apple-darwin17-lipo
+-rwxr-xr-x 1 root root   114184 Aug  5 14:24 x86_64-apple-darwin17-machocheck
+-rwxr-xr-x 1 root root   164560 Aug  5 14:24 x86_64-apple-darwin17-nm
+-rwxr-xr-x 1 root root   198640 Aug  5 14:24 x86_64-apple-darwin17-nmedit
+lrwxrwxrwx 1 root root       29 Aug  6 05:37 x86_64-apple-darwin17-osxcross -> x86_64-apple-darwin17-wrapper
+lrwxrwxrwx 1 root root       29 Aug  6 05:37 x86_64-apple-darwin17-osxcross-cmp -> x86_64-apple-darwin17-wrapper
+lrwxrwxrwx 1 root root       29 Aug  6 05:37 x86_64-apple-darwin17-osxcross-conf -> x86_64-apple-darwin17-wrapper
+lrwxrwxrwx 1 root root       29 Aug  6 05:37 x86_64-apple-darwin17-osxcross-env -> x86_64-apple-darwin17-wrapper
+lrwxrwxrwx 1 root root       29 Aug  6 05:37 x86_64-apple-darwin17-osxcross-man -> x86_64-apple-darwin17-wrapper
+-rwxr-xr-x 1 root root   952240 Aug  5 14:24 x86_64-apple-darwin17-otool
+-rwxr-xr-x 1 root root   158880 Aug  5 14:24 x86_64-apple-darwin17-pagestuff
+lrwxrwxrwx 1 root root       29 Aug  6 05:37 x86_64-apple-darwin17-pkg-config -> x86_64-apple-darwin17-wrapper
+-rwxr-xr-x 1 root root   181360 Aug  5 14:24 x86_64-apple-darwin17-ranlib
+-rwxr-xr-x 1 root root   250776 Aug  5 14:24 x86_64-apple-darwin17-redo_prebinding
+-rwxr-xr-x 1 root root   180920 Aug  5 14:24 x86_64-apple-darwin17-seg_addr_table
+-rwxr-xr-x 1 root root   163648 Aug  5 14:24 x86_64-apple-darwin17-seg_hack
+-rwxr-xr-x 1 root root    60920 Aug  5 14:24 x86_64-apple-darwin17-segedit
+-rwxr-xr-x 1 root root   145848 Aug  5 14:24 x86_64-apple-darwin17-size
+-rwxr-xr-x 1 root root   146320 Aug  5 14:24 x86_64-apple-darwin17-strings
+-rwxr-xr-x 1 root root   212440 Aug  5 14:24 x86_64-apple-darwin17-strip
+lrwxrwxrwx 1 root root       29 Aug  6 05:37 x86_64-apple-darwin17-sw_vers -> x86_64-apple-darwin17-wrapper
+-rwxr-xr-x 1 root root    50832 Aug  5 14:24 x86_64-apple-darwin17-unwinddump
+-rwxr-xr-x 1 root root  1677160 Aug  6 05:37 x86_64-apple-darwin17-wrapper
+lrwxrwxrwx 1 root root       29 Aug  6 05:37 x86_64-apple-darwin17-xcrun -> x86_64-apple-darwin17-wrapper
+lrwxrwxrwx 1 root root       34 Aug  5 14:24 x86_64h-apple-darwin17-ObjectDump -> ./x86_64-apple-darwin17-ObjectDump
+lrwxrwxrwx 1 root root       26 Aug  5 14:24 x86_64h-apple-darwin17-ar -> ./x86_64-apple-darwin17-ar
+lrwxrwxrwx 1 root root       26 Aug  5 14:24 x86_64h-apple-darwin17-as -> ./x86_64-apple-darwin17-as
+lrwxrwxrwx 1 root root       37 Aug  5 14:24 x86_64h-apple-darwin17-bitcode_strip -> ./x86_64-apple-darwin17-bitcode_strip
+lrwxrwxrwx 1 root root       29 Aug  5 14:24 x86_64h-apple-darwin17-c++ -> x86_64-apple-darwin17-wrapper
+lrwxrwxrwx 1 root root       29 Aug  5 14:24 x86_64h-apple-darwin17-cc -> x86_64-apple-darwin17-wrapper
+lrwxrwxrwx 1 root root       35 Aug  5 14:24 x86_64h-apple-darwin17-check_dylib -> ./x86_64-apple-darwin17-check_dylib
+lrwxrwxrwx 1 root root       33 Aug  5 14:24 x86_64h-apple-darwin17-checksyms -> ./x86_64-apple-darwin17-checksyms
+lrwxrwxrwx 1 root root       29 Aug  5 14:24 x86_64h-apple-darwin17-clang -> x86_64-apple-darwin17-wrapper
+lrwxrwxrwx 1 root root       29 Aug  5 14:24 x86_64h-apple-darwin17-clang++ -> x86_64-apple-darwin17-wrapper
+lrwxrwxrwx 1 root root       29 Aug  5 14:24 x86_64h-apple-darwin17-clang++-libc++ -> x86_64-apple-darwin17-wrapper
+lrwxrwxrwx 1 root root       29 Aug  5 14:24 x86_64h-apple-darwin17-clang++-stdc++ -> x86_64-apple-darwin17-wrapper
+lrwxrwxrwx 1 root root       32 Aug  5 14:24 x86_64h-apple-darwin17-cmpdylib -> ./x86_64-apple-darwin17-cmpdylib
+lrwxrwxrwx 1 root root       41 Aug  5 14:24 x86_64h-apple-darwin17-codesign_allocate -> ./x86_64-apple-darwin17-codesign_allocate
+lrwxrwxrwx 1 root root       34 Aug  5 14:24 x86_64h-apple-darwin17-ctf_insert -> ./x86_64-apple-darwin17-ctf_insert
+lrwxrwxrwx 1 root root       29 Aug  5 14:24 x86_64h-apple-darwin17-dsymutil -> x86_64-apple-darwin17-wrapper
+lrwxrwxrwx 1 root root       32 Aug  5 14:24 x86_64h-apple-darwin17-dyldinfo -> ./x86_64-apple-darwin17-dyldinfo
+lrwxrwxrwx 1 root root       28 Aug  5 14:24 x86_64h-apple-darwin17-indr -> ./x86_64-apple-darwin17-indr
+lrwxrwxrwx 1 root root       29 Aug  5 14:24 x86_64h-apple-darwin17-inout -> ./x86_64-apple-darwin17-inout
+lrwxrwxrwx 1 root root       41 Aug  5 14:24 x86_64h-apple-darwin17-install_name_tool -> ./x86_64-apple-darwin17-install_name_tool
+lrwxrwxrwx 1 root root       26 Aug  5 14:24 x86_64h-apple-darwin17-ld -> ./x86_64-apple-darwin17-ld
+lrwxrwxrwx 1 root root       31 Aug  5 14:24 x86_64h-apple-darwin17-libtool -> ./x86_64-apple-darwin17-libtool
+lrwxrwxrwx 1 root root       28 Aug  5 14:24 x86_64h-apple-darwin17-lipo -> ./x86_64-apple-darwin17-lipo
+lrwxrwxrwx 1 root root       34 Aug  5 14:24 x86_64h-apple-darwin17-machocheck -> ./x86_64-apple-darwin17-machocheck
+lrwxrwxrwx 1 root root       26 Aug  5 14:24 x86_64h-apple-darwin17-nm -> ./x86_64-apple-darwin17-nm
+lrwxrwxrwx 1 root root       30 Aug  5 14:24 x86_64h-apple-darwin17-nmedit -> ./x86_64-apple-darwin17-nmedit
+lrwxrwxrwx 1 root root       29 Aug  5 14:24 x86_64h-apple-darwin17-osxcross -> x86_64-apple-darwin17-wrapper
+lrwxrwxrwx 1 root root       29 Aug  5 14:24 x86_64h-apple-darwin17-osxcross-cmp -> x86_64-apple-darwin17-wrapper
+lrwxrwxrwx 1 root root       29 Aug  5 14:24 x86_64h-apple-darwin17-osxcross-conf -> x86_64-apple-darwin17-wrapper
+lrwxrwxrwx 1 root root       29 Aug  5 14:24 x86_64h-apple-darwin17-osxcross-env -> x86_64-apple-darwin17-wrapper
+lrwxrwxrwx 1 root root       29 Aug  5 14:24 x86_64h-apple-darwin17-osxcross-man -> x86_64-apple-darwin17-wrapper
+lrwxrwxrwx 1 root root       29 Aug  5 14:24 x86_64h-apple-darwin17-otool -> ./x86_64-apple-darwin17-otool
+lrwxrwxrwx 1 root root       33 Aug  5 14:24 x86_64h-apple-darwin17-pagestuff -> ./x86_64-apple-darwin17-pagestuff
+lrwxrwxrwx 1 root root       29 Aug  5 14:24 x86_64h-apple-darwin17-pkg-config -> x86_64-apple-darwin17-wrapper
+lrwxrwxrwx 1 root root       30 Aug  5 14:24 x86_64h-apple-darwin17-ranlib -> ./x86_64-apple-darwin17-ranlib
+lrwxrwxrwx 1 root root       39 Aug  5 14:24 x86_64h-apple-darwin17-redo_prebinding -> ./x86_64-apple-darwin17-redo_prebinding
+lrwxrwxrwx 1 root root       38 Aug  5 14:24 x86_64h-apple-darwin17-seg_addr_table -> ./x86_64-apple-darwin17-seg_addr_table
+lrwxrwxrwx 1 root root       32 Aug  5 14:24 x86_64h-apple-darwin17-seg_hack -> ./x86_64-apple-darwin17-seg_hack
+lrwxrwxrwx 1 root root       31 Aug  5 14:24 x86_64h-apple-darwin17-segedit -> ./x86_64-apple-darwin17-segedit
+lrwxrwxrwx 1 root root       28 Aug  5 14:24 x86_64h-apple-darwin17-size -> ./x86_64-apple-darwin17-size
+lrwxrwxrwx 1 root root       31 Aug  5 14:24 x86_64h-apple-darwin17-strings -> ./x86_64-apple-darwin17-strings
+lrwxrwxrwx 1 root root       29 Aug  5 14:24 x86_64h-apple-darwin17-strip -> ./x86_64-apple-darwin17-strip
+lrwxrwxrwx 1 root root       29 Aug  5 14:24 x86_64h-apple-darwin17-sw_vers -> x86_64-apple-darwin17-wrapper
+lrwxrwxrwx 1 root root       34 Aug  5 14:24 x86_64h-apple-darwin17-unwinddump -> ./x86_64-apple-darwin17-unwinddump
+lrwxrwxrwx 1 root root       29 Aug  5 14:24 x86_64h-apple-darwin17-xcrun -> x86_64-apple-darwin17-wrapper
+-rwxr-xr-x 1 root root    78144 Aug  5 14:17 xar
+lrwxrwxrwx 1 root root       29 Aug  6 05:37 xcrun -> x86_64-apple-darwin17-wrapper
+-rwxr-xr-x 1 root root  1688416 Aug  9 09:41 yaml2obj

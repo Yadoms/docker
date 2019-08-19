@@ -1,4 +1,4 @@
-FROM yadoms/raspberrypi_cross_toolchain
+FROM yadoms/toolchain_for_macos
 MAINTAINER jano42 "https://github.com/jano42"
 LABEL authors=jano42
 ENV DEBIAN_FRONTEND noninteractive
@@ -6,7 +6,7 @@ ENV DEBIAN_FRONTEND noninteractive
 ENV YADOMS_BUILD_BRANCH develop
 ENV MAKE_PACKAGE false
 ENV YADOMS_BUILD_TOOLS_PATH /yadoms-build-tools
-ENV YADOMS_DEPS_PATH /yadoms-deps/raspberry
+ENV YADOMS_DEPS_PATH /yadoms-deps/macos
 
 USER root
 
@@ -27,48 +27,36 @@ RUN mkdir -p $YADOMS_DEPS_PATH
 
 # CMake
 RUN cd $YADOMS_DEPS_PATH \
-	&& wget --no-check-certificate -d --no-verbose https://github.com/Kitware/CMake/releases/download/v3.15.1/cmake-3.15.1.tar.gz \
-	&& tar xzf cmake-3.15.1.tar.gz && cd cmake-3.15.1\
+	&& wget --no-check-certificate -d --no-verbose https://github.com/Kitware/CMake/releases/download/v3.15.2/cmake-3.15.2.tar.gz \
+	&& tar xzf cmake-3.15.2.tar.gz && cd cmake-3.15.2\
 	&& ./bootstrap && make > /dev/null && make install\
-	&& cd .. && rm -Rf cmake-3.15.1 && rm $YADOMS_DEPS_PATH/cmake-3.15.1.tar.gz
+	&& cd .. && rm -Rf cmake-3.15.2 && rm $YADOMS_DEPS_PATH/cmake-3.15.2.tar.gz
 
 # Boost
 RUN cd $YADOMS_DEPS_PATH \
 	&& wget --no-check-certificate --no-verbose https://dl.bintray.com/boostorg/release/1.70.0/source/boost_1_70_0.tar.bz2\
 	&& tar xjf boost_1_70_0.tar.bz2 && cd boost_1_70_0  > /dev/null\
-	&& echo "using gcc : arm : armv6-rpi-linux-gnueabihf-g++ ;" > ~/user-config.jam \
+	&& echo "using gcc : o64 : o64-g++ : <archiver>x86_64-apple-darwin16-ar <ranlib>x86_64-apple-darwin16-ranlib ;" > ~/user-config.jam \
 	&& ./bootstrap.sh\
-	&& ./b2 --with-atomic --with-chrono --with-date_time --with-filesystem --with-locale --with-regex --with-thread --with-system link=static runtime-link=static --no-samples --no-tests toolset=gcc-arm cxxflags=-fPIC\
+	&& ./b2 --with-atomic --with-chrono --with-date_time --with-filesystem --with-locale --with-regex --with-thread --with-system link=static runtime-link=static --no-samples --no-tests toolset=gcc-o64 target-os=darwin cxxflags="-fPIC -fvisibility=hidden"\
 	&& rm -Rf bin.v2 \
 	&& rm -Rf doc \
 	&& rm -Rf libs \
 	&& rm -Rf tools \
 	&& cd .. && rm $YADOMS_DEPS_PATH/boost_1_70_0.tar.bz2
 	
-
-# OpenSSL
-RUN cd $YADOMS_DEPS_PATH \
-	&& wget --no-check-certificate --no-verbose https://www.openssl.org/source/openssl-1.1.0g.tar.gz  > /dev/null\
-	&& tar xzf openssl-1.1.0g.tar.gz && cd openssl-1.1.0g  > /dev/null\
-	&& ./Configure -fPIC linux-generic32 --prefix=$YADOMS_DEPS_PATH/openssl --cross-compile-prefix=/x-tools/armv6-rpi-linux-gnueabihf/bin/armv6-rpi-linux-gnueabihf-  > /dev/null\
-	&& make CC="armv6-rpi-linux-gnueabihf-gcc" AR="armv6-rpi-linux-gnueabihf-ar r" RANLIB="armv6-rpi-linux-gnueabihf-ranlib"  > /dev/null\
-	&& make install  > /dev/null\
-	&& cd .. && rm -Rf openssl-1.1.0g && rm $YADOMS_DEPS_PATH/openssl-1.1.0g.tar.gz
-	
-
 # Poco
+COPY ./Darwin64-osxcross $YADOMS_DEPS_PATH/Darwin64-osxcross
 RUN cd $YADOMS_DEPS_PATH \
-	&& wget --no-check-certificate --no-verbose http://pocoproject.org/releases/poco-1.9.2/poco-1.9.2-all.tar.gz  > /dev/null\
-	&& tar xzf poco-1.9.2-all.tar.gz && cd poco-1.9.2-all  > /dev/null\
-	&& echo 'TOOL = armv6-rpi-linux-gnueabihf' > build/config/RaspberryPI \
-	&& cat build/config/ARM-Linux >> build/config/RaspberryPI \
-	&& echo 'STATICOPT_CC = -fPIC' >> build/config/RaspberryPI \
-	&& echo 'STATICOPT_CXX = -fPIC' >> build/config/RaspberryPI \
-	&& ./configure --static --config=RaspberryPI --no-samples --no-tests --omit=CppUnit,CppUnit/WinTestRunner,Data,Data/SQLite,Data/ODBCData/MySQL,MongoDB,PageCompiler,PageCompiler/File2Page --include-path=$YADOMS_DEPS_PATH/openssl/include --library-path=$YADOMS_DEPS_PATH/openssl/lib  > /dev/null\
-	&& make  > /dev/null\
+	&& wget --no-check-certificate --no-verbose http://pocoproject.org/releases/poco-1.9.2/poco-1.9.2-all.tar.gz\
+	&& tar xzf poco-1.9.2-all.tar.gz && cd poco-1.9.2-all\
+        && cp $YADOMS_DEPS_PATH/Darwin64-osxcross build/config/Darwin64-osxcross \
+	&& OSXCROSS_MP_INC=1 ./configure --static --config=Darwin64-osxcross --no-samples --no-tests --omit=CppUnit,CppUnit/WinTestRunner,Data,Data/SQLite,Data/ODBCData/MySQL,MongoDB,PageCompiler,PageCompiler/File2Page\
+	&& OSXCROSS_MP_INC=1 make\
 	&& cd .. \
 	&& find . -name obj -type d -print0 | xargs -0 rm -rf  > /dev/null\
-	&& rm $YADOMS_DEPS_PATH/poco-1.9.2-all.tar.gz
+	&& rm $YADOMS_DEPS_PATH/poco-1.9.2-all.tar.gz && rm -f $YADOMS_DEPS_PATH/Darwin64-osxcross
+
 
 
 # Protobuf (Host)
@@ -82,11 +70,11 @@ RUN wget --no-check-certificate --no-verbose https://github.com/google/protobuf/
 	&& cmake -Dprotobuf_BUILD_TESTS=OFF --build .  > /dev/null\
 	&& make install  > /dev/null\
 	&& ldconfig  > /dev/null
-# Protobuf (Pi)
+# Protobuf (Darwin)
 RUN mv protobuf-3.9.0 $YADOMS_DEPS_PATH/protobuf-3.9.0 \
 	&& cd $YADOMS_DEPS_PATH/protobuf-3.9.0 \
 	&& ./autogen.sh  > /dev/null\
-	&& ./configure --enable-shared=no --host=arm-linux CC=armv6-rpi-linux-gnueabihf-gcc CXX=armv6-rpi-linux-gnueabihf-g++ AR=armv6-rpi-linux-gnueabihf-ar STRIP=armv6-rpi-linux-gnueabihf-strip RANLIB=armv6-rpi-linux-gnueabihf-ranlib --prefix=$YADOMS_DEPS_PATH/protobuf --with-protoc=protoc --with-pic  > /dev/null\
+	&& ./configure --enable-shared=no --host=x86_64-apple-darwin16 CC=x86_64-apple-darwin16-gcc CXX=x86_64-apple-darwin16-g++ AR=x86_64-apple-darwin16-ar STRIP=x86_64-apple-darwin16-strip RANLIB=x86_64-apple-darwin16-ranlib --prefix=$YADOMS_DEPS_PATH/protobuf --with-protoc=protoc --with-pic  > /dev/null\
 	&& make  > /dev/null\
 	&& make install  > /dev/null\
     && cd .. && rm -Rf $YADOMS_DEPS_PATH/protobuf-3.9.0
@@ -126,10 +114,11 @@ RUN wget --no-check-certificate --no-verbose https://www.python.org/ftp/python/2
 	&& cp Parser/pgen $YADOMS_BUILD_TOOLS_PATH/pythonhost27/ \
 	&& cd .. && rm -Rf Python-2.7.16-host
 # Python 2.7 (Pi)
-RUN mv Python-2.7.16 $YADOMS_DEPS_PATH/Python-2.7.16  > /dev/null\
-	&& cd $YADOMS_DEPS_PATH/Python-2.7.16  > /dev/null\
-	&& CC=armv6-rpi-linux-gnueabihf-gcc CXX=armv6-rpi-linux-gnueabihf-g++ AR=armv6-rpi-linux-gnueabihf-ar RANLIB=armv6-rpi-linux-gnueabihf-ranlib ./configure --host=armv6-rpi-linux-gnueabihf --target=armv6-rpi-linux-gnueabihf --build=x86_64-linux-gnu --prefix=$YADOMS_DEPS_PATH/python --disable-ipv6 ac_cv_file__dev_ptmx=no ac_cv_file__dev_ptc=no ac_cv_have_long_long_format=yes --enable-shared  > /dev/null\
-	&& make HOSTPYTHON=$YADOMS_BUILD_TOOLS_PATH/pythonhost27/python HOSTPGEN=$YADOMS_BUILD_TOOLS_PATH/pythonhost27/Parser/pgen BLDSHARED="armv6-rpi-linux-gnueabihf-cc -shared" CROSS-COMPILE=armv6-rpi-linux-gnueabihf- CROSS_COMPILE_TARGET=yes HOSTARCH=arm-linux BUILDARCH=armv6-rpi-linux-gnueabihf  > /dev/null
+RUN UNATTENDED=1 MACOSX_DEPLOYMENT_TARGET=${DARWIN_OSX_VERSION_MIN} WGETOPTS=--no-check-certificate osxcross-macports install -s -v python27
+#RUN mv Python-2.7.16 $YADOMS_DEPS_PATH/Python-2.7.16  > /dev/null\
+#	&& cd $YADOMS_DEPS_PATH/Python-2.7.16  > /dev/null\
+#	&& OSXCROSS_MP_INC=1 CC=x86_64-apple-darwin16-gcc CXX=x86_64-apple-darwin16-g++ AR=x86_64-apple-darwin16-ar RANLIB=x86_64-apple-darwin16-ranlib ./configure --host=x86_64-#apple-darwin17 --target=x86_64-apple-darwin16 --build=x86_64-linux-gnu --prefix=$YADOMS_DEPS_PATH/python --enable-shared || true\
+#	&& OSXCROSS_MP_INC=1 make HOSTPYTHON=$YADOMS_BUILD_TOOLS_PATH/pythonhost27/python HOSTPGEN=$YADOMS_BUILD_TOOLS_PATH/pythonhost27/Parser/pgen BLDSHARED="x86_64-apple-darwin16-#cc -shared" CROSS-COMPILE=x86_64-apple-darwin16- CROSS_COMPILE_TARGET=yes HOSTARCH=x86_64-apple-darwin16 BUILDARCH=x86_64-apple-darwin16  > /dev/null
 
 RUN apt-get install -y libffi-dev
 
@@ -146,27 +135,29 @@ RUN wget --no-check-certificate --no-verbose https://www.python.org/ftp/python/3
 	&& cp Parser/pgen $YADOMS_BUILD_TOOLS_PATH/pythonhost37/ \
 	&& cd .. && rm -Rf Python-3.7.3-host
 # Python 3.7 (Pi)
-RUN mv Python-3.7.3 $YADOMS_DEPS_PATH/Python-3.7.3  > /dev/null\
-	&& cd $YADOMS_DEPS_PATH/Python-3.7.3  > /dev/null\
-	&& CC=armv6-rpi-linux-gnueabihf-gcc CXX=armv6-rpi-linux-gnueabihf-g++ AR=armv6-rpi-linux-gnueabihf-ar RANLIB=armv6-rpi-linux-gnueabihf-ranlib ./configure --host=armv6-rpi-linux-gnueabihf --target=armv6-rpi-linux-gnueabihf --build=x86_64-linux-gnu --prefix=$YADOMS_DEPS_PATH/python --disable-ipv6 ac_cv_file__dev_ptmx=no ac_cv_file__dev_ptc=no ac_cv_have_long_long_format=yes --enable-shared  --without-pymalloc  > /dev/null\
-	&& make HOSTPYTHON=$YADOMS_BUILD_TOOLS_PATH/pythonhost37/python HOSTPGEN=$YADOMS_BUILD_TOOLS_PATH/pythonhost37/Parser/pgen BLDSHARED="armv6-rpi-linux-gnueabihf-cc -shared" CROSS-COMPILE=armv6-rpi-linux-gnueabihf- CROSS_COMPILE_TARGET=yes HOSTARCH=arm-linux BUILDARCH=armv6-rpi-linux-gnueabihf  > /dev/null
+#RUN mv Python-3.7.3 $YADOMS_DEPS_PATH/Python-3.7.3  > /dev/null\
+#	&& cd $YADOMS_DEPS_PATH/Python-3.7.3  > /dev/null\
+#	&& CC=o64-gcc CXX=o64-g++ AR=o64-ar RANLIB=o64-ranlib ./configure --host=o64 --target=o64 --build=x86_64-linux-gnu --prefix=$YADOMS_DEPS_PATH/python --disable-ipv6 #ac_cv_file__dev_ptmx=no ac_cv_file__dev_ptc=no ac_cv_have_long_long_format=yes --enable-shared  --without-pymalloc  > /dev/null\
+#	&& make HOSTPYTHON=$YADOMS_BUILD_TOOLS_PATH/pythonhost37/python HOSTPGEN=$YADOMS_BUILD_TOOLS_PATH/pythonhost37/Parser/pgen BLDSHARED="o64-cc -shared" CROSS-COMPILE=o64- #CROSS_COMPILE_TARGET=yes HOSTARCH=arm-linux BUILDARCH=o64  > /dev/null
+RUN UNATTENDED=1 MACOSX_DEPLOYMENT_TARGET=${DARWIN_OSX_VERSION_MIN} WGETOPTS=--no-check-certificate osxcross-macports install -s -v python37
 
 # PostgreSQL
 # TODO ne fonctionne pas, à voir...
-RUN cd $YADOMS_DEPS_PATH \
-	&& wget --no-check-certificate --no-verbose https://ftp.postgresql.org/pub/source/v9.6.2/postgresql-9.6.2.tar.bz2  > /dev/null\
-	&& tar xjf postgresql-9.6.2.tar.bz2 && rm postgresql-9.6.2.tar.bz2  > /dev/null\
-	&& cd postgresql-9.6.2  > /dev/null\
-	&& CC=armv6-rpi-linux-gnueabihf-gcc CXX=armv6-rpi-linux-gnueabihf-g++ AR=armv6-rpi-linux-gnueabihf-ar RANLIB=armv6-rpi-linux-gnueabihf-ranlib ./configure --host=arm-linux --build=armv6-rpi-linux-gnueabihf --without-readline --without-zlib --disable-spinlocks  > /dev/null\
-	&& cd src/interfaces/libpq \
-	&& make  > /dev/null\
-	&& cd ../../../.. && rm -Rf postgresql-9.6.2/doc
+RUN UNATTENDED=1 MACOSX_DEPLOYMENT_TARGET=${DARWIN_OSX_VERSION_MIN} WGETOPTS=--no-check-certificate osxcross-macports install -s -v postgresql96
+#RUN cd $YADOMS_DEPS_PATH \
+#	&& wget --no-check-certificate --no-verbose https://ftp.postgresql.org/pub/source/v9.6.2/postgresql-9.6.2.tar.bz2  > /dev/null\
+#	&& tar xjf postgresql-9.6.2.tar.bz2 && rm postgresql-9.6.2.tar.bz2  > /dev/null\
+#	&& cd postgresql-9.6.2  > /dev/null\
+#	&& CC=x86_64-apple-darwin16-gcc CXX=x86_64-apple-darwin16-g++ AR=x86_64-apple-darwin16-ar RANLIB=x86_64-apple-darwin16-ranlib ./configure --host=x86_64-apple-darwin16 --#build=x86_64-apple-darwin16 --without-readline --without-zlib --disable-spinlocks  > /dev/null\
+#	&& cd src/interfaces/libpq \
+#	&& make  > /dev/null\
+#	&& cd ../../../.. && rm -Rf postgresql-9.6.2/doc
 
 # Gammu
 #copy cross compile toolchain
 COPY raspberrypi.cmake /
 
-RUN which armv6-rpi-linux-gnueabihf-gcc
+RUN which o64-gcc
 
 RUN cd $YADOMS_DEPS_PATH \
 	&& wget --no-check-certificate --no-verbose https://dl.cihar.com/gammu/releases/gammu-1.40.0.tar.bz2  > /dev/null\
@@ -174,10 +165,11 @@ RUN cd $YADOMS_DEPS_PATH \
 	&& cd gammu-1.40.0 \
 	&& mkdir rpicc \
 	&& cd rpicc \
-	&& cmake -DCC_RPI_GCC=armv6-rpi-linux-gnueabihf-gcc -DCC_RPI_GXX=armv6-rpi-linux-gnueabihf-g++ -DBUILD_SHARED_LIBS=OFF -DCMAKE_TOOLCHAIN_FILE=/raspberrypi.cmake -DCMAKE_STAGING_PREFIX=$YADOMS_DEPS_PATH/gammu ..  > /dev/null\
+	&& cmake -DCC_RPI_GCC=x86_64-apple-darwin16-gcc -DCC_RPI_GXX=x86_64-apple-darwin16-g++ -DBUILD_SHARED_LIBS=OFF -DCMAKE_TOOLCHAIN_FILE=/raspberrypi.cmake -DCMAKE_STAGING_PREFIX=$YADOMS_DEPS_PATH/gammu ..  > /dev/null\
 	&& make  > /dev/null\
 	&& make install  > /dev/null\
 	&& cd ../.. && rm -Rf gammu-1.40.*
+
 
 # Yadoms configuration file
 RUN echo 'Configuring Yadoms CMakeListsUserConfig.txt' \
@@ -186,20 +178,22 @@ RUN echo 'Configuring Yadoms CMakeListsUserConfig.txt' \
 	&& echo 'set(PROTOBUF_ROOT "'$YADOMS_DEPS_PATH'/protobuf")' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
 	&& echo 'set(PROTOBUF_PROTOC_EXECUTABLE "'`which protoc`'")' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
 	&& echo 'set(PROTOBUF_INSTALLED_TO_CUSTOM_DIRECTORY ON)' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
-	&& echo 'set(OPENSSL_ROOT "'$YADOMS_DEPS_PATH'/openssl")' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
+#	&& echo 'set(OPENSSL_ROOT "'$YADOMS_DEPS_PATH'/openssl")' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
 	&& echo 'set(DEBUG_WITH_GCC OFF)' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
-	&& echo 'set(PYTHON_USE_PKGCONFIG OFF)' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
-	&& echo 'set(PYTHON_USE_SOURCES ON)' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
-	&& echo 'set(PYTHON_ROOT "'$YADOMS_DEPS_PATH'/Python-2.7.16")' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
-	&& echo 'set(PYTHON_LIBRARIES "'$YADOMS_DEPS_PATH'/Python-2.7.16/libpython2.7.so")' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
-	&& echo 'set(Python2_ROOT "'$YADOMS_DEPS_PATH'/Python-2.7.16")' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
-	&& echo 'set(PYTHON27_LIBRARIES "'$YADOMS_DEPS_PATH'/Python-2.7.16/libpython2.7.so")' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
-	&& echo 'set(Python3_ROOT "'$YADOMS_DEPS_PATH'/Python-3.7.3")' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
-	&& echo 'set(Python3_ROOT_DIR "'$YADOMS_DEPS_PATH'/Python-3.7.3")' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
-	&& echo 'set(PYTHON3_LIBRARIES "'$YADOMS_DEPS_PATH'/Python-3.7.3/libpython3.7.so")' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
-	&& echo 'set(PostgreSQL_ROOT ' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
-	&& echo '       "'$YADOMS_DEPS_PATH'/postgresql-9.6.2/src/interfaces/libpq"' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
-	&& echo '       "'$YADOMS_DEPS_PATH'/postgresql-9.6.2/src/include")' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
+	&& echo 'set(PYTHON_USE_PKGCONFIG ON)' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
+#	&& echo 'set(PYTHON_USE_SOURCES ON)' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
+#	&& echo 'set(PYTHON_ROOT "'$YADOMS_DEPS_PATH'/Python-2.7.16")' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
+#	&& echo 'set(PYTHON_LIBRARIES "'$YADOMS_DEPS_PATH'/Python-2.7.16/libpython2.7.so")' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
+#	&& echo 'set(Python2_ROOT "'$YADOMS_DEPS_PATH'/Python-2.7.16")' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
+#	&& echo 'set(PYTHON27_LIBRARIES "'$YADOMS_DEPS_PATH'/Python-2.7.16/libpython2.7.so")' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
+#	&& echo 'set(Python3_ROOT "'$YADOMS_DEPS_PATH'/Python-3.7.3")' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
+#	&& echo 'set(Python3_ROOT_DIR "'$YADOMS_DEPS_PATH'/Python-3.7.3")' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
+#	&& echo 'set(PYTHON3_LIBRARIES "'$YADOMS_DEPS_PATH'/Python-3.7.3/libpython3.7.so")' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
+#	&& echo 'set(PostgreSQL_ROOT ' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
+#	&& echo '       "'$YADOMS_DEPS_PATH'/postgresql-9.6.2/src/interfaces/libpq"' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
+#	&& echo '       "'$YADOMS_DEPS_PATH'/postgresql-9.6.2/src/include")' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
+	&& echo 'set(PostgreSQL_INCLUDE_DIR "/opt/osxcross/target/macports/pkgs/opt/local/include/postgresql96")' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
+	&& echo 'set(PostgreSQL_LIBRARY_DIR "/opt/osxcross/target/macports/pkgs/opt/local/lib/postgresql96")' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
 	&& echo 'set(GAMMU_ROOT "'$YADOMS_DEPS_PATH'/gammu")' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
 	&& echo 'set(SWIG_ROOT "'$YADOMS_DEPS_PATH'/swig-4.0.0")' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
 	&& echo 'SET(COTIRE_USE ON)' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
@@ -207,11 +201,12 @@ RUN echo 'Configuring Yadoms CMakeListsUserConfig.txt' \
 	&& echo 'set(LIBUDEV_ROOT "'$YADOMS_DEPS_PATH'/libudev")' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
 	&& echo 'set(UDEV_PATH_LIB "'$YADOMS_DEPS_PATH'/libudev")' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
 	&& echo 'set(UDEV_PATH_INCLUDES "'$YADOMS_DEPS_PATH'/libudev")' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
-	&& echo 'set(CC_RPI_ROOT "/x-tools/armv6-rpi-linux-gnueabihf")' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt
+	&& echo 'set(CC_RPI_ROOT "/opt/osxcross/target/SDK")' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt
 
 COPY entrypoint.sh /
 
 #ensure entrypoint is executable (force flags update, because file flags may change if a commit is made under Windows)
 RUN chmod +x /entrypoint.sh
 
-CMD /entrypoint.sh
+#CMD /entrypoint.sh
+CMD /bin/bash
