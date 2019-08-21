@@ -38,7 +38,7 @@ RUN cd $YADOMS_DEPS_PATH \
 	&& tar xjf boost_1_70_0.tar.bz2 && cd boost_1_70_0  > /dev/null\
 	&& echo "using gcc : o64 : o64-g++ : <archiver>x86_64-apple-darwin16-ar <ranlib>x86_64-apple-darwin16-ranlib ;" > ~/user-config.jam \
 	&& ./bootstrap.sh\
-	&& ./b2 --with-atomic --with-chrono --with-date_time --with-filesystem --with-locale --with-regex --with-thread --with-system link=static runtime-link=static --no-samples --no-tests toolset=gcc-o64 target-os=darwin cxxflags="-fPIC -fvisibility=hidden"\
+	&& ./b2 --with-atomic --with-chrono --with-date_time --with-filesystem --with-locale --with-regex --with-thread --with-system link=static runtime-link=static --no-samples --no-tests toolset=gcc-o64 target-os=darwin cxxflags="-fPIC" visibility=global \
 	&& rm -Rf bin.v2 \
 	&& rm -Rf doc \
 	&& rm -Rf libs \
@@ -104,60 +104,36 @@ RUN cd $YADOMS_DEPS_PATH \
 # Python 2.7 (Host)
 RUN wget --no-check-certificate --no-verbose https://www.python.org/ftp/python/2.7.16/Python-2.7.16.tgz  > /dev/null\
 	&& tar xzf Python-2.7.16.tgz && rm Python-2.7.16.tgz  > /dev/null\
-    && cp -R Python-2.7.16 Python-2.7.16-host  > /dev/null\
-	&& cd Python-2.7.16-host  > /dev/null\
+        && cd Python-2.7.16  > /dev/null\
 	&& ./configure  > /dev/null\
-	&& make python Parser/pgen  > /dev/null\
+	&& make  > /dev/null\
 	&& make install  > /dev/null\
-	&& mkdir -p $YADOMS_BUILD_TOOLS_PATH/pythonhost27 \
-	&& cp python $YADOMS_BUILD_TOOLS_PATH/pythonhost27/ \
-	&& cp Parser/pgen $YADOMS_BUILD_TOOLS_PATH/pythonhost27/ \
-	&& cd .. && rm -Rf Python-2.7.16-host
-# Python 2.7 (Pi)
+	&& cd .. && rm -Rf Python-2.7.16
+
+# Python 2.7 (macports)
 RUN UNATTENDED=1 MACOSX_DEPLOYMENT_TARGET=${DARWIN_OSX_VERSION_MIN} WGETOPTS=--no-check-certificate osxcross-macports install -s -v python27
-#RUN mv Python-2.7.16 $YADOMS_DEPS_PATH/Python-2.7.16  > /dev/null\
-#	&& cd $YADOMS_DEPS_PATH/Python-2.7.16  > /dev/null\
-#	&& OSXCROSS_MP_INC=1 CC=x86_64-apple-darwin16-gcc CXX=x86_64-apple-darwin16-g++ AR=x86_64-apple-darwin16-ar RANLIB=x86_64-apple-darwin16-ranlib ./configure --host=x86_64-#apple-darwin17 --target=x86_64-apple-darwin16 --build=x86_64-linux-gnu --prefix=$YADOMS_DEPS_PATH/python --enable-shared || true\
-#	&& OSXCROSS_MP_INC=1 make HOSTPYTHON=$YADOMS_BUILD_TOOLS_PATH/pythonhost27/python HOSTPGEN=$YADOMS_BUILD_TOOLS_PATH/pythonhost27/Parser/pgen BLDSHARED="x86_64-apple-darwin16-#cc -shared" CROSS-COMPILE=x86_64-apple-darwin16- CROSS_COMPILE_TARGET=yes HOSTARCH=x86_64-apple-darwin16 BUILDARCH=x86_64-apple-darwin16  > /dev/null
 
 RUN apt-get install -y libffi-dev
 
 # Python 3.7 (Host)
 RUN wget --no-check-certificate --no-verbose https://www.python.org/ftp/python/3.7.3/Python-3.7.3.tgz  > /dev/null\
 	&& tar xzf Python-3.7.3.tgz && rm Python-3.7.3.tgz  > /dev/null\
-    && cp -R Python-3.7.3 Python-3.7.3-host  > /dev/null\
-	&& cd Python-3.7.3-host  > /dev/null\
+        && cd Python-3.7.3  > /dev/null\
 	&& ./configure  > /dev/null\
-	&& make python Parser/pgen  > /dev/null\
+	&& make  > /dev/null\
 	&& make install  > /dev/null\
-	&& mkdir -p $YADOMS_BUILD_TOOLS_PATH/pythonhost37 \
-	&& cp python $YADOMS_BUILD_TOOLS_PATH/pythonhost37/ \
-	&& cp Parser/pgen $YADOMS_BUILD_TOOLS_PATH/pythonhost37/ \
-	&& cd .. && rm -Rf Python-3.7.3-host
-# Python 3.7 (Pi)
-#RUN mv Python-3.7.3 $YADOMS_DEPS_PATH/Python-3.7.3  > /dev/null\
-#	&& cd $YADOMS_DEPS_PATH/Python-3.7.3  > /dev/null\
-#	&& CC=o64-gcc CXX=o64-g++ AR=o64-ar RANLIB=o64-ranlib ./configure --host=o64 --target=o64 --build=x86_64-linux-gnu --prefix=$YADOMS_DEPS_PATH/python --disable-ipv6 #ac_cv_file__dev_ptmx=no ac_cv_file__dev_ptc=no ac_cv_have_long_long_format=yes --enable-shared  --without-pymalloc  > /dev/null\
-#	&& make HOSTPYTHON=$YADOMS_BUILD_TOOLS_PATH/pythonhost37/python HOSTPGEN=$YADOMS_BUILD_TOOLS_PATH/pythonhost37/Parser/pgen BLDSHARED="o64-cc -shared" CROSS-COMPILE=o64- #CROSS_COMPILE_TARGET=yes HOSTARCH=arm-linux BUILDARCH=o64  > /dev/null
+	&& cd .. && rm -Rf Python-3.7.3
+# Python 3.7 (macports)
 RUN UNATTENDED=1 MACOSX_DEPLOYMENT_TARGET=${DARWIN_OSX_VERSION_MIN} WGETOPTS=--no-check-certificate osxcross-macports install -s -v python37
 
 # PostgreSQL
-# TODO ne fonctionne pas, à voir...
-RUN UNATTENDED=1 MACOSX_DEPLOYMENT_TARGET=${DARWIN_OSX_VERSION_MIN} WGETOPTS=--no-check-certificate osxcross-macports install -s -v postgresql96
-#RUN cd $YADOMS_DEPS_PATH \
-#	&& wget --no-check-certificate --no-verbose https://ftp.postgresql.org/pub/source/v9.6.2/postgresql-9.6.2.tar.bz2  > /dev/null\
-#	&& tar xjf postgresql-9.6.2.tar.bz2 && rm postgresql-9.6.2.tar.bz2  > /dev/null\
-#	&& cd postgresql-9.6.2  > /dev/null\
-#	&& CC=x86_64-apple-darwin16-gcc CXX=x86_64-apple-darwin16-g++ AR=x86_64-apple-darwin16-ar RANLIB=x86_64-apple-darwin16-ranlib ./configure --host=x86_64-apple-darwin16 --#build=x86_64-apple-darwin16 --without-readline --without-zlib --disable-spinlocks  > /dev/null\
-#	&& cd src/interfaces/libpq \
-#	&& make  > /dev/null\
-#	&& cd ../../../.. && rm -Rf postgresql-9.6.2/doc
+#remove already installed package on host
+RUN apt-get purge -y postgresql* && apt autoremove -y
+RUN UNATTENDED=1 MACOSX_DEPLOYMENT_TARGET=${DARWIN_OSX_VERSION_MIN} WGETOPTS=--no-check-certificate osxcross-macports install -s -v postgresql96 postgresql96-server
 
 # Gammu
 #copy cross compile toolchain
-COPY raspberrypi.cmake /
-
-RUN which o64-gcc
+COPY gammu.cmake /
 
 RUN cd $YADOMS_DEPS_PATH \
 	&& wget --no-check-certificate --no-verbose https://dl.cihar.com/gammu/releases/gammu-1.40.0.tar.bz2  > /dev/null\
@@ -165,10 +141,15 @@ RUN cd $YADOMS_DEPS_PATH \
 	&& cd gammu-1.40.0 \
 	&& mkdir rpicc \
 	&& cd rpicc \
-	&& cmake -DCC_RPI_GCC=x86_64-apple-darwin16-gcc -DCC_RPI_GXX=x86_64-apple-darwin16-g++ -DBUILD_SHARED_LIBS=OFF -DCMAKE_TOOLCHAIN_FILE=/raspberrypi.cmake -DCMAKE_STAGING_PREFIX=$YADOMS_DEPS_PATH/gammu ..  > /dev/null\
+	&& eval `x86_64-apple-darwin16-osxcross-conf` \
+	&& export OSXCROSS_HOST="x86_64-apple-darwin16" \
+	&& cmake -DCMAKE_C_COMPILER=x86_64-apple-darwin16-gcc -DCMAKE_CXX_COMPILER=x86_64-apple-darwin16-g++ -DICONV_LIBRARIES="/opt/osxcross/target/macports/pkgs/opt/local/lib/libiconv.a" -DBUILD_SHARED_LIBS=OFF -DCMAKE_TOOLCHAIN_FILE=/gammu.cmake -DCMAKE_STAGING_PREFIX=$YADOMS_DEPS_PATH/gammu ..  > /dev/null\
 	&& make  > /dev/null\
 	&& make install  > /dev/null\
 	&& cd ../.. && rm -Rf gammu-1.40.*
+
+
+
 
 
 # Yadoms configuration file
@@ -178,23 +159,24 @@ RUN echo 'Configuring Yadoms CMakeListsUserConfig.txt' \
 	&& echo 'set(PROTOBUF_ROOT "'$YADOMS_DEPS_PATH'/protobuf")' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
 	&& echo 'set(PROTOBUF_PROTOC_EXECUTABLE "'`which protoc`'")' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
 	&& echo 'set(PROTOBUF_INSTALLED_TO_CUSTOM_DIRECTORY ON)' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
-#	&& echo 'set(OPENSSL_ROOT "'$YADOMS_DEPS_PATH'/openssl")' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
 	&& echo 'set(DEBUG_WITH_GCC OFF)' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
-	&& echo 'set(PYTHON_USE_PKGCONFIG ON)' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
-#	&& echo 'set(PYTHON_USE_SOURCES ON)' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
-#	&& echo 'set(PYTHON_ROOT "'$YADOMS_DEPS_PATH'/Python-2.7.16")' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
-#	&& echo 'set(PYTHON_LIBRARIES "'$YADOMS_DEPS_PATH'/Python-2.7.16/libpython2.7.so")' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
-#	&& echo 'set(Python2_ROOT "'$YADOMS_DEPS_PATH'/Python-2.7.16")' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
-#	&& echo 'set(PYTHON27_LIBRARIES "'$YADOMS_DEPS_PATH'/Python-2.7.16/libpython2.7.so")' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
-#	&& echo 'set(Python3_ROOT "'$YADOMS_DEPS_PATH'/Python-3.7.3")' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
-#	&& echo 'set(Python3_ROOT_DIR "'$YADOMS_DEPS_PATH'/Python-3.7.3")' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
-#	&& echo 'set(PYTHON3_LIBRARIES "'$YADOMS_DEPS_PATH'/Python-3.7.3/libpython3.7.so")' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
-#	&& echo 'set(PostgreSQL_ROOT ' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
-#	&& echo '       "'$YADOMS_DEPS_PATH'/postgresql-9.6.2/src/interfaces/libpq"' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
-#	&& echo '       "'$YADOMS_DEPS_PATH'/postgresql-9.6.2/src/include")' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
+	&& echo 'set(PYTHON_USE_PKGCONFIG OFF)' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
+	&& echo 'set(Python3_ManualSetup ON)' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
+	&& echo 'set(Python3_EXECUTABLE "/usr/local/bin/python3.7")' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
+	&& echo 'set(Python3_LIBRARIES "/opt/osxcross/target/macports/pkgs/opt/local/Library/Frameworks/Python.framework/Versions/3.7/lib/python3.7/config-3.7m-darwin/libpython3.7.a")' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
+	&& echo 'set(Python3_INCLUDE_DIRS "/opt/osxcross/target/macports/pkgs/opt/local/Library/Frameworks/Python.framework/Versions/3.7/include/python3.7m")' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
+	&& echo 'set(Python2_ManualSetup ON)' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
+	&& echo 'set(Python2_EXECUTABLE "/usr/local/bin/python2.7")' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
+	&& echo 'set(Python2_LIBRARIES "/opt/osxcross/target/macports/pkgs/opt/local/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/config/libpython2.7.a")' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
+	&& echo 'set(Python2_INCLUDE_DIRS "/opt/osxcross/target/macports/pkgs/opt/local/Library/Frameworks/Python.framework/Versions/2.7/include/python2.7")' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
+	&& echo 'set(PostgreSQL_ROOT ' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
+	&& echo '       "/opt/osxcross/target/macports/pkgs/opt/local/include/postgresql96"' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
+	&& echo '       "/opt/osxcross/target/macports/pkgs/opt/local/include/postgresql96/server"' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
+	&& echo '       "/opt/osxcross/target/macports/pkgs/opt/local/lib/postgresql96")' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
 	&& echo 'set(PostgreSQL_INCLUDE_DIR "/opt/osxcross/target/macports/pkgs/opt/local/include/postgresql96")' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
 	&& echo 'set(PostgreSQL_LIBRARY_DIR "/opt/osxcross/target/macports/pkgs/opt/local/lib/postgresql96")' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
 	&& echo 'set(GAMMU_ROOT "'$YADOMS_DEPS_PATH'/gammu")' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
+	&& echo 'set(GAMMU_LINK_DEPS "/opt/osxcross/target/macports/pkgs/opt/local/lib/libiconv.a" "/opt/osxcross/target/macports/pkgs/opt/local/lib/libintl.a")' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
 	&& echo 'set(SWIG_ROOT "'$YADOMS_DEPS_PATH'/swig-4.0.0")' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
 	&& echo 'SET(COTIRE_USE ON)' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
 	&& echo 'SET(COTIRE_USE_UNITY ON)' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
