@@ -11,7 +11,7 @@ echo "Copy build config file"
 cp $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt sources/
 
 echo "Create makefile"
-sh cmake_macosx.sh c
+sh cmake_macosx.sh d
 
 echo "Build Yadoms"
 cd projects
