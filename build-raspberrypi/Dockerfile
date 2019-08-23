@@ -23,14 +23,14 @@ RUN mkdir -p $YADOMS_DEPS_PATH
 
 # CMake
 RUN cd $YADOMS_DEPS_PATH \
-	&& wget --no-verbose https://github.com/Kitware/CMake/releases/download/v3.15.2/cmake-3.15.2.tar.gz  > /dev/null\
+	&& wget --no-check-certificate -d --no-verbose https://github.com/Kitware/CMake/releases/download/v3.15.2/cmake-3.15.2.tar.gz  > /dev/null\
 	&& tar xzf cmake-3.15.2.tar.gz && cd cmake-3.15.2  > /dev/null\
 	&& ./bootstrap > /dev/null && make > /dev/null && make install > /dev/null\
 	&& cd .. && rm -Rf cmake-3.15.2 && rm $YADOMS_DEPS_PATH/cmake-3.15.2.tar.gz
 
 # Installing arm-linux-gnueabihf cross toolchain
 RUN cd $YADOMS_BUILD_TOOLS_PATH \
-	&& git clone --depth=1 git://github.com/raspberrypi/tools.git  > /dev/null
+	&& git clone --depth=1 https://github.com/raspberrypi/tools.git  > /dev/null
 ENV PATH $PATH:$YADOMS_BUILD_TOOLS_PATH/tools/arm-bcm2708/arm-rpi-4.9.3-linux-gnueabihf/bin
 
 # Check GCC version
@@ -39,7 +39,7 @@ RUN arm-linux-gnueabihf-gcc --version
 
 # Boost
 RUN cd $YADOMS_DEPS_PATH \
-	&& wget --no-verbose https://dl.bintray.com/boostorg/release/1.71.0/source/boost_1_71_0.tar.bz2  > /dev/null\
+	&& wget --no-check-certificate --no-verbose https://dl.bintray.com/boostorg/release/1.71.0/source/boost_1_71_0.tar.bz2  > /dev/null\
 	&& tar xjf boost_1_71_0.tar.bz2 && cd boost_1_71_0  > /dev/null\
 	&& echo "using gcc : arm : arm-linux-gnueabihf-g++ ;" > /root/user-config.jam \
 	&& ./bootstrap.sh > /dev/null\
@@ -53,7 +53,7 @@ RUN cd $YADOMS_DEPS_PATH \
 
 # OpenSSL
 RUN cd $YADOMS_DEPS_PATH \
-	&& wget --no-verbose https://www.openssl.org/source/openssl-1.1.0g.tar.gz  > /dev/null\
+	&& wget --no-check-certificate --no-verbose https://www.openssl.org/source/openssl-1.1.0g.tar.gz  > /dev/null\
 	&& tar xzf openssl-1.1.0g.tar.gz && cd openssl-1.1.0g  > /dev/null\
 	&& ./Configure linux-generic32 --prefix=$YADOMS_DEPS_PATH/openssl --cross-compile-prefix=$YADOMS_BUILD_TOOLS_PATH/tools/arm-bcm2708/arm-rpi-4.9.3-linux-gnueabihf/bin/arm-linux-gnueabihf-  > /dev/null\
 	&& make CC="arm-linux-gnueabihf-gcc" AR="arm-linux-gnueabihf-ar r" RANLIB="arm-linux-gnueabihf-ranlib"  > /dev/null\
@@ -63,7 +63,7 @@ RUN cd $YADOMS_DEPS_PATH \
 
 # Poco
 RUN cd $YADOMS_DEPS_PATH \
-	&& wget --no-verbose http://pocoproject.org/releases/poco-1.9.3/poco-1.9.3-all.tar.gz  > /dev/null\
+	&& wget --no-check-certificate --no-verbose http://pocoproject.org/releases/poco-1.9.3/poco-1.9.3-all.tar.gz  > /dev/null\
 	&& tar xzf poco-1.9.3-all.tar.gz && cd poco-1.9.3-all  > /dev/null\
 	&& echo 'TOOL = arm-linux-gnueabihf' > build/config/RaspberryPI \
 	&& cat build/config/ARM-Linux >> build/config/RaspberryPI \
@@ -77,7 +77,7 @@ RUN cd $YADOMS_DEPS_PATH \
 
 
 # Protobuf (Host)
-RUN wget --no-verbose https://github.com/google/protobuf/releases/download/v3.9.1/protobuf-cpp-3.9.1.tar.gz  > /dev/null\
+RUN wget --no-check-certificate --no-verbose https://github.com/google/protobuf/releases/download/v3.9.1/protobuf-cpp-3.9.1.tar.gz  > /dev/null\
 	&& tar xzf protobuf-cpp-3.9.1.tar.gz && rm protobuf-cpp-3.9.1.tar.gz > /dev/null\
     && cp -R protobuf-3.9.1 $YADOMS_BUILD_TOOLS_PATH/protobuf-3.9.1-host > /dev/null \
 	&& cd $YADOMS_BUILD_TOOLS_PATH/protobuf-3.9.1-host \
@@ -106,7 +106,7 @@ RUN cd $YADOMS_DEPS_PATH \
 
 # Swig
 RUN cd $YADOMS_DEPS_PATH \
-	&& wget --no-verbose http://prdownloads.sourceforge.net/swig/swig-4.0.1.tar.gz  > /dev/null\
+	&& wget --no-check-certificate --no-verbose http://prdownloads.sourceforge.net/swig/swig-4.0.1.tar.gz  > /dev/null\
 	&& tar xzf swig-4.0.1.tar.gz  > /dev/null\
 	&& cd $YADOMS_DEPS_PATH/swig-4.0.1  > /dev/null\
 	&& ./configure  > /dev/null\
@@ -119,7 +119,7 @@ RUN cd $YADOMS_DEPS_PATH \
 	&& rm $YADOMS_DEPS_PATH/swig-4.0.1.tar.gz
 
 # Python (Host)
-RUN wget --no-verbose https://www.python.org/ftp/python/2.7.16/Python-2.7.16.tgz  > /dev/null\
+RUN wget --no-check-certificate --no-verbose https://www.python.org/ftp/python/2.7.16/Python-2.7.16.tgz  > /dev/null\
 	&& tar xzf Python-2.7.16.tgz && rm Python-2.7.16.tgz  > /dev/null\
     && cp -R Python-2.7.16 Python-2.7.16-host  > /dev/null\
 	&& cd Python-2.7.16-host  > /dev/null\
@@ -138,7 +138,7 @@ RUN mv Python-2.7.16 $YADOMS_DEPS_PATH/Python-2.7.16  > /dev/null\
 
 
 # Python 2.7 (Host)
-RUN wget --no-check-certificate --no-verbose https://www.python.org/ftp/python/2.7.16/Python-2.7.16.tgz  > /dev/null\
+RUN wget --no-check-certificate --no-check-certificate --no-verbose https://www.python.org/ftp/python/2.7.16/Python-2.7.16.tgz  > /dev/null\
 	&& tar xzf Python-2.7.16.tgz && rm Python-2.7.16.tgz  > /dev/null\
     && cp -R Python-2.7.16 Python-2.7.16-host  > /dev/null\
 	&& cd Python-2.7.16-host  > /dev/null\
@@ -158,7 +158,7 @@ RUN mv Python-2.7.16 $YADOMS_DEPS_PATH/Python-2.7.16  > /dev/null\
 RUN apt-get install -y libffi-dev
 
 # Python 3.7 (Host)
-RUN wget --no-check-certificate --no-verbose https://www.python.org/ftp/python/3.7.3/Python-3.7.3.tgz  > /dev/null\
+RUN wget --no-check-certificate --no-check-certificate --no-verbose https://www.python.org/ftp/python/3.7.3/Python-3.7.3.tgz  > /dev/null\
 	&& tar xzf Python-3.7.3.tgz && rm Python-3.7.3.tgz  > /dev/null\
     && cp -R Python-3.7.3 Python-3.7.3-host  > /dev/null\
 	&& cd Python-3.7.3-host  > /dev/null\
@@ -178,9 +178,8 @@ RUN mv Python-3.7.3 $YADOMS_DEPS_PATH/Python-3.7.3  > /dev/null\
 
 
 # PostgreSQL
-# TODO ne fonctionne pas, à voir...
 RUN cd $YADOMS_DEPS_PATH \
-	&& wget --no-verbose https://ftp.postgresql.org/pub/source/v9.6.2/postgresql-9.6.2.tar.bz2  > /dev/null\
+	&& wget --no-check-certificate --no-verbose https://ftp.postgresql.org/pub/source/v9.6.2/postgresql-9.6.2.tar.bz2  > /dev/null\
 	&& tar xjf postgresql-9.6.2.tar.bz2 && rm postgresql-9.6.2.tar.bz2  > /dev/null\
 	&& cd postgresql-9.6.2  > /dev/null\
 	&& CC=arm-linux-gnueabihf-gcc CXX=arm-linux-gnueabihf-g++ AR=arm-linux-gnueabihf-ar RANLIB=arm-linux-gnueabihf-ranlib ./configure --host=arm-linux --build=arm-linux-gnueabihf --without-readline --without-zlib --disable-spinlocks  > /dev/null\
