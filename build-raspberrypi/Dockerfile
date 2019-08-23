@@ -27,15 +27,15 @@ RUN mkdir -p $YADOMS_DEPS_PATH
 
 # CMake
 RUN cd $YADOMS_DEPS_PATH \
-	&& wget --no-check-certificate -d --no-verbose https://github.com/Kitware/CMake/releases/download/v3.15.1/cmake-3.15.1.tar.gz \
-	&& tar xzf cmake-3.15.1.tar.gz && cd cmake-3.15.1\
+	&& wget --no-check-certificate -d --no-verbose https://github.com/Kitware/CMake/releases/download/v3.15.2/cmake-3.15.2.tar.gz \
+	&& tar xzf cmake-3.15.2.tar.gz && cd cmake-3.15.2\
 	&& ./bootstrap && make > /dev/null && make install\
-	&& cd .. && rm -Rf cmake-3.15.1 && rm $YADOMS_DEPS_PATH/cmake-3.15.1.tar.gz
+	&& cd .. && rm -Rf cmake-3.15.2 && rm $YADOMS_DEPS_PATH/cmake-3.15.2.tar.gz
 
 # Boost
 RUN cd $YADOMS_DEPS_PATH \
-	&& wget --no-check-certificate --no-verbose https://dl.bintray.com/boostorg/release/1.70.0/source/boost_1_70_0.tar.bz2\
-	&& tar xjf boost_1_70_0.tar.bz2 && cd boost_1_70_0  > /dev/null\
+	&& wget --no-check-certificate --no-verbose https://dl.bintray.com/boostorg/release/1.71.0/source/boost_1_71_0.tar.bz2\
+	&& tar xjf boost_1_71_0.tar.bz2 && cd boost_1_71_0  > /dev/null\
 	&& echo "using gcc : arm : armv6-rpi-linux-gnueabihf-g++ ;" > ~/user-config.jam \
 	&& ./bootstrap.sh\
 	&& ./b2 --with-atomic --with-chrono --with-date_time --with-filesystem --with-locale --with-regex --with-thread --with-system link=static runtime-link=static --no-samples --no-tests toolset=gcc-arm cxxflags=-fPIC\
@@ -43,7 +43,7 @@ RUN cd $YADOMS_DEPS_PATH \
 	&& rm -Rf doc \
 	&& rm -Rf libs \
 	&& rm -Rf tools \
-	&& cd .. && rm $YADOMS_DEPS_PATH/boost_1_70_0.tar.bz2
+	&& cd .. && rm $YADOMS_DEPS_PATH/boost_1_71_0.tar.bz2
 	
 
 # OpenSSL
@@ -58,8 +58,8 @@ RUN cd $YADOMS_DEPS_PATH \
 
 # Poco
 RUN cd $YADOMS_DEPS_PATH \
-	&& wget --no-check-certificate --no-verbose http://pocoproject.org/releases/poco-1.9.2/poco-1.9.2-all.tar.gz  > /dev/null\
-	&& tar xzf poco-1.9.2-all.tar.gz && cd poco-1.9.2-all  > /dev/null\
+	&& wget --no-check-certificate --no-verbose http://pocoproject.org/releases/poco-1.9.3/poco-1.9.3-all.tar.gz  > /dev/null\
+	&& tar xzf poco-1.9.3-all.tar.gz && cd poco-1.9.3-all  > /dev/null\
 	&& echo 'TOOL = armv6-rpi-linux-gnueabihf' > build/config/RaspberryPI \
 	&& cat build/config/ARM-Linux >> build/config/RaspberryPI \
 	&& echo 'STATICOPT_CC = -fPIC' >> build/config/RaspberryPI \
@@ -68,14 +68,14 @@ RUN cd $YADOMS_DEPS_PATH \
 	&& make  > /dev/null\
 	&& cd .. \
 	&& find . -name obj -type d -print0 | xargs -0 rm -rf  > /dev/null\
-	&& rm $YADOMS_DEPS_PATH/poco-1.9.2-all.tar.gz
+	&& rm $YADOMS_DEPS_PATH/poco-1.9.3-all.tar.gz
 
 
 # Protobuf (Host)
-RUN wget --no-check-certificate --no-verbose https://github.com/google/protobuf/releases/download/v3.9.0/protobuf-cpp-3.9.0.tar.gz  > /dev/null\
-	&& tar xzf protobuf-cpp-3.9.0.tar.gz && rm protobuf-cpp-3.9.0.tar.gz > /dev/null\
-    && cp -R protobuf-3.9.0 $YADOMS_BUILD_TOOLS_PATH/protobuf-3.9.0-host > /dev/null \
-	&& cd $YADOMS_BUILD_TOOLS_PATH/protobuf-3.9.0-host \
+RUN wget --no-check-certificate --no-verbose https://github.com/google/protobuf/releases/download/v3.9.1/protobuf-cpp-3.9.1.tar.gz  > /dev/null\
+	&& tar xzf protobuf-cpp-3.9.1.tar.gz && rm protobuf-cpp-3.9.1.tar.gz > /dev/null\
+    && cp -R protobuf-3.9.1 $YADOMS_BUILD_TOOLS_PATH/protobuf-3.9.1-host > /dev/null \
+	&& cd $YADOMS_BUILD_TOOLS_PATH/protobuf-3.9.1-host \
 	&& mkdir build \
 	&& cd build \
 	&& cmake -Dprotobuf_BUILD_TESTS=OFF ../cmake  > /dev/null\
@@ -83,13 +83,13 @@ RUN wget --no-check-certificate --no-verbose https://github.com/google/protobuf/
 	&& make install  > /dev/null\
 	&& ldconfig  > /dev/null
 # Protobuf (Pi)
-RUN mv protobuf-3.9.0 $YADOMS_DEPS_PATH/protobuf-3.9.0 \
-	&& cd $YADOMS_DEPS_PATH/protobuf-3.9.0 \
+RUN mv protobuf-3.9.1 $YADOMS_DEPS_PATH/protobuf-3.9.1 \
+	&& cd $YADOMS_DEPS_PATH/protobuf-3.9.1 \
 	&& ./autogen.sh  > /dev/null\
 	&& ./configure --enable-shared=no --host=arm-linux CC=armv6-rpi-linux-gnueabihf-gcc CXX=armv6-rpi-linux-gnueabihf-g++ AR=armv6-rpi-linux-gnueabihf-ar STRIP=armv6-rpi-linux-gnueabihf-strip RANLIB=armv6-rpi-linux-gnueabihf-ranlib --prefix=$YADOMS_DEPS_PATH/protobuf --with-protoc=protoc --with-pic  > /dev/null\
 	&& make  > /dev/null\
 	&& make install  > /dev/null\
-    && cd .. && rm -Rf $YADOMS_DEPS_PATH/protobuf-3.9.0
+    && cd .. && rm -Rf $YADOMS_DEPS_PATH/protobuf-3.9.1
 
 
 # Libudev TODO : must be cross-compiled
@@ -101,17 +101,17 @@ RUN cd $YADOMS_DEPS_PATH \
 
 # Swig
 RUN cd $YADOMS_DEPS_PATH \
-	&& wget --no-check-certificate --no-verbose http://prdownloads.sourceforge.net/swig/swig-4.0.0.tar.gz  > /dev/null\
-	&& tar xzf swig-4.0.0.tar.gz  > /dev/null\
-	&& cd $YADOMS_DEPS_PATH/swig-4.0.0  > /dev/null\
+	&& wget --no-check-certificate --no-verbose http://prdownloads.sourceforge.net/swig/swig-4.0.1.tar.gz  > /dev/null\
+	&& tar xzf swig-4.0.1.tar.gz  > /dev/null\
+	&& cd $YADOMS_DEPS_PATH/swig-4.0.1  > /dev/null\
 	&& ./configure  > /dev/null\
 	&& make  > /dev/null\
 	&& make install  > /dev/null\
 	&& cd .. \
-	&& rm -f swig-4.0.0\Source\Modules\*.o \
-	&& rm -Rf swig-4.0.0\Examples \
-	&& rm -Rf swig-4.0.0\Docs \
-	&& rm $YADOMS_DEPS_PATH/swig-4.0.0.tar.gz
+	&& rm -f swig-4.0.1\Source\Modules\*.o \
+	&& rm -Rf swig-4.0.1\Examples \
+	&& rm -Rf swig-4.0.1\Docs \
+	&& rm $YADOMS_DEPS_PATH/swig-4.0.1.tar.gz
 
 # Python 2.7 (Host)
 RUN wget --no-check-certificate --no-verbose https://www.python.org/ftp/python/2.7.16/Python-2.7.16.tgz  > /dev/null\
@@ -181,8 +181,8 @@ RUN cd $YADOMS_DEPS_PATH \
 
 # Yadoms configuration file
 RUN echo 'Configuring Yadoms CMakeListsUserConfig.txt' \
-	&& echo 'set(BOOST_ROOT "'$YADOMS_DEPS_PATH'/boost_1_70_0")' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
-	&& echo 'set(POCO_ROOT "'$YADOMS_DEPS_PATH'/poco-1.9.2-all")' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
+	&& echo 'set(BOOST_ROOT "'$YADOMS_DEPS_PATH'/boost_1_71_0")' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
+	&& echo 'set(POCO_ROOT "'$YADOMS_DEPS_PATH'/poco-1.9.3-all")' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
 	&& echo 'set(PROTOBUF_ROOT "'$YADOMS_DEPS_PATH'/protobuf")' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
 	&& echo 'set(PROTOBUF_PROTOC_EXECUTABLE "'`which protoc`'")' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
 	&& echo 'set(PROTOBUF_INSTALLED_TO_CUSTOM_DIRECTORY ON)' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
@@ -201,7 +201,7 @@ RUN echo 'Configuring Yadoms CMakeListsUserConfig.txt' \
 	&& echo '       "'$YADOMS_DEPS_PATH'/postgresql-9.6.2/src/interfaces/libpq"' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
 	&& echo '       "'$YADOMS_DEPS_PATH'/postgresql-9.6.2/src/include")' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
 	&& echo 'set(GAMMU_ROOT "'$YADOMS_DEPS_PATH'/gammu")' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
-	&& echo 'set(SWIG_ROOT "'$YADOMS_DEPS_PATH'/swig-4.0.0")' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
+	&& echo 'set(SWIG_ROOT "'$YADOMS_DEPS_PATH'/swig-4.0.1")' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
 	&& echo 'SET(COTIRE_USE ON)' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
 	&& echo 'SET(COTIRE_USE_UNITY ON)' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
 	&& echo 'set(LIBUDEV_ROOT "'$YADOMS_DEPS_PATH'/libudev")' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
@@ -214,4 +214,5 @@ COPY entrypoint.sh /
 #ensure entrypoint is executable (force flags update, because file flags may change if a commit is made under Windows)
 RUN chmod +x /entrypoint.sh
 
-CMD /entrypoint.sh
+CMD /bin/bash
+#CMD /entrypoint.sh

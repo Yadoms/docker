@@ -18,22 +18,22 @@ RUN echo "check_certificate = off" >> ~/.wgetrc
 
 # CMake
 RUN cd $YADOMS_DEPS_PATH \
-	&& wget --no-verbose https://github.com/Kitware/CMake/releases/download/v3.15.1/cmake-3.15.1.tar.gz \
-	&& tar xzf cmake-3.15.1.tar.gz && cd cmake-3.15.1 \
+	&& wget --no-verbose https://github.com/Kitware/CMake/releases/download/v3.15.2/cmake-3.15.2.tar.gz \
+	&& tar xzf cmake-3.15.2.tar.gz && cd cmake-3.15.2 \
 	&& ./bootstrap && make && make install \
-	&& cd .. && rm -Rf cmake-3.15.1 && rm $YADOMS_DEPS_PATH/cmake-3.15.1.tar.gz
+	&& cd .. && rm -Rf cmake-3.15.2 && rm $YADOMS_DEPS_PATH/cmake-3.15.2.tar.gz
 
 # Boost
 RUN cd $YADOMS_DEPS_PATH \
-	&& wget --no-verbose https://dl.bintray.com/boostorg/release/1.70.0/source/boost_1_70_0.tar.bz2 \
-	&& tar xjf boost_1_70_0.tar.bz2 && cd boost_1_70_0 \
+	&& wget --no-verbose https://dl.bintray.com/boostorg/release/1.71.0/source/boost_1_71_0.tar.bz2 \
+	&& tar xjf boost_1_71_0.tar.bz2 && cd boost_1_71_0 \
 	&& ./bootstrap.sh \
 	&& ./b2 --with-atomic --with-chrono --with-date_time --with-filesystem --with-locale --with-regex --with-thread --with-system link=static runtime-link=static --no-samples --no-tests cxxflags=-fPIC \
 	&& rm -Rf bin.v2 \
 	&& rm -Rf doc \
 	&& rm -Rf libs \
 	&& rm -Rf tools \
-	&& cd .. && rm $YADOMS_DEPS_PATH/boost_1_70_0.tar.bz2
+	&& cd .. && rm $YADOMS_DEPS_PATH/boost_1_71_0.tar.bz2
 
 # OpenSSL
 RUN cd $YADOMS_DEPS_PATH \
@@ -46,40 +46,40 @@ RUN cd $YADOMS_DEPS_PATH \
 
 # Poco
 RUN cd $YADOMS_DEPS_PATH \
-	&& wget --no-verbose http://pocoproject.org/releases/poco-1.9.2/poco-1.9.2-all.tar.gz \
-	&& tar xzf poco-1.9.2-all.tar.gz && cd poco-1.9.2-all \
+	&& wget --no-verbose http://pocoproject.org/releases/poco-1.9.3/poco-1.9.3-all.tar.gz \
+	&& tar xzf poco-1.9.3-all.tar.gz && cd poco-1.9.3-all \
 	&& echo 'STATICOPT_CC = -fPIC' >> build/config/Linux \
 	&& echo 'STATICOPT_CXX = -fPIC' >> build/config/Linux \
 	&& ./configure --static --config=Linux --no-samples --no-tests --omit=CppUnit,CppUnit/WinTestRunner,Data,Data/SQLite,Data/ODBCData/MySQL,MongoDB,PageCompiler,PageCompiler/File2Page --include-path=$HOME/depsBuild/openssl/include --library-path=$HOME/depsBuild/openssl/lib \
 	&& make \
 	&& cd .. \
 	&& find . -name obj -type d -print0 | xargs -0 rm -rf \
-	&& rm $YADOMS_DEPS_PATH/poco-1.9.2-all.tar.gz
+	&& rm $YADOMS_DEPS_PATH/poco-1.9.3-all.tar.gz
 
 # Protobuf
 RUN cd $YADOMS_DEPS_PATH \
-	&& wget --no-verbose https://github.com/google/protobuf/releases/download/v3.9.0/protobuf-cpp-3.9.0.tar.gz \
-	&& tar xzf protobuf-cpp-3.9.0.tar.gz && cd protobuf-3.9.0 \
+	&& wget --no-verbose https://github.com/google/protobuf/releases/download/v3.9.1/protobuf-cpp-3.9.1.tar.gz \
+	&& tar xzf protobuf-cpp-3.9.1.tar.gz && cd protobuf-3.9.1 \
 	&& ./autogen.sh \
 	&& ./configure --enable-shared=no --prefix=$HOME/depsBuild/protobuf --with-pic \
 	&& make \
 	&& make install \
 	&& ldconfig \
-	&& cd .. && rm -Rf protobuf-3.9.0 && rm $YADOMS_DEPS_PATH/protobuf-cpp-3.9.0.tar.gz
+	&& cd .. && rm -Rf protobuf-3.9.1 && rm $YADOMS_DEPS_PATH/protobuf-cpp-3.9.1.tar.gz
 
 # Swig
 RUN cd $YADOMS_DEPS_PATH \
-	&& wget --no-verbose http://prdownloads.sourceforge.net/swig/swig-4.0.0.tar.gz \
-	&& tar xzf swig-4.0.0.tar.gz \
-	&& cd swig-4.0.0 \
+	&& wget --no-verbose http://prdownloads.sourceforge.net/swig/swig-4.0.1.tar.gz \
+	&& tar xzf swig-4.0.1.tar.gz \
+	&& cd swig-4.0.1 \
 	&& ./configure \
 	&& make \
 	&& make install \
 	&& cd .. \
-	&& rm -f swig-4.0.0\Source\Modules\*.o \
-	&& rm -Rf swig-4.0.0\Examples \
-	&& rm -Rf swig-4.0.0\Docs \
-	&& rm $YADOMS_DEPS_PATH/swig-4.0.0.tar.gz
+	&& rm -f swig-4.0.1\Source\Modules\*.o \
+	&& rm -Rf swig-4.0.1\Examples \
+	&& rm -Rf swig-4.0.1\Docs \
+	&& rm $YADOMS_DEPS_PATH/swig-4.0.1.tar.gz
 
 # Python 2.7 
 RUN wget --no-verbose https://www.python.org/ftp/python/2.7.16/Python-2.7.16.tgz  > /dev/null\
@@ -127,8 +127,8 @@ RUN cd $YADOMS_DEPS_PATH \
 
 # Yadoms configuration file
 RUN echo 'Configuring Yadoms CMakeListsUserConfig.txt' \
-	&& echo 'set(BOOST_ROOT "'$YADOMS_DEPS_PATH'/boost_1_70_0")' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
-	&& echo 'set(POCO_ROOT "'$YADOMS_DEPS_PATH'/poco-1.9.2-all")' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
+	&& echo 'set(BOOST_ROOT "'$YADOMS_DEPS_PATH'/boost_1_71_0")' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
+	&& echo 'set(POCO_ROOT "'$YADOMS_DEPS_PATH'/poco-1.9.3-all")' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
 	&& echo 'set(PROTOBUF_ROOT "'$HOME'/depsBuild/protobuf")' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
 	&& echo 'set(PROTOBUF_PROTOC_EXECUTABLE "'$HOME'/depsBuild/protobuf/bin/protoc")' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
 	&& echo 'set(PROTOBUF_INSTALLED_TO_CUSTOM_DIRECTORY ON)' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
@@ -147,7 +147,7 @@ RUN echo 'Configuring Yadoms CMakeListsUserConfig.txt' \
 	&& echo '       "'$YADOMS_DEPS_PATH'/postgresql-9.6.2/src/interfaces/libpq"' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
 	&& echo '       "'$YADOMS_DEPS_PATH'/postgresql-9.6.2/src/include")' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
 	&& echo 'set(GAMMU_ROOT "'$YADOMS_DEPS_PATH'/gammu")' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
-	&& echo 'set(SWIG_ROOT "'$YADOMS_DEPS_PATH'/swig-4.0.0")' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
+	&& echo 'set(SWIG_ROOT "'$YADOMS_DEPS_PATH'/swig-4.0.1")' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
 	&& echo 'SET(COTIRE_USE ON)' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
 	&& echo 'SET(COTIRE_USE_UNITY ON)' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt
 
