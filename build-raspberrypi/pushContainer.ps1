@@ -1,2 +1,2 @@
-docker tag build_for_raspberrypi yadoms/build_for_raspberrypi
-docker push yadoms/build_for_raspberrypi
+docker tag build_for_raspberrypi yadoms/build_for_raspberrypi:gcc_4_9
+docker push yadoms/build_for_raspberrypi:gcc_4_9
