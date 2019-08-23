@@ -34,8 +34,8 @@ RUN cd $YADOMS_DEPS_PATH \
 
 # Boost
 RUN cd $YADOMS_DEPS_PATH \
-	&& wget --no-check-certificate --no-verbose https://dl.bintray.com/boostorg/release/1.70.0/source/boost_1_70_0.tar.bz2\
-	&& tar xjf boost_1_70_0.tar.bz2 && cd boost_1_70_0  > /dev/null\
+	&& wget --no-check-certificate --no-verbose https://dl.bintray.com/boostorg/release/1.71.0/source/boost_1_71_0.tar.bz2\
+	&& tar xjf boost_1_71_0.tar.bz2 && cd boost_1_71_0  > /dev/null\
 	&& echo "using gcc : o64 : o64-g++ : <archiver>x86_64-apple-darwin16-ar <ranlib>x86_64-apple-darwin16-ranlib ;" > ~/user-config.jam \
 	&& ./bootstrap.sh\
 	&& ./b2 --with-atomic --with-chrono --with-date_time --with-filesystem --with-locale --with-regex --with-thread --with-system link=static runtime-link=static --no-samples --no-tests toolset=gcc-o64 target-os=darwin cxxflags="-fPIC" visibility=global \
@@ -43,27 +43,27 @@ RUN cd $YADOMS_DEPS_PATH \
 	&& rm -Rf doc \
 	&& rm -Rf libs \
 	&& rm -Rf tools \
-	&& cd .. && rm $YADOMS_DEPS_PATH/boost_1_70_0.tar.bz2
+	&& cd .. && rm $YADOMS_DEPS_PATH/boost_1_71_0.tar.bz2
 	
 # Poco
 COPY ./Darwin64-osxcross $YADOMS_DEPS_PATH/Darwin64-osxcross
 RUN cd $YADOMS_DEPS_PATH \
-	&& wget --no-check-certificate --no-verbose http://pocoproject.org/releases/poco-1.9.2/poco-1.9.2-all.tar.gz\
-	&& tar xzf poco-1.9.2-all.tar.gz && cd poco-1.9.2-all\
+	&& wget --no-check-certificate --no-verbose http://pocoproject.org/releases/poco-1.9.3/poco-1.9.3-all.tar.gz\
+	&& tar xzf poco-1.9.3-all.tar.gz && cd poco-1.9.3-all\
         && cp $YADOMS_DEPS_PATH/Darwin64-osxcross build/config/Darwin64-osxcross \
 	&& OSXCROSS_MP_INC=1 ./configure --static --config=Darwin64-osxcross --no-samples --no-tests --omit=CppUnit,CppUnit/WinTestRunner,Data,Data/SQLite,Data/ODBCData/MySQL,MongoDB,PageCompiler,PageCompiler/File2Page\
 	&& OSXCROSS_MP_INC=1 make\
 	&& cd .. \
 	&& find . -name obj -type d -print0 | xargs -0 rm -rf  > /dev/null\
-	&& rm $YADOMS_DEPS_PATH/poco-1.9.2-all.tar.gz && rm -f $YADOMS_DEPS_PATH/Darwin64-osxcross
+	&& rm $YADOMS_DEPS_PATH/poco-1.9.3-all.tar.gz && rm -f $YADOMS_DEPS_PATH/Darwin64-osxcross
 
 
 
 # Protobuf (Host)
-RUN wget --no-check-certificate --no-verbose https://github.com/google/protobuf/releases/download/v3.9.0/protobuf-cpp-3.9.0.tar.gz  > /dev/null\
-	&& tar xzf protobuf-cpp-3.9.0.tar.gz && rm protobuf-cpp-3.9.0.tar.gz > /dev/null\
-    && cp -R protobuf-3.9.0 $YADOMS_BUILD_TOOLS_PATH/protobuf-3.9.0-host > /dev/null \
-	&& cd $YADOMS_BUILD_TOOLS_PATH/protobuf-3.9.0-host \
+RUN wget --no-check-certificate --no-verbose https://github.com/google/protobuf/releases/download/v3.9.1/protobuf-cpp-3.9.1.tar.gz  > /dev/null\
+	&& tar xzf protobuf-cpp-3.9.1.tar.gz && rm protobuf-cpp-3.9.1.tar.gz > /dev/null\
+    && cp -R protobuf-3.9.1 $YADOMS_BUILD_TOOLS_PATH/protobuf-3.9.1-host > /dev/null \
+	&& cd $YADOMS_BUILD_TOOLS_PATH/protobuf-3.9.1-host \
 	&& mkdir build \
 	&& cd build \
 	&& cmake -Dprotobuf_BUILD_TESTS=OFF ../cmake  > /dev/null\
@@ -71,13 +71,13 @@ RUN wget --no-check-certificate --no-verbose https://github.com/google/protobuf/
 	&& make install  > /dev/null\
 	&& ldconfig  > /dev/null
 # Protobuf (Darwin)
-RUN mv protobuf-3.9.0 $YADOMS_DEPS_PATH/protobuf-3.9.0 \
-	&& cd $YADOMS_DEPS_PATH/protobuf-3.9.0 \
+RUN mv protobuf-3.9.1 $YADOMS_DEPS_PATH/protobuf-3.9.1 \
+	&& cd $YADOMS_DEPS_PATH/protobuf-3.9.1 \
 	&& ./autogen.sh  > /dev/null\
 	&& ./configure --enable-shared=no --host=x86_64-apple-darwin16 CC=x86_64-apple-darwin16-gcc CXX=x86_64-apple-darwin16-g++ AR=x86_64-apple-darwin16-ar STRIP=x86_64-apple-darwin16-strip RANLIB=x86_64-apple-darwin16-ranlib --prefix=$YADOMS_DEPS_PATH/protobuf --with-protoc=protoc --with-pic  > /dev/null\
 	&& make  > /dev/null\
 	&& make install  > /dev/null\
-    && cd .. && rm -Rf $YADOMS_DEPS_PATH/protobuf-3.9.0
+    && cd .. && rm -Rf $YADOMS_DEPS_PATH/protobuf-3.9.1
 
 
 # Libudev TODO : must be cross-compiled
@@ -89,17 +89,17 @@ RUN cd $YADOMS_DEPS_PATH \
 
 # Swig
 RUN cd $YADOMS_DEPS_PATH \
-	&& wget --no-check-certificate --no-verbose http://prdownloads.sourceforge.net/swig/swig-4.0.0.tar.gz  > /dev/null\
-	&& tar xzf swig-4.0.0.tar.gz  > /dev/null\
-	&& cd $YADOMS_DEPS_PATH/swig-4.0.0  > /dev/null\
+	&& wget --no-check-certificate --no-verbose http://prdownloads.sourceforge.net/swig/swig-4.0.1.tar.gz  > /dev/null\
+	&& tar xzf swig-4.0.1.tar.gz  > /dev/null\
+	&& cd $YADOMS_DEPS_PATH/swig-4.0.1  > /dev/null\
 	&& ./configure  > /dev/null\
 	&& make  > /dev/null\
 	&& make install  > /dev/null\
 	&& cd .. \
-	&& rm -f swig-4.0.0\Source\Modules\*.o \
-	&& rm -Rf swig-4.0.0\Examples \
-	&& rm -Rf swig-4.0.0\Docs \
-	&& rm $YADOMS_DEPS_PATH/swig-4.0.0.tar.gz
+	&& rm -f swig-4.0.1\Source\Modules\*.o \
+	&& rm -Rf swig-4.0.1\Examples \
+	&& rm -Rf swig-4.0.1\Docs \
+	&& rm $YADOMS_DEPS_PATH/swig-4.0.1.tar.gz
 
 # Python 2.7 (Host)
 RUN wget --no-check-certificate --no-verbose https://www.python.org/ftp/python/2.7.16/Python-2.7.16.tgz  > /dev/null\
@@ -154,8 +154,8 @@ RUN cd $YADOMS_DEPS_PATH \
 
 # Yadoms configuration file
 RUN echo 'Configuring Yadoms CMakeListsUserConfig.txt' \
-	&& echo 'set(BOOST_ROOT "'$YADOMS_DEPS_PATH'/boost_1_70_0")' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
-	&& echo 'set(POCO_ROOT "'$YADOMS_DEPS_PATH'/poco-1.9.2-all")' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
+	&& echo 'set(BOOST_ROOT "'$YADOMS_DEPS_PATH'/boost_1_71_0")' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
+	&& echo 'set(POCO_ROOT "'$YADOMS_DEPS_PATH'/poco-1.9.3-all")' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
 	&& echo 'set(PROTOBUF_ROOT "'$YADOMS_DEPS_PATH'/protobuf")' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
 	&& echo 'set(PROTOBUF_PROTOC_EXECUTABLE "'`which protoc`'")' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
 	&& echo 'set(PROTOBUF_INSTALLED_TO_CUSTOM_DIRECTORY ON)' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
@@ -177,7 +177,7 @@ RUN echo 'Configuring Yadoms CMakeListsUserConfig.txt' \
 	&& echo 'set(PostgreSQL_LIBRARY_DIR "/opt/osxcross/target/macports/pkgs/opt/local/lib/postgresql96")' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
 	&& echo 'set(GAMMU_ROOT "'$YADOMS_DEPS_PATH'/gammu")' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
 	&& echo 'set(GAMMU_LINK_DEPS "/opt/osxcross/target/macports/pkgs/opt/local/lib/libiconv.a" "/opt/osxcross/target/macports/pkgs/opt/local/lib/libintl.a")' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
-	&& echo 'set(SWIG_ROOT "'$YADOMS_DEPS_PATH'/swig-4.0.0")' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
+	&& echo 'set(SWIG_ROOT "'$YADOMS_DEPS_PATH'/swig-4.0.1")' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
 	&& echo 'SET(COTIRE_USE ON)' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
 	&& echo 'SET(COTIRE_USE_UNITY ON)' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
 	&& echo 'set(LIBUDEV_ROOT "'$YADOMS_DEPS_PATH'/libudev")' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
