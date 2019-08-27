@@ -1,5 +1,0 @@
-Il s'agit d'une version qui ne génère pas la chaine de compilation croisée mais qui en intgère une directement.
-
-La chaine est générée à la main (cf GenerateToolChain.md) et directement copiée dans le container Docker.
-
-L'intérêt est de pouvoir spécifier facilement les options à crosstoolng (version de gcc, version mini de glibc,...)
