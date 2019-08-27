@@ -1,22 +1,18 @@
-FROM yadoms/raspberrypi_cross_toolchain
+FROM yadoms/raspberrypi_cross_toolchain:9.1.0
 MAINTAINER jano42 "https://github.com/jano42"
 LABEL authors=jano42
-ENV DEBIAN_FRONTEND noninteractive
 
 ENV YADOMS_BUILD_BRANCH develop
 ENV MAKE_PACKAGE false
 ENV YADOMS_BUILD_TOOLS_PATH /yadoms-build-tools
 ENV YADOMS_DEPS_PATH /yadoms-deps/raspberry
 
-USER root
-
-RUN cp /dev/null /etc/apt/sources.list \
- && echo "deb http://deb.debian.org/debian/ stretch main contrib non-free" | tee -a /etc/apt/sources.list \
- && echo "deb http://security.debian.org/ stretch/updates main contrib non-free" | tee -a /etc/apt/sources.list \
- && echo "deb http://deb.debian.org/debian/ stretch-updates main contrib non-free" | tee -a /etc/apt/sources.list \
- && echo "deb http://deb.debian.org/debian stretch-backports main contrib non-free" | tee -a /etc/apt/sources.list
+RUN echo "deb http://deb.debian.org/debian/ stretch main contrib non-free" | tee -a /etc/apt/sources.list \
+&&  echo "deb http://security.debian.org/ stretch/updates main contrib non-free" | tee -a /etc/apt/sources.list \
+&& echo "deb http://deb.debian.org/debian/ stretch-updates main contrib non-free" | tee -a /etc/apt/sources.list \
+&& echo "deb http://deb.debian.org/debian stretch-backports main contrib non-free" | tee -a /etc/apt/sources.list
  
-RUN apt-get update  > /dev/null\
+RUN apt-get update > /dev/null\
 	&& apt-get install -y g++ libbz2-dev python-dev wget build-essential libssl-dev \
 	libopencv-gpu-dev autoconf automake libtool curl make g++ unzip \
 	libudev-dev libpcre3 libpcre3-dev libreadline-dev libpq5 \
@@ -27,18 +23,21 @@ RUN mkdir -p $YADOMS_DEPS_PATH
 
 # CMake
 RUN cd $YADOMS_DEPS_PATH \
-	&& wget --no-check-certificate -d --no-verbose https://github.com/Kitware/CMake/releases/download/v3.15.2/cmake-3.15.2.tar.gz \
-	&& tar xzf cmake-3.15.2.tar.gz && cd cmake-3.15.2\
-	&& ./bootstrap && make > /dev/null && make install\
+	&& wget --no-check-certificate -d --no-verbose https://github.com/Kitware/CMake/releases/download/v3.15.2/cmake-3.15.2.tar.gz  > /dev/null\
+	&& tar xzf cmake-3.15.2.tar.gz && cd cmake-3.15.2  > /dev/null\
+	&& ./bootstrap > /dev/null && make > /dev/null && make install > /dev/null\
 	&& cd .. && rm -Rf cmake-3.15.2 && rm $YADOMS_DEPS_PATH/cmake-3.15.2.tar.gz
+
+# Check GCC version
+RUN arm-linux-gnueabihf-gcc --version
 
 # Boost
 RUN cd $YADOMS_DEPS_PATH \
-	&& wget --no-check-certificate --no-verbose https://dl.bintray.com/boostorg/release/1.71.0/source/boost_1_71_0.tar.bz2\
+	&& wget --no-check-certificate --no-verbose https://dl.bintray.com/boostorg/release/1.71.0/source/boost_1_71_0.tar.bz2  > /dev/null\
 	&& tar xjf boost_1_71_0.tar.bz2 && cd boost_1_71_0  > /dev/null\
-	&& echo "using gcc : arm : armv6-rpi-linux-gnueabihf-g++ ;" > ~/user-config.jam \
-	&& ./bootstrap.sh\
-	&& ./b2 --with-atomic --with-chrono --with-date_time --with-filesystem --with-locale --with-regex --with-thread --with-system link=static runtime-link=static --no-samples --no-tests toolset=gcc-arm cxxflags=-fPIC\
+	&& echo "using gcc : arm : arm-linux-gnueabihf-g++ ;" > /root/user-config.jam \
+	&& ./bootstrap.sh > /dev/null\
+	&& ./b2 --with-atomic --with-chrono --with-date_time --with-filesystem --with-regex --with-thread --with-system link=static runtime-link=static --no-samples --no-tests toolset=gcc-arm cxxflags=-fPIC  > /dev/null\
 	&& rm -Rf bin.v2 \
 	&& rm -Rf doc \
 	&& rm -Rf libs \
@@ -50,8 +49,8 @@ RUN cd $YADOMS_DEPS_PATH \
 RUN cd $YADOMS_DEPS_PATH \
 	&& wget --no-check-certificate --no-verbose https://www.openssl.org/source/openssl-1.1.0g.tar.gz  > /dev/null\
 	&& tar xzf openssl-1.1.0g.tar.gz && cd openssl-1.1.0g  > /dev/null\
-	&& ./Configure -fPIC linux-generic32 --prefix=$YADOMS_DEPS_PATH/openssl --cross-compile-prefix=/x-tools/armv6-rpi-linux-gnueabihf/bin/armv6-rpi-linux-gnueabihf-  > /dev/null\
-	&& make CC="armv6-rpi-linux-gnueabihf-gcc" AR="armv6-rpi-linux-gnueabihf-ar r" RANLIB="armv6-rpi-linux-gnueabihf-ranlib"  > /dev/null\
+	&& ./Configure linux-generic32 --prefix=$YADOMS_DEPS_PATH/openssl --cross-compile-prefix=/opt/cross-pi-gcc-9.1.0-2/bin/arm-linux-gnueabihf-  > /dev/null\
+	&& make CC="arm-linux-gnueabihf-gcc" AR="arm-linux-gnueabihf-ar r" RANLIB="arm-linux-gnueabihf-ranlib"  > /dev/null\
 	&& make install  > /dev/null\
 	&& cd .. && rm -Rf openssl-1.1.0g && rm $YADOMS_DEPS_PATH/openssl-1.1.0g.tar.gz
 	
@@ -60,7 +59,7 @@ RUN cd $YADOMS_DEPS_PATH \
 RUN cd $YADOMS_DEPS_PATH \
 	&& wget --no-check-certificate --no-verbose http://pocoproject.org/releases/poco-1.9.3/poco-1.9.3-all.tar.gz  > /dev/null\
 	&& tar xzf poco-1.9.3-all.tar.gz && cd poco-1.9.3-all  > /dev/null\
-	&& echo 'TOOL = armv6-rpi-linux-gnueabihf' > build/config/RaspberryPI \
+	&& echo 'TOOL = arm-linux-gnueabihf' > build/config/RaspberryPI \
 	&& cat build/config/ARM-Linux >> build/config/RaspberryPI \
 	&& echo 'STATICOPT_CC = -fPIC' >> build/config/RaspberryPI \
 	&& echo 'STATICOPT_CXX = -fPIC' >> build/config/RaspberryPI \
@@ -86,7 +85,7 @@ RUN wget --no-check-certificate --no-verbose https://github.com/google/protobuf/
 RUN mv protobuf-3.9.1 $YADOMS_DEPS_PATH/protobuf-3.9.1 \
 	&& cd $YADOMS_DEPS_PATH/protobuf-3.9.1 \
 	&& ./autogen.sh  > /dev/null\
-	&& ./configure --enable-shared=no --host=arm-linux CC=armv6-rpi-linux-gnueabihf-gcc CXX=armv6-rpi-linux-gnueabihf-g++ AR=armv6-rpi-linux-gnueabihf-ar STRIP=armv6-rpi-linux-gnueabihf-strip RANLIB=armv6-rpi-linux-gnueabihf-ranlib --prefix=$YADOMS_DEPS_PATH/protobuf --with-protoc=protoc --with-pic  > /dev/null\
+	&& ./configure --enable-shared=no --host=arm-linux CC=arm-linux-gnueabihf-gcc CXX=arm-linux-gnueabihf-g++ AR=arm-linux-gnueabihf-ar STRIP=arm-linux-gnueabihf-strip RANLIB=arm-linux-gnueabihf-ranlib --prefix=$YADOMS_DEPS_PATH/protobuf --with-protoc=protoc --with-pic  > /dev/null\
 	&& make  > /dev/null\
 	&& make install  > /dev/null\
     && cd .. && rm -Rf $YADOMS_DEPS_PATH/protobuf-3.9.1
@@ -113,8 +112,9 @@ RUN cd $YADOMS_DEPS_PATH \
 	&& rm -Rf swig-4.0.1\Docs \
 	&& rm $YADOMS_DEPS_PATH/swig-4.0.1.tar.gz
 
+
 # Python 2.7 (Host)
-RUN wget --no-check-certificate --no-verbose https://www.python.org/ftp/python/2.7.16/Python-2.7.16.tgz  > /dev/null\
+RUN wget --no-check-certificate --no-check-certificate --no-verbose https://www.python.org/ftp/python/2.7.16/Python-2.7.16.tgz  > /dev/null\
 	&& tar xzf Python-2.7.16.tgz && rm Python-2.7.16.tgz  > /dev/null\
     && cp -R Python-2.7.16 Python-2.7.16-host  > /dev/null\
 	&& cd Python-2.7.16-host  > /dev/null\
@@ -128,17 +128,17 @@ RUN wget --no-check-certificate --no-verbose https://www.python.org/ftp/python/2
 # Python 2.7 (Pi)
 RUN mv Python-2.7.16 $YADOMS_DEPS_PATH/Python-2.7.16  > /dev/null\
 	&& cd $YADOMS_DEPS_PATH/Python-2.7.16  > /dev/null\
-	&& CC=armv6-rpi-linux-gnueabihf-gcc CXX=armv6-rpi-linux-gnueabihf-g++ AR=armv6-rpi-linux-gnueabihf-ar RANLIB=armv6-rpi-linux-gnueabihf-ranlib ./configure --host=armv6-rpi-linux-gnueabihf --target=armv6-rpi-linux-gnueabihf --build=x86_64-linux-gnu --prefix=$YADOMS_DEPS_PATH/python --disable-ipv6 ac_cv_file__dev_ptmx=no ac_cv_file__dev_ptc=no ac_cv_have_long_long_format=yes --enable-shared  > /dev/null\
-	&& make HOSTPYTHON=$YADOMS_BUILD_TOOLS_PATH/pythonhost27/python HOSTPGEN=$YADOMS_BUILD_TOOLS_PATH/pythonhost27/Parser/pgen BLDSHARED="armv6-rpi-linux-gnueabihf-cc -shared" CROSS-COMPILE=armv6-rpi-linux-gnueabihf- CROSS_COMPILE_TARGET=yes HOSTARCH=arm-linux BUILDARCH=armv6-rpi-linux-gnueabihf  > /dev/null
+	&& CC=arm-linux-gnueabihf-gcc CXX=arm-linux-gnueabihf-g++ AR=arm-linux-gnueabihf-ar RANLIB=arm-linux-gnueabihf-ranlib ./configure --host=arm-linux-gnueabihf --target=arm-linux-gnueabihf --build=x86_64-linux-gnu --prefix=$YADOMS_DEPS_PATH/python27 --disable-ipv6 ac_cv_file__dev_ptmx=no ac_cv_file__dev_ptc=no ac_cv_have_long_long_format=yes --enable-shared  > /dev/null\
+	&& make HOSTPYTHON=$YADOMS_BUILD_TOOLS_PATH/pythonhost27/python HOSTPGEN=$YADOMS_BUILD_TOOLS_PATH/pythonhost27/Parser/pgen BLDSHARED="arm-linux-gnueabihf-gcc -shared" CROSS-COMPILE=arm-linux-gnueabihf- CROSS_COMPILE_TARGET=yes HOSTARCH=arm-linux BUILDARCH=arm-linux-gnueabihf  > /dev/null
 
 RUN apt-get install -y libffi-dev
 
 # Python 3.7 (Host)
-RUN wget --no-check-certificate --no-verbose https://www.python.org/ftp/python/3.7.3/Python-3.7.3.tgz  > /dev/null\
+RUN wget --no-check-certificate --no-check-certificate --no-verbose https://www.python.org/ftp/python/3.7.3/Python-3.7.3.tgz  > /dev/null\
 	&& tar xzf Python-3.7.3.tgz && rm Python-3.7.3.tgz  > /dev/null\
     && cp -R Python-3.7.3 Python-3.7.3-host  > /dev/null\
 	&& cd Python-3.7.3-host  > /dev/null\
-	&& ./configure  > /dev/null\
+	&& ./configure \
 	&& make python Parser/pgen  > /dev/null\
 	&& make install  > /dev/null\
 	&& mkdir -p $YADOMS_BUILD_TOOLS_PATH/pythonhost37 \
@@ -148,25 +148,23 @@ RUN wget --no-check-certificate --no-verbose https://www.python.org/ftp/python/3
 # Python 3.7 (Pi)
 RUN mv Python-3.7.3 $YADOMS_DEPS_PATH/Python-3.7.3  > /dev/null\
 	&& cd $YADOMS_DEPS_PATH/Python-3.7.3  > /dev/null\
-	&& CC=armv6-rpi-linux-gnueabihf-gcc CXX=armv6-rpi-linux-gnueabihf-g++ AR=armv6-rpi-linux-gnueabihf-ar RANLIB=armv6-rpi-linux-gnueabihf-ranlib ./configure --host=armv6-rpi-linux-gnueabihf --target=armv6-rpi-linux-gnueabihf --build=x86_64-linux-gnu --prefix=$YADOMS_DEPS_PATH/python --disable-ipv6 ac_cv_file__dev_ptmx=no ac_cv_file__dev_ptc=no ac_cv_have_long_long_format=yes --enable-shared  --without-pymalloc  > /dev/null\
-	&& make HOSTPYTHON=$YADOMS_BUILD_TOOLS_PATH/pythonhost37/python HOSTPGEN=$YADOMS_BUILD_TOOLS_PATH/pythonhost37/Parser/pgen BLDSHARED="armv6-rpi-linux-gnueabihf-cc -shared" CROSS-COMPILE=armv6-rpi-linux-gnueabihf- CROSS_COMPILE_TARGET=yes HOSTARCH=arm-linux BUILDARCH=armv6-rpi-linux-gnueabihf  > /dev/null
+	&& CC=arm-linux-gnueabihf-gcc CXX=arm-linux-gnueabihf-g++ AR=arm-linux-gnueabihf-ar RANLIB=arm-linux-gnueabihf-ranlib ./configure --host=arm-linux-gnueabihf --target=arm-linux-gnueabihf --build=x86_64-linux-gnu --prefix=$YADOMS_DEPS_PATH/python37 --disable-ipv6 ac_cv_file__dev_ptmx=no ac_cv_file__dev_ptc=no ac_cv_have_long_long_format=yes --enable-shared  --without-pymalloc  > /dev/null\
+	&& make HOSTPYTHON=$YADOMS_BUILD_TOOLS_PATH/pythonhost37/python HOSTPGEN=$YADOMS_BUILD_TOOLS_PATH/pythonhost37/Parser/pgen BLDSHARED="arm-linux-gnueabihf-gcc -shared" CROSS-COMPILE=arm-linux-gnueabihf- CROSS_COMPILE_TARGET=yes HOSTARCH=arm-linux BUILDARCH=arm-linux-gnueabihf  > /dev/null
+
+
 
 # PostgreSQL
-# TODO ne fonctionne pas, à voir...
 RUN cd $YADOMS_DEPS_PATH \
 	&& wget --no-check-certificate --no-verbose https://ftp.postgresql.org/pub/source/v9.6.2/postgresql-9.6.2.tar.bz2  > /dev/null\
 	&& tar xjf postgresql-9.6.2.tar.bz2 && rm postgresql-9.6.2.tar.bz2  > /dev/null\
 	&& cd postgresql-9.6.2  > /dev/null\
-	&& CC=armv6-rpi-linux-gnueabihf-gcc CXX=armv6-rpi-linux-gnueabihf-g++ AR=armv6-rpi-linux-gnueabihf-ar RANLIB=armv6-rpi-linux-gnueabihf-ranlib ./configure --host=arm-linux --build=armv6-rpi-linux-gnueabihf --without-readline --without-zlib --disable-spinlocks  > /dev/null\
+	&& CC=arm-linux-gnueabihf-gcc CXX=arm-linux-gnueabihf-g++ AR=arm-linux-gnueabihf-ar RANLIB=arm-linux-gnueabihf-ranlib ./configure --host=arm-linux --build=arm-linux-gnueabihf --without-readline --without-zlib --disable-spinlocks  > /dev/null\
 	&& cd src/interfaces/libpq \
 	&& make  > /dev/null\
 	&& cd ../../../.. && rm -Rf postgresql-9.6.2/doc
 
-# Gammu
-#copy cross compile toolchain
-COPY raspberrypi.cmake /
 
-RUN which armv6-rpi-linux-gnueabihf-gcc
+COPY raspberrypi.cmake /
 
 RUN cd $YADOMS_DEPS_PATH \
 	&& wget --no-check-certificate --no-verbose https://dl.cihar.com/gammu/releases/gammu-1.40.0.tar.bz2  > /dev/null\
@@ -174,10 +172,11 @@ RUN cd $YADOMS_DEPS_PATH \
 	&& cd gammu-1.40.0 \
 	&& mkdir rpicc \
 	&& cd rpicc \
-	&& cmake -DCC_RPI_GCC=armv6-rpi-linux-gnueabihf-gcc -DCC_RPI_GXX=armv6-rpi-linux-gnueabihf-g++ -DBUILD_SHARED_LIBS=OFF -DCMAKE_TOOLCHAIN_FILE=/raspberrypi.cmake -DCMAKE_STAGING_PREFIX=$YADOMS_DEPS_PATH/gammu ..  > /dev/null\
+	&& cmake -DCC_RPI_GCC=arm-linux-gnueabihf-gcc -DCC_RPI_GXX=arm-linux-gnueabihf-g++ -DBUILD_SHARED_LIBS=OFF -DCMAKE_TOOLCHAIN_FILE=/raspberrypi.cmake -DCMAKE_STAGING_PREFIX=$YADOMS_DEPS_PATH/gammu ..  > /dev/null\
 	&& make  > /dev/null\
 	&& make install  > /dev/null\
 	&& cd ../.. && rm -Rf gammu-1.40.*
+
 
 # Yadoms configuration file
 RUN echo 'Configuring Yadoms CMakeListsUserConfig.txt' \
@@ -207,12 +206,11 @@ RUN echo 'Configuring Yadoms CMakeListsUserConfig.txt' \
 	&& echo 'set(LIBUDEV_ROOT "'$YADOMS_DEPS_PATH'/libudev")' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
 	&& echo 'set(UDEV_PATH_LIB "'$YADOMS_DEPS_PATH'/libudev")' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
 	&& echo 'set(UDEV_PATH_INCLUDES "'$YADOMS_DEPS_PATH'/libudev")' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
-	&& echo 'set(CC_RPI_ROOT "/x-tools/armv6-rpi-linux-gnueabihf")' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt
+	&& echo 'set(CC_RPI_ROOT "/opt/cross-pi-gcc-9.1.0-2")' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt
 
 COPY entrypoint.sh /
 
 #ensure entrypoint is executable (force flags update, because file flags may change if a commit is made under Windows)
 RUN chmod +x /entrypoint.sh
 
-CMD /bin/bash
-#CMD /entrypoint.sh
+CMD /entrypoint.sh
