@@ -9,7 +9,7 @@ ENV YADOMS_DEPS_PATH /yadoms-deps
 RUN apt-get update \
 	&& apt-get install -y g++ libbz2-dev python-dev python3-dev wget build-essential libssl-dev \
 	libopencv-gpu-dev autoconf automake libtool curl make g++ unzip \
-	libudev-dev libpcre3 libpcre3-dev libpq5 \
+	libpcre3 libpcre3-dev libpq5 \
 	postgresql-server-dev-all git rpm zip
 
 RUN mkdir $YADOMS_DEPS_PATH
@@ -101,7 +101,6 @@ RUN wget --no-verbose https://www.python.org/ftp/python/3.7.3/Python-3.7.3.tgz  
 	&& cd ..
 
 # PostgreSQL
-# TODO ne fonctionne pas, à voir...
 RUN apt-get install -y libreadline-dev
 RUN cd $YADOMS_DEPS_PATH \
 	&& wget --no-verbose https://ftp.postgresql.org/pub/source/v9.6.2/postgresql-9.6.2.tar.bz2 \
