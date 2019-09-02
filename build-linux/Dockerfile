@@ -101,7 +101,6 @@ RUN wget --no-verbose https://www.python.org/ftp/python/3.7.3/Python-3.7.3.tgz  
 	&& cd ..
 
 # PostgreSQL
-# TODO ne fonctionne pas, à voir...
 RUN apt-get install -y libreadline-dev
 RUN cd $YADOMS_DEPS_PATH \
 	&& wget --no-verbose https://ftp.postgresql.org/pub/source/v9.6.2/postgresql-9.6.2.tar.bz2 \
@@ -156,5 +155,5 @@ COPY entrypoint.sh /
 #ensure entrypoint is executable (force flags update, because file flags may change if a commit is made under Windows)
 RUN chmod +x /entrypoint.sh
 
-CMD /entrypoint.sh
+
 
