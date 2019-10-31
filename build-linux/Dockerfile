@@ -9,7 +9,7 @@ ENV YADOMS_DEPS_PATH /yadoms-deps
 RUN apt-get update \
 	&& apt-get install -y g++ libbz2-dev python-dev python3-dev wget build-essential libssl-dev \
 	libopencv-gpu-dev autoconf automake libtool curl make g++ unzip \
-	libudev-dev libpcre3 libpcre3-dev libpq5 \
+	libpcre3 libpcre3-dev libpq5 \
 	postgresql-server-dev-all git rpm zip
 
 RUN mkdir $YADOMS_DEPS_PATH

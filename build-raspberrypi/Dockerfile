@@ -15,7 +15,7 @@ RUN echo "deb http://deb.debian.org/debian/ stretch main contrib non-free" | tee
 RUN apt-get update \
 	&& apt-get install -q -y g++ libbz2-dev python-dev python3-dev wget build-essential libssl-dev \
 	libopencv-gpu-dev autoconf automake libtool curl make g++ unzip \
-	libudev-dev libpcre3 libpcre3-dev libreadline-dev libpq5 \
+	libpcre3 libpcre3-dev libreadline-dev libpq5 \
 	postgresql-server-dev-all git rpm zip gcc gcc-doc libc6-dev
 
 RUN mkdir -p $YADOMS_BUILD_TOOLS_PATH
@@ -95,13 +95,6 @@ RUN mv protobuf-$protobuf_version $YADOMS_DEPS_PATH/protobuf-$protobuf_version \
 	&& make  > /dev/null\
 	&& make install  > /dev/null\
     && cd .. && rm -Rf $YADOMS_DEPS_PATH/protobuf-protobuf_version
-
-
-# Libudev TODO : must be cross-compiled
-RUN cd $YADOMS_DEPS_PATH \
-	&& wget -U 'Yadoms/1.0.0' --no-verbose http://yadoms.com/builds/raspberry_pi/libs/libudev.tar.gz \
-	&& tar xzf libudev.tar.gz -C $YADOMS_DEPS_PATH \
-    && rm $YADOMS_DEPS_PATH/libudev.tar.gz
 
 
 # Swig
@@ -215,9 +208,6 @@ RUN echo 'Configuring Yadoms CMakeListsUserConfig.txt' \
 	&& echo 'set(SWIG_ROOT "'$YADOMS_DEPS_PATH'/swig-'$swig_version'")' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
 	&& echo 'SET(COTIRE_USE ON)' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
 	&& echo 'SET(COTIRE_USE_UNITY ON)' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
-	&& echo 'set(LIBUDEV_ROOT "'$YADOMS_DEPS_PATH'/libudev")' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
-	&& echo 'set(UDEV_PATH_LIB "'$YADOMS_DEPS_PATH'/libudev")' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
-	&& echo 'set(UDEV_PATH_INCLUDES "'$YADOMS_DEPS_PATH'/libudev")' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
 	&& echo 'set(CC_RPI_ROOT "/opt/cross-pi-gcc-9.1.0-2")' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt
 
 #copy entrypoint at root
