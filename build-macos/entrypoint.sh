@@ -1,10 +1,9 @@
 #!/bin/bash
 set -e
 
-
 echo "Update Yadoms Git repository for $YADOMS_BUILD_BRANCH branch"
 # Yadoms sources
-GIT_SSL_NO_VERIFY=true git clone --depth=1 -b $YADOMS_BUILD_BRANCH https://github.com/Yadoms/yadoms.git
+git clone --depth=1 -b $YADOMS_BUILD_BRANCH https://github.com/Yadoms/yadoms.git
 
 cd yadoms
 
@@ -12,11 +11,11 @@ echo "Copy build config file"
 cp $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt sources/
 
 echo "Create makefile"
-sh cmake_raspberry.sh r
+sh cmake_macosx.sh d
 
 echo "Build Yadoms"
 cd projects
-make all_unity
+OSXCROSS_MP_INC=1 make all_unity
 cd -
 
 if [ $MAKE_PACKAGE == "true" ]; then
@@ -47,6 +46,6 @@ if [ $MAKE_PACKAGE == "true" ]; then
 	
 	if [ ! -z "$UPLOAD_FTP_CREDENTIALS" ]; then
 		echo "Upload packages"
-		curl --ftp-create-dirs -T "{$(echo builds/package/* | tr ' ' ',')}" -k sftp://$UPLOAD_FTP_CREDENTIALS@ssh.cluster010.ovh.net:22/~/builds/raspberry_pi/
+		curl --ftp-create-dirs -T "{$(echo builds/package/* | tr ' ' ',')}" -k sftp://$UPLOAD_FTP_CREDENTIALS@ssh.cluster010.ovh.net:22/~/builds/macos/
 	fi
 fi

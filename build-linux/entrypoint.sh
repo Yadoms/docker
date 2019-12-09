@@ -1,20 +1,20 @@
 #!/bin/bash
 set -e
 
-cd yadoms
-
+# Yadoms sources
 echo "Update Yadoms Git repository for $YADOMS_BUILD_BRANCH branch"
-git fetch --depth=1
-git checkout $YADOMS_BUILD_BRANCH
-git clean -d -x -f
-git pull
+git clone -b $YADOMS_BUILD_BRANCH https://github.com/Yadoms/yadoms.git
 
+cd yadoms
 
 echo "Copy build config file"
 cp $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt sources/
 
+echo "Display config content"
+cat sources/CMakeListsUserConfig.txt
+
 echo "Create makefile"
-sh cmake_linux.sh m
+sh cmake_linux.sh r
 
 echo "Build Yadoms"
 cd projects

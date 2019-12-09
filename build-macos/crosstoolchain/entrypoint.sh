@@ -4,7 +4,7 @@ set -e
 
 echo "Update Yadoms Git repository for $YADOMS_BUILD_BRANCH branch"
 # Yadoms sources
-GIT_SSL_NO_VERIFY=true git clone --depth=1 -b $YADOMS_BUILD_BRANCH https://github.com/Yadoms/yadoms.git
+git clone --depth=1 -b $YADOMS_BUILD_BRANCH https://github.com/Yadoms/yadoms.git
 
 cd yadoms
 

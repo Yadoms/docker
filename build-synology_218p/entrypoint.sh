@@ -12,7 +12,7 @@ echo "Copy build config file"
 cp $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt sources/
 
 echo "Create makefile"
-sh cmake_raspberry.sh r
+sh cmake_synology218p.sh r
 
 echo "Build Yadoms"
 cd projects
@@ -47,6 +47,6 @@ if [ $MAKE_PACKAGE == "true" ]; then
 	
 	if [ ! -z "$UPLOAD_FTP_CREDENTIALS" ]; then
 		echo "Upload packages"
-		curl --ftp-create-dirs -T "{$(echo builds/package/* | tr ' ' ',')}" -k sftp://$UPLOAD_FTP_CREDENTIALS@ssh.cluster010.ovh.net:22/~/builds/raspberry_pi/
+		curl --ftp-create-dirs -T "{$(echo builds/package/* | tr ' ' ',')}" -k sftp://$UPLOAD_FTP_CREDENTIALS@ssh.cluster010.ovh.net:22/~/builds/synology218p/
 	fi
 fi
