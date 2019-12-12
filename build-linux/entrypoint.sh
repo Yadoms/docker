@@ -5,10 +5,10 @@ set -e
 if [ -z "$YADOMS_REPO" ]
 then
 	echo "Update Yadoms Git repository for $YADOMS_BUILD_BRANCH branch"
-	git clone -b $YADOMS_BUILD_BRANCH https://github.com/Yadoms/yadoms.git
+	GIT_SSL_NO_VERIFY=true git clone --depth=1 -b $YADOMS_BUILD_BRANCH https://github.com/Yadoms/yadoms.git
 else
 	echo "Update Yadoms Git repository for $YADOMS_REPO:$YADOMS_BUILD_BRANCH branch"
-	git clone -b $YADOMS_BUILD_BRANCH https://github.com/$YADOMS_REPO
+	GIT_SSL_NO_VERIFY=true git clone --depth=1 -b $YADOMS_BUILD_BRANCH https://github.com/$YADOMS_REPO
 fi
 
 cd yadoms

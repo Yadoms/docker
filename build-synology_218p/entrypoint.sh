@@ -4,7 +4,14 @@ set -e
 
 echo "Update Yadoms Git repository for $YADOMS_BUILD_BRANCH branch"
 # Yadoms sources
-GIT_SSL_NO_VERIFY=true git clone --depth=1 -b $YADOMS_BUILD_BRANCH https://github.com/Yadoms/yadoms.git
+if [ -z "$YADOMS_REPO" ]
+then
+	echo "Update Yadoms Git repository for $YADOMS_BUILD_BRANCH branch"
+	GIT_SSL_NO_VERIFY=true git clone --depth=1 -b $YADOMS_BUILD_BRANCH https://github.com/Yadoms/yadoms.git
+else
+	echo "Update Yadoms Git repository for $YADOMS_REPO:$YADOMS_BUILD_BRANCH branch"
+	GIT_SSL_NO_VERIFY=true git clone --depth=1 -b $YADOMS_BUILD_BRANCH https://github.com/$YADOMS_REPO
+fi
 
 cd yadoms
 
@@ -25,25 +32,8 @@ if [ $MAKE_PACKAGE == "true" ]; then
 	make package
 	cd -
 	
-	echo "Build Yadoms update package"
-	mkdir updatepackage
-	yadomsVersion=$(grep -oP '###[[:space:]]\K.*' sources/server/changelog.md -m 1)
-	# Copy script
-	cp update/scripts/update.sh updatepackage/update.sh
-	# Generate package.json
-	cp update/package.json.in updatepackage/package.json
-	sed -i -- 's/__version__/'$yadomsVersion'/g' updatepackage/package.json
-	sed -i -- 's/__gitdate__/'`git log -1 --format=%cI `'/g' updatepackage/package.json
-	cp sources/server/changelog.md updatepackage/changelog.md
-	mv builds/package packagetomove
-	mv builds updatepackage/package
-	rm -f updatepackage/package/yadoms.ini
-	cd updatepackage
-	zip -r ../package.zip ./ -x \*.gitignore
-	cd -
-	mkdir builds
-	mv packagetomove builds/package
-	mv package.zip builds/package
+	cd update
+	sh make_package.sh Synology218p
 	
 	if [ ! -z "$UPLOAD_FTP_CREDENTIALS" ]; then
 		echo "Upload packages"
