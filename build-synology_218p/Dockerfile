@@ -60,7 +60,7 @@ RUN cd $YADOMS_DEPS_PATH \
 	
 
 # Poco
-ARG poco_version=1.9.3
+ARG poco_version=1.9.4
 RUN cd $YADOMS_DEPS_PATH \
 	&& wget --no-check-certificate --no-verbose http://pocoproject.org/releases/poco-$poco_version/poco-$poco_version-all.tar.gz  > /dev/null\
 	&& tar xzf poco-$poco_version-all.tar.gz && cd poco-$poco_version-all  > /dev/null\
@@ -76,7 +76,7 @@ RUN cd $YADOMS_DEPS_PATH \
 
 
 # Protobuf (Host)
-ARG protobuf_version=3.9.1
+ARG protobuf_version=3.11.1
 RUN wget --no-check-certificate --no-verbose https://github.com/google/protobuf/releases/download/v$protobuf_version/protobuf-cpp-$protobuf_version.tar.gz  > /dev/null\
 	&& tar xzf protobuf-cpp-$protobuf_version.tar.gz && rm protobuf-cpp-$protobuf_version.tar.gz > /dev/null\
         && cp -R protobuf-$protobuf_version $YADOMS_BUILD_TOOLS_PATH/protobuf-$protobuf_version-host > /dev/null \

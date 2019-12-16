@@ -37,35 +37,35 @@ RUN cd $YADOMS_DEPS_PATH \
 
 # OpenSSL
 RUN cd $YADOMS_DEPS_PATH \
-	&& wget --no-verbose https://www.openssl.org/source/openssl-1.1.0k.tar.gz \
-	&& tar xzf openssl-1.1.0k.tar.gz && cd openssl-1.1.0k \
+	&& wget --no-verbose https://www.openssl.org/source/openssl-1.1.1d.tar.gz \
+	&& tar xzf openssl-1.1.1d.tar.gz && cd openssl-1.1.1d \
 	&& ./Configure --prefix=$HOME/depsBuild/openssl -fPIC linux-x86_64\
 	&& make \
 	&& make install \
-	&& cd .. && rm -Rf openssl-1.1.0k && rm $YADOMS_DEPS_PATH/openssl-1.1.0k.tar.gz
+	&& cd .. && rm -Rf openssl-1.1.1d && rm $YADOMS_DEPS_PATH/openssl-1.1.1d.tar.gz
 
 # Poco
 RUN cd $YADOMS_DEPS_PATH \
-	&& wget --no-verbose http://pocoproject.org/releases/poco-1.9.3/poco-1.9.3-all.tar.gz \
-	&& tar xzf poco-1.9.3-all.tar.gz && cd poco-1.9.3-all \
+	&& wget --no-verbose http://pocoproject.org/releases/poco-1.9.4/poco-1.9.4-all.tar.gz \
+	&& tar xzf poco-1.9.4-all.tar.gz && cd poco-1.9.4-all \
 	&& echo 'STATICOPT_CC = -fPIC' >> build/config/Linux \
 	&& echo 'STATICOPT_CXX = -fPIC' >> build/config/Linux \
 	&& ./configure --static --config=Linux --no-samples --no-tests --omit=CppUnit,CppUnit/WinTestRunner,Data,Data/SQLite,Data/ODBCData/MySQL,MongoDB,PageCompiler,PageCompiler/File2Page --include-path=$HOME/depsBuild/openssl/include --library-path=$HOME/depsBuild/openssl/lib \
 	&& make \
 	&& cd .. \
 	&& find . -name obj -type d -print0 | xargs -0 rm -rf \
-	&& rm $YADOMS_DEPS_PATH/poco-1.9.3-all.tar.gz
+	&& rm $YADOMS_DEPS_PATH/poco-1.9.4-all.tar.gz
 
 # Protobuf
 RUN cd $YADOMS_DEPS_PATH \
-	&& wget --no-verbose https://github.com/google/protobuf/releases/download/v3.9.1/protobuf-cpp-3.9.1.tar.gz \
-	&& tar xzf protobuf-cpp-3.9.1.tar.gz && cd protobuf-3.9.1 \
+	&& wget --no-verbose https://github.com/google/protobuf/releases/download/v3.11.1/protobuf-cpp-3.11.1.tar.gz \
+	&& tar xzf protobuf-cpp-3.11.1.tar.gz && cd protobuf-3.11.1 \
 	&& ./autogen.sh \
 	&& ./configure --enable-shared=no --prefix=$HOME/depsBuild/protobuf --with-pic \
 	&& make \
 	&& make install \
 	&& ldconfig \
-	&& cd .. && rm -Rf protobuf-3.9.1 && rm $YADOMS_DEPS_PATH/protobuf-cpp-3.9.1.tar.gz
+	&& cd .. && rm -Rf protobuf-3.11.1 && rm $YADOMS_DEPS_PATH/protobuf-cpp-3.11.1.tar.gz
 
 # Swig
 RUN cd $YADOMS_DEPS_PATH \
@@ -127,7 +127,7 @@ RUN cd $YADOMS_DEPS_PATH \
 # Yadoms configuration file
 RUN echo 'Configuring Yadoms CMakeListsUserConfig.txt' \
 	&& echo 'set(BOOST_ROOT "'$YADOMS_DEPS_PATH'/boost_1_71_0")' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
-	&& echo 'set(POCO_ROOT "'$YADOMS_DEPS_PATH'/poco-1.9.3-all")' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
+	&& echo 'set(POCO_ROOT "'$YADOMS_DEPS_PATH'/poco-1.9.4-all")' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
 	&& echo 'set(PROTOBUF_ROOT "'$HOME'/depsBuild/protobuf")' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
 	&& echo 'set(PROTOBUF_PROTOC_EXECUTABLE "'$HOME'/depsBuild/protobuf/bin/protoc")' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
 	&& echo 'set(PROTOBUF_INSTALLED_TO_CUSTOM_DIRECTORY ON)' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
