@@ -210,6 +210,17 @@ RUN echo 'Configuring Yadoms CMakeListsUserConfig.txt' \
 	&& echo 'SET(COTIRE_USE_UNITY ON)' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
 	&& echo 'set(CC_RPI_ROOT "/opt/cross-pi-gcc-9.1.0-2")' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt
 
+####################################################################################
+#RaspberryPI IMAGE generation
+####################################################################################
+
+RUN apt-get update -y
+RUN apt-get install -y dialog apt-utils
+RUN apt-get install -y --allow-unauthenticated build-essential wget git lzop u-boot-tools binfmt-support qemu qemu-user-static multistrap parted dosfstools file udev zip curl
+ENV DEBIAN_FRONTEND noninteractive
+USER root
+
+
 #copy entrypoint at root
 COPY entrypoint.sh /
 
