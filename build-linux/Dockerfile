@@ -134,6 +134,17 @@ RUN cd $YADOMS_DEPS_PATH \
 	&& make install  > /dev/null\
 	&& cd ../.. && rm -Rf gammu-$gammu_version*
 
+# Libusb
+ARG libusb_version=1.0.23
+RUN cd $YADOMS_DEPS_PATH \
+	&& wget --no-verbose https://github.com/libusb/libusb/releases/download/v$libusb_version/libusb-$libusb_version.tar.bz2  > /dev/null\
+	&& tar xjf libusb-$libusb_version.tar.bz2  > /dev/null\
+	&& cd libusb-$libusb_version \
+	&& ./configure --prefix=$YADOMS_DEPS_PATH/libusb > /dev/null\
+	&& make > /dev/null\
+	&& make install  > /dev/null\
+	&& cd ../.. && rm -Rf libusb-$libusb_version*
+
 
 # Yadoms configuration file
 RUN echo 'Configuring Yadoms CMakeListsUserConfig.txt' \
@@ -157,6 +168,7 @@ RUN echo 'Configuring Yadoms CMakeListsUserConfig.txt' \
 	&& echo '       "'$YADOMS_DEPS_PATH'/postgresql-'$postgresql_version'/src/interfaces/libpq"' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
 	&& echo '       "'$YADOMS_DEPS_PATH'/postgresql-'$postgresql_version'/src/include")' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
 	&& echo 'set(GAMMU_ROOT "'$YADOMS_DEPS_PATH'/gammu")' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
+	&& echo 'set(LIBUSB_ROOT "'$YADOMS_DEPS_PATH'/libusb")' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
 	&& echo 'set(SWIG_ROOT "'$YADOMS_DEPS_PATH'/swig-'$swig_version'")' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
 	&& echo 'SET(COTIRE_USE ON)' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
 	&& echo 'SET(COTIRE_USE_UNITY ON)' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt
