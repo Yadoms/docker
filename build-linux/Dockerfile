@@ -41,7 +41,7 @@ RUN cd $YADOMS_DEPS_PATH \
 # OpenSSL
 ARG openssl_version=1.1.1d
 RUN cd $YADOMS_DEPS_PATH \
-	&& wget --no-verbose https://www.openssl.org/source/openssl-$openssl_version.tar.gz \
+	&& wget --no-verbose https://www.openssl.org/source/old/1.1.0/openssl-1.1.0k.tar.gz \
 	&& tar xzf openssl-$openssl_version.tar.gz && cd openssl-$openssl_version \
 	&& ./Configure --prefix=$HOME/depsBuild/openssl -fPIC linux-x86_64\
 	&& make \
