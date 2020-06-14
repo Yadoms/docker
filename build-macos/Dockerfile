@@ -48,22 +48,22 @@ RUN cd $YADOMS_DEPS_PATH \
 # Poco
 COPY ./Darwin64-osxcross $YADOMS_DEPS_PATH/Darwin64-osxcross
 RUN cd $YADOMS_DEPS_PATH \
-	&& wget --no-check-certificate --no-verbose http://pocoproject.org/releases/poco-1.9.3/poco-1.9.3-all.tar.gz\
-	&& tar xzf poco-1.9.3-all.tar.gz && cd poco-1.9.3-all\
+	&& wget --no-check-certificate --no-verbose http://pocoproject.org/releases/poco-1.9.4/poco-1.9.4-all.tar.gz\
+	&& tar xzf poco-1.9.4-all.tar.gz && cd poco-1.9.4-all\
         && cp $YADOMS_DEPS_PATH/Darwin64-osxcross build/config/Darwin64-osxcross \
 	&& OSXCROSS_MP_INC=1 ./configure --static --config=Darwin64-osxcross --no-samples --no-tests --omit=CppUnit,CppUnit/WinTestRunner,Data,Data/SQLite,Data/ODBCData/MySQL,MongoDB,PageCompiler,PageCompiler/File2Page\
 	&& OSXCROSS_MP_INC=1 make\
 	&& cd .. \
 	&& find . -name obj -type d -print0 | xargs -0 rm -rf  > /dev/null\
-	&& rm $YADOMS_DEPS_PATH/poco-1.9.3-all.tar.gz && rm -f $YADOMS_DEPS_PATH/Darwin64-osxcross
+	&& rm $YADOMS_DEPS_PATH/poco-1.9.4-all.tar.gz && rm -f $YADOMS_DEPS_PATH/Darwin64-osxcross
 
 
 
 # Protobuf (Host)
-RUN wget --no-check-certificate --no-verbose https://github.com/google/protobuf/releases/download/v3.9.1/protobuf-cpp-3.9.1.tar.gz  > /dev/null\
-	&& tar xzf protobuf-cpp-3.9.1.tar.gz && rm protobuf-cpp-3.9.1.tar.gz > /dev/null\
-    && cp -R protobuf-3.9.1 $YADOMS_BUILD_TOOLS_PATH/protobuf-3.9.1-host > /dev/null \
-	&& cd $YADOMS_BUILD_TOOLS_PATH/protobuf-3.9.1-host \
+RUN wget --no-check-certificate --no-verbose https://github.com/google/protobuf/releases/download/v3.11.1/protobuf-cpp-3.11.1.tar.gz  > /dev/null\
+	&& tar xzf protobuf-cpp-3.11.1.tar.gz && rm protobuf-cpp-3.11.1.tar.gz > /dev/null\
+    && cp -R protobuf-3.11.1 $YADOMS_BUILD_TOOLS_PATH/protobuf-3.11.1-host > /dev/null \
+	&& cd $YADOMS_BUILD_TOOLS_PATH/protobuf-3.11.1-host \
 	&& mkdir build \
 	&& cd build \
 	&& cmake -Dprotobuf_BUILD_TESTS=OFF ../cmake  > /dev/null\
@@ -71,13 +71,13 @@ RUN wget --no-check-certificate --no-verbose https://github.com/google/protobuf/
 	&& make install  > /dev/null\
 	&& ldconfig  > /dev/null
 # Protobuf (Darwin)
-RUN mv protobuf-3.9.1 $YADOMS_DEPS_PATH/protobuf-3.9.1 \
-	&& cd $YADOMS_DEPS_PATH/protobuf-3.9.1 \
+RUN mv protobuf-3.11.1 $YADOMS_DEPS_PATH/protobuf-3.11.1 \
+	&& cd $YADOMS_DEPS_PATH/protobuf-3.11.1 \
 	&& ./autogen.sh  > /dev/null\
 	&& ./configure --enable-shared=no --host=x86_64-apple-darwin16 CC=x86_64-apple-darwin16-gcc CXX=x86_64-apple-darwin16-g++ AR=x86_64-apple-darwin16-ar STRIP=x86_64-apple-darwin16-strip RANLIB=x86_64-apple-darwin16-ranlib --prefix=$YADOMS_DEPS_PATH/protobuf --with-protoc=protoc --with-pic  > /dev/null\
 	&& make  > /dev/null\
 	&& make install  > /dev/null\
-    && cd .. && rm -Rf $YADOMS_DEPS_PATH/protobuf-3.9.1
+    && cd .. && rm -Rf $YADOMS_DEPS_PATH/protobuf-3.11.1
 
 # Swig
 RUN cd $YADOMS_DEPS_PATH \
@@ -147,7 +147,7 @@ RUN cd $YADOMS_DEPS_PATH \
 # Yadoms configuration file
 RUN echo 'Configuring Yadoms CMakeListsUserConfig.txt' \
 	&& echo 'set(BOOST_ROOT "'$YADOMS_DEPS_PATH'/boost_1_71_0")' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
-	&& echo 'set(POCO_ROOT "'$YADOMS_DEPS_PATH'/poco-1.9.3-all")' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
+	&& echo 'set(POCO_ROOT "'$YADOMS_DEPS_PATH'/poco-1.9.4-all")' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
 	&& echo 'set(PROTOBUF_ROOT "'$YADOMS_DEPS_PATH'/protobuf")' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
 	&& echo 'set(PROTOBUF_PROTOC_EXECUTABLE "'`which protoc`'")' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
 	&& echo 'set(PROTOBUF_INSTALLED_TO_CUSTOM_DIRECTORY ON)' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
