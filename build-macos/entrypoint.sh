@@ -1,7 +1,6 @@
 #!/bin/bash
 set -e
 
-echo "Update Yadoms Git repository for $YADOMS_BUILD_BRANCH branch"
 # Yadoms sources
 if [ -z "$YADOMS_REPO" ]
 then
