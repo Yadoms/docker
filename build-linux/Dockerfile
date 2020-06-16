@@ -47,10 +47,11 @@ ARG openssl_version=1.1.1g
 RUN cd $YADOMS_DEPS_PATH \
 	&& wget --no-verbose https://www.openssl.org/source/openssl-$openssl_version.tar.gz \
 	&& tar xzf openssl-$openssl_version.tar.gz && cd openssl-$openssl_version \
-	&& ./Configure --prefix=$HOME/depsBuild/openssl -fPIC linux-x86_64\
+	&& ./Configure --prefix=$YADOMS_DEPS_PATH/openssl -fPIC linux-x86_64\
 	&& make \
 	&& make install \
-	&& cd .. && rm -Rf openssl-$openssl_version && rm $YADOMS_DEPS_PATH/openssl-$openssl_version.tar.gz
+	&& cd .. && rm -Rf openssl-$openssl_version && rm $YADOMS_DEPS_PATH/openssl-$openssl_version.tar.gz \
+	&& rm -Rf $YADOMS_DEPS_PATH/openssl/share
 
 # Poco
 ARG poco_version=1.9.4
@@ -71,11 +72,13 @@ RUN cd $YADOMS_DEPS_PATH \
 	&& wget --no-verbose https://github.com/google/protobuf/releases/download/v$protobuf_version/protobuf-cpp-$protobuf_version.tar.gz \
 	&& tar xzf protobuf-cpp-$protobuf_version.tar.gz && cd protobuf-$protobuf_version \
 	&& ./autogen.sh \
-	&& ./configure --enable-shared=no --prefix=$HOME/depsBuild/protobuf --with-pic \
+	&& ./configure --enable-shared=no --prefix=$YADOMS_DEPS_PATH/protobuf --with-pic \
 	&& make \
 	&& make install \
 	&& ldconfig \
-	&& cd .. && rm -Rf protobuf-$protobuf_version && rm $YADOMS_DEPS_PATH/protobuf-cpp-$protobuf_version.tar.gz
+	&& cd .. && rm -Rf protobuf-$protobuf_version && rm $YADOMS_DEPS_PATH/protobuf-cpp-$protobuf_version.tar.gz \
+	&& rm -f $YADOMS_DEPS_PATH/protobuf/lib/libprotoc.* && rm -f $YADOMS_DEPS_PATH/protobuf/lib/libprotobuf-lite.*
+
 
 # Swig
 ARG swig_version=4.0.2
@@ -87,30 +90,38 @@ RUN cd $YADOMS_DEPS_PATH \
 	&& make \
 	&& make install \
 	&& cd .. \
-	&& rm -f swig-$swig_version\Source\Modules\*.o \
-	&& rm -Rf swig-$swig_version\Examples \
-	&& rm -Rf swig-$swig_version\Docs \
+	&& rm -f swig-$swig_version/Source/Modules/*.o \
+	&& rm -Rf swig-$swig_version/Examples \
+	&& rm -Rf swig-$swig_version/Docs \
 	&& rm $YADOMS_DEPS_PATH/swig-$swig_version.tar.gz
 
 # Python 2.7 
-ARG python2_version=2.7.18
+ARG python2_version_maj=2
+ARG python2_version_min=7
+ARG python2_version_patch=18
+ARG python2_version=$python2_version_maj.$python2_version_min.$python2_version_patch
 RUN wget --no-verbose https://www.python.org/ftp/python/$python2_version/Python-$python2_version.tgz  > /dev/null\
 	&& tar xzf Python-$python2_version.tgz && rm Python-$python2_version.tgz  > /dev/null\
 	&& cd Python-$python2_version \
-	&& ./configure --enable-shared --prefix=$YADOMS_DEPS_PATH/python27 > /dev/null\
+	&& ./configure --enable-shared --prefix=$YADOMS_DEPS_PATH/python$python2_version_maj$python2_version_min > /dev/null\
 	&& make > /dev/null\
 	&& make install  > /dev/null\
-	&& cd ..
+	&& cd .. \
+	&& rm -Rf Python-$python2_version && rm -Rf $YADOMS_DEPS_PATH/python$python2_version_maj$python2_version_min/lib/python$python2_version_maj$.python2_version_min
 
 # Python $python3_version
-ARG python3_version=3.8.3
+ARG python3_version_maj=3
+ARG python3_version_min=8
+ARG python3_version_patch=3
+ARG python3_version=$python3_version_maj.$python3_version_min.$python3_version_patch
 RUN wget --no-verbose https://www.python.org/ftp/python/$python3_version/Python-$python3_version.tgz  > /dev/null\
 	&& tar xzf Python-$python3_version.tgz && rm Python-$python3_version.tgz  > /dev/null\
 	&& cd Python-$python3_version \
-	&& ./configure --enable-shared --without-pymalloc --prefix=$YADOMS_DEPS_PATH/python37 > /dev/null\
+	&& ./configure --enable-shared --without-pymalloc --prefix=$YADOMS_DEPS_PATH/python$python3_version_maj$python3_version_min > /dev/null\
 	&& make > /dev/null\
 	&& make install  > /dev/null\
-	&& cd ..
+	&& cd ..\
+	&& rm -Rf Python-$python3_version && rm -Rf $YADOMS_DEPS_PATH/python$python3_version_maj$python3_version_min/lib/python$python3_version_maj.$python3_version_min
 
 # PostgreSQL
 ARG postgresql_version=9.6.2
@@ -121,7 +132,7 @@ RUN cd $YADOMS_DEPS_PATH \
 	&& ./configure \
 	&& cd src/interfaces/libpq \
 	&& make \
-	&& cd .. && rm -Rf postgresql-$postgresql_version/doc && rm $YADOMS_DEPS_PATH/postgresql-$postgresql_version.tar.bz2
+	&& cd ../../../.. && rm -Rf postgresql-$postgresql_version/doc && rm $YADOMS_DEPS_PATH/postgresql-$postgresql_version.tar.bz2
 
 # Gammu
 ARG gammu_version=1.41.0
@@ -149,26 +160,28 @@ RUN cd $YADOMS_DEPS_PATH \
 	&& make install  > /dev/null\
 	&& cmake -DWITH_EIGEN:BOOL="0" -DWITH_IMGCODEC_HDR:BOOL="0" -DBUILD_opencv_ts:BOOL="0" -DBUILD_opencv_video:BOOL="0" -DWITH_TIFF:BOOL="0" -DBUILD_PACKAGE:BOOL="0" -DBUILD_opencv_features2d:BOOL="0" -DBUILD_ITT:BOOL="0" -Dthunder:BOOL="0" -Dlzw:BOOL="0" -DCV_TRACE:BOOL="0" -DWITH_MSMF:BOOL="0" -DWITH_FFMPEG:BOOL="0" -DWITH_IMGCODEC_PXM:BOOL="0" -DWITH_MSMF_DXVA:BOOL="0" -DCPACK_SOURCE_ZIP:BOOL="0" -Dpackbits:BOOL="0" -DBUILD_opencv_apps:BOOL="0" -DBUILD_PROTOBUF:BOOL="0" -DBUILD_opencv_objdetect:BOOL="0" -DBUILD_IPP_IW:BOOL="0" -DBUILD_opencv_videoio:BOOL="0" -DBUILD_PERF_TESTS:BOOL="0" -Dmdi:BOOL="0" -DWITH_1394:BOOL="0" -DINSTALL_PDB:BOOL="0" -DWITH_OPENCL:BOOL="0" -DM_LIBRARY:FILEPATH="M_LIBRARY-NOTFOUND" -DUSE_WIN32_FILEIO:BOOL="1" -DCPACK_SOURCE_7Z:BOOL="0" -DBUILD_opencv_stitching:BOOL="0" -Dccitt:BOOL="0" -DVIDEOIO_ENABLE_STRICT_PLUGIN_CHECK:BOOL="0" -DWITH_IPP:BOOL="0" -DBUILD_opencv_dnn:BOOL="0" -DWITH_ITT:BOOL="0" -DCPACK_BINARY_NSIS:BOOL="0" -DBUILD_opencv_photo:BOOL="0" -DBUILD_opencv_calib3d:BOOL="0" -DWITH_QUIRC:BOOL="0" -DWITH_WEBP:BOOL="0" -DBUILD_opencv_python_bindings_generator:BOOL="0" -DWITH_PROTOBUF:BOOL="0" -DBUILD_JASPER:BOOL="1" -DWITH_OPENCLAMDBLAS:BOOL="0" -DBUILD_JAVA:BOOL="0" -DWITH_VTK:BOOL="0" -DBUILD_opencv_java_bindings_generator:BOOL="0" -DBUILD_opencv_highgui:BOOL="0" -DWITH_ARITH_DEC:BOOL="0" -DWITH_IMGCODEC_SUNRASTER:BOOL="0" -DWITH_ADE:BOOL="0" -DBUILD_OPENEXR:BOOL="0" -DWITH_OPENEXR:BOOL="0" -DWITH_OPENCLAMDFFT:BOOL="0" -DVIDEOIO_ENABLE_PLUGINS:BOOL="0" -DWITH_DSHOW:BOOL="0" -DOPENCV_DNN_OPENCL:BOOL="0" -DWITH_LAPACK:BOOL="0" -DWITH_IMGCODEC_PFM:BOOL="0" -Dlogluv:BOOL="0" -DINSTALL_PDB_COMPONENT_EXCLUDE_FROM_ALL:BOOL="0" -DBUILD_opencv_ml:BOOL="0" -DOPENCV_ENABLE_MEMALIGN:BOOL="0" -DBUILD_opencv_python_tests:BOOL="0" -DCV_ENABLE_INTRINSICS:BOOL="0" -DOPENCL_FOUND:BOOL="0" -DWITH_OPENCL_D3D11_NV:BOOL="0" -Dnext:BOOL="0" -DBUILD_opencv_gapi:BOOL="0" -DBUILD_opencv_flann:BOOL="0" -DBUILD_TESTS:BOOL="0" -DWITH_DIRECTX:BOOL="0" -DCMAKE_BUILD_TYPE=Debug -DCMAKE_INSTALL_PREFIX=$YADOMS_DEPS_PATH/opencv .. >/dev/null \
 	&& make  > /dev/null\
-	&& make install  > /dev/null\	&& cd ../.. && rm -Rf opencv-$opencv_version* && rm -f $opencv_version.zip
+	&& make install  > /dev/null\	
+	&& cd ../.. && rm -Rf opencv-$opencv_version* && rm -f $opencv_version.zip
 
 # Yadoms configuration file
 RUN echo 'Configuring Yadoms CMakeListsUserConfig.txt' \
 	&& echo 'set(BOOST_ROOT "'$YADOMS_DEPS_PATH'/boost_'$boost_version'")' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
 	&& echo 'set(POCO_ROOT "'$YADOMS_DEPS_PATH'/poco-'$poco_version-all'")' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
-	&& echo 'set(PROTOBUF_ROOT "'$HOME'/depsBuild/protobuf")' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
-	&& echo 'set(PROTOBUF_PROTOC_EXECUTABLE "'$HOME'/depsBuild/protobuf/bin/protoc")' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
+	&& echo 'set(PROTOBUF_ROOT "'$YADOMS_DEPS_PATH'/protobuf")' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
+	&& echo 'set(PROTOBUF_PROTOC_EXECUTABLE "'$YADOMS_DEPS_PATH'/protobuf/bin/protoc")' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
 	&& echo 'set(PROTOBUF_INSTALLED_TO_CUSTOM_DIRECTORY ON)' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
-	&& echo 'set(OPENSSL_ROOT "'$HOME'/depsBuild/openssl")' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
+	&& echo 'set(OPENSSL_ROOT "'$YADOMS_DEPS_PATH'/openssl")' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
 	&& echo 'set(DEBUG_WITH_GCC OFF)' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
 	&& echo 'set(PYTHON_USE_PKGCONFIG OFF)' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
 	&& echo 'set(PYTHON_USE_SOURCES ON)' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
-	&& echo 'set(PYTHON_ROOT "'$YADOMS_DEPS_PATH'/Python-'$python2_version'")' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
-	&& echo 'set(PYTHON_LIBRARIES "'$YADOMS_DEPS_PATH'/Python-'$python2_version'/libpython2.7.so")' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
-	&& echo 'set(Python2_ROOT "'$YADOMS_DEPS_PATH'/Python-'$python2_version'")' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
-	&& echo 'set(PYTHON27_LIBRARIES "'$YADOMS_DEPS_PATH'/Python-'$python2_version'/libpython2.7.so")' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
-	&& echo 'set(Python3_ROOT "'$YADOMS_DEPS_PATH'/Python-'$python3_version'")' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
-	&& echo 'set(Python3_ROOT_DIR "'$YADOMS_DEPS_PATH'/Python-'$python2_version'")' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
-	&& echo 'set(PYTHON3_LIBRARIES "'$YADOMS_DEPS_PATH'/Python-'$python3_version'/libpython3.7.so")' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
+	&& echo 'set(Python2_ManualSetup ON)' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
+	&& echo 'set(Python2_EXECUTABLE "'$YADOMS_DEPS_PATH'/python'$python2_version_maj$python2_version_min'/bin/python'$python2_version_maj'")' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
+	&& echo 'set(Python2_LIBRARIES "'$YADOMS_DEPS_PATH'/python'$python2_version_maj$python2_version_min'/lib/libpython'$python2_version_maj'.'$python2_version_min'.so")' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
+	&& echo 'set(Python2_INCLUDE_DIRS "'$YADOMS_DEPS_PATH'/python'$python2_version_maj$python2_version_min'/include/python'$python2_version_maj'.'$python2_version_min'")' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
+	&& echo 'set(Python3_ManualSetup ON)' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
+	&& echo 'set(Python3_EXECUTABLE "'$YADOMS_DEPS_PATH'/python'$python3_version_maj$python3_version_min'/bin/python'$python3_version_maj'")' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
+	&& echo 'set(Python3_LIBRARIES "'$YADOMS_DEPS_PATH'/python'$python3_version_maj$python3_version_min'/lib/libpython'$python3_version_maj'.'$python3_version_min'.so")' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
+	&& echo 'set(Python3_INCLUDE_DIRS "'$YADOMS_DEPS_PATH'/python'$python3_version_maj$python3_version_min'/include/python'$python3_version_maj'.'$python3_version_min'")' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
 	&& echo 'set(PostgreSQL_ROOT ' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
 	&& echo '       "'$YADOMS_DEPS_PATH'/postgresql-'$postgresql_version'/src/interfaces/libpq"' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
 	&& echo '       "'$YADOMS_DEPS_PATH'/postgresql-'$postgresql_version'/src/include")' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
