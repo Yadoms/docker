@@ -1,14 +1,14 @@
 
 OPENSSL_DIR = /opt/osxcross/target/macports/pkgs/opt/local
 POCO_TARGET_OSNAME = Darwin
-OSFLAGS = -mmacosx-version-min=10.6
-CC=x86_64-apple-darwin16-gcc
-CXX=x86_64-apple-darwin16-g++
+OSFLAGS = -mmacosx-version-min=10.9
+CC=x86_64-apple-darwin19-gcc
+CXX=x86_64-apple-darwin19-g++
 
 #
 # Darwin-clang
 #
-# Build settings for Mac OS X 10.6 (clang, libstdc++, x86_64)
+# Build settings for Mac OS X 10.9 (clang, libstdc++, x86_64)
 # 
 # NOTE: This build configuration will build 64-bit binaries.
 # Use the Darwin32-clang build configuration to build 32-bit binaries.
@@ -22,7 +22,7 @@ LINKMODE ?= SHARED
 POCO_TARGET_OSARCH ?= x86_64
 POCO_HOST_OSARCH   := $(POCO_TARGET_OSARCH)
 ARCHFLAGS          ?= -arch $(POCO_TARGET_OSARCH) 
-OSFLAGS            ?= -mmacosx-version-min=10.7
+OSFLAGS            ?= -mmacosx-version-min=10.9
 
 OPENSSL_DIR        ?= /usr/local/opt/openssl
 
@@ -36,8 +36,8 @@ endif
 #CC      = $(shell xcrun -find clang)
 #CXX     = $(shell xcrun -find clang++)
 LINK    = $(CXX) -bind_at_load
-LIB     = x86_64-apple-darwin16-libtool -static -o
-RANLIB  = x86_64-apple-darwin16-ranlib
+LIB     = x86_64-apple-darwin19-libtool -static -o
+RANLIB  = x86_64-apple-darwin19-ranlib
 SHLIB   = $(CXX) -dynamiclib -Wl,-install_name,$(POCO_LIB_INSTALLDIR)/$(notdir \$@) -o $@
 DYLIB   = $(CXX) -dynamic -bundle $(RORELOCS) -Wl,-bind_at_load -o $@ 
 SHLIBLN = $(POCO_BASE)/build/script/shlibln
