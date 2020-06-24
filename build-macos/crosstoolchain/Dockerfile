@@ -19,11 +19,7 @@ ENV DARWIN_SDK_VERSION="${darwin_sdk_version}"         \
 USER root
 
 RUN apt-get update \
-	&& apt-get install -y -q autoconf automake autotools-dev bc binfmt-support binutils-multiarch \
-		binutils-multiarch-dev build-essential clang curl devscripts gdb git-core libtool llvm \
-		mercurial multistrap patch software-properties-common subversion wget xz-utils cmake \
-		qemu-user-static gcc-multilib libxml2-dev libssl-dev libz-dev gcc g++ zlib1g-dev \
-		libmpc-dev libmpfr-dev libgmp-dev  \
+	&& apt-get install -y -q wget git cmake apt-utils\
 	&& apt-get clean
 
 RUN git config --global http.sslVerify false \
@@ -36,13 +32,12 @@ COPY $sdk_file /
 RUN cd /opt/osxcross \
 	&& mv /$sdk_file tarballs/MacOSX${DARWIN_SDK_VERSION}.sdk.tar.xz \
     && UNATTENDED=1 PORTABLE=true SDK_VERSION="${DARWIN_SDK_VERSION}" OSX_VERSION_MIN="${DARWIN_OSX_VERSION_MIN}" ./build.sh \
-    && UNATTENDED=1 PORTABLE=true SDK_VERSION="${DARWIN_SDK_VERSION}" OSX_VERSION_MIN="${DARWIN_OSX_VERSION_MIN}" ./build_gcc.sh \
     && rm -Rf /opt/osxcross/build
 
 ENV PATH $PATH:/opt/osxcross/target/bin
 
 RUN UNATTENDED=1 MACOSX_DEPLOYMENT_TARGET=${DARWIN_OSX_VERSION_MIN} WGETOPTS=--no-check-certificate osxcross-macports install -s -v libtool
 RUN UNATTENDED=1 MACOSX_DEPLOYMENT_TARGET=${DARWIN_OSX_VERSION_MIN} WGETOPTS=--no-check-certificate osxcross-macports install -s -v openssl
-RUN UNATTENDED=1 MACOSX_DEPLOYMENT_TARGET=${DARWIN_OSX_VERSION_MIN} WGETOPTS=--no-check-certificate osxcross-macports install -v mpfr libmpc gmp llvm-8.0
+#RUN UNATTENDED=1 MACOSX_DEPLOYMENT_TARGET=${DARWIN_OSX_VERSION_MIN} WGETOPTS=--no-check-certificate osxcross-macports install -v mpfr libmpc gmp llvm-8.0
 
 CMD /bin/bash

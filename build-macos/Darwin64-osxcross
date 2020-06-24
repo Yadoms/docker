@@ -2,8 +2,8 @@
 OPENSSL_DIR = /opt/osxcross/target/macports/pkgs/opt/local
 POCO_TARGET_OSNAME = Darwin
 OSFLAGS = -mmacosx-version-min=10.9
-CC=x86_64-apple-darwin19-gcc
-CXX=x86_64-apple-darwin19-g++
+CC=x86_64-apple-darwin19-clang
+CXX=x86_64-apple-darwin19-clang++
 
 #
 # Darwin-clang
@@ -58,7 +58,7 @@ SHAREDLIBLINKEXT = .dylib
 # Compiler and Linker Flags
 #
 CFLAGS          = $(ARCHFLAGS) $(OSFLAGS) -std=c99
-CXXFLAGS        = $(ARCHFLAGS) $(OSFLAGS) -std=c++03 -Wall -Wno-sign-compare -Wno-unused-variable -Wno-unused-function -Wno-unneeded-internal-declaration
+CXXFLAGS        = $(ARCHFLAGS) $(OSFLAGS) -std=c++11 -Wall -Wno-sign-compare -Wno-unused-variable -Wno-unused-function -Wno-unneeded-internal-declaration
 LINKFLAGS       = $(ARCHFLAGS) $(OSFLAGS) 
 SHLIBFLAGS      = $(ARCHFLAGS) $(OSFLAGS) 
 DYLIBFLAGS      = $(ARCHFLAGS) $(OSFLAGS) 

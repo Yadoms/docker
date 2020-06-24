@@ -1,4 +1,4 @@
-FROM yadoms/toolchain_for_macos:june2020
+FROM yadoms/toolchain_for_macos:clangJune2020
 MAINTAINER jano42 "https://github.com/jano42"
 LABEL authors=jano42
 ENV DEBIAN_FRONTEND noninteractive
@@ -52,10 +52,10 @@ ARG boost_version=$boost_version_major$boost_underscore$boost_version_minor$boos
 ARG boost_version_dot=$boost_version_major.$boost_version_minor.$boost_version_patch
 RUN cd $YADOMS_DEPS_PATH \
 	&& wget --no-check-certificate --no-verbose https://dl.bintray.com/boostorg/release/$boost_version_dot/source/boost_$boost_version.tar.bz2\
-	&& tar xjf boost_$boost_version.tar.bz2 && cd boost_$boost_version  > /dev/null\
-	&& echo "using gcc : o64 : o64-g++ : <archiver>$YADOMS_CCMACOS_TRIPLET-ar <ranlib>$YADOMS_CCMACOS_TRIPLET-ranlib ;" > ~/user-config.jam \
+	&& tar xjf boost_$boost_version.tar.bz2 && cd boost_$boost_version  > /dev/null \
+	&& echo "using clang : o64 : o64-clang++ : <archiver>$YADOMS_CCMACOS_TRIPLET-ar <ranlib>$YADOMS_CCMACOS_TRIPLET-ranlib ;" > ~/user-config.jam \
 	&& ./bootstrap.sh\
-	&& ./b2 --with-atomic --with-chrono --with-date_time --with-filesystem --with-regex --with-thread --with-system link=static runtime-link=static --no-samples --no-tests toolset=gcc-o64 target-os=darwin cxxflags="-fPIC" visibility=global \
+	&& ./b2 --with-atomic --with-chrono --with-date_time --with-filesystem --with-regex --with-thread --with-system link=static runtime-link=static --no-samples --no-tests toolset=clang-o64 target-os=darwin cxxflags="-fPIC" visibility=global \
 	&& rm -Rf bin.v2 \
 	&& rm -Rf doc \
 	&& rm -Rf libs \
@@ -93,7 +93,7 @@ RUN wget --no-check-certificate --no-verbose https://github.com/google/protobuf/
 RUN mv protobuf-$protobuf_version $YADOMS_DEPS_PATH/protobuf-$protobuf_version \
 	&& cd $YADOMS_DEPS_PATH/protobuf-$protobuf_version \
 	&& ./autogen.sh  > /dev/null\
-	&& ./configure --enable-shared=no --host=$YADOMS_CCMACOS_TRIPLET CC=$YADOMS_CCMACOS_TRIPLET-gcc CXX=$YADOMS_CCMACOS_TRIPLET-g++ AR=$YADOMS_CCMACOS_TRIPLET-ar STRIP=$YADOMS_CCMACOS_TRIPLET-strip RANLIB=$YADOMS_CCMACOS_TRIPLET-ranlib --prefix=$YADOMS_DEPS_PATH/protobuf --with-protoc=protoc --with-pic  > /dev/null\
+	&& ./configure --enable-shared=no --host=$YADOMS_CCMACOS_TRIPLET CC=$YADOMS_CCMACOS_TRIPLET-clang CXX=$YADOMS_CCMACOS_TRIPLET-clang++ AR=$YADOMS_CCMACOS_TRIPLET-ar STRIP=$YADOMS_CCMACOS_TRIPLET-strip RANLIB=$YADOMS_CCMACOS_TRIPLET-ranlib --prefix=$YADOMS_DEPS_PATH/protobuf --with-protoc=protoc --with-pic  > /dev/null\
 	&& make  > /dev/null\
 	&& make install  > /dev/null\
     && cd .. && rm -Rf $YADOMS_DEPS_PATH/protobuf-$protobuf_version \
@@ -113,6 +113,29 @@ RUN cd $YADOMS_DEPS_PATH \
 	&& rm -Rf swig-$swig_version/Examples \
 	&& rm -Rf swig-$swig_version/Docs \
 	&& rm $YADOMS_DEPS_PATH/swig-$swig_version.tar.gz
+
+# Gammu
+
+#copy cross compile toolchain
+ARG gammu_version=1.41.0
+COPY gammu.cmake /
+COPY gammu_osx.patch /
+
+#build gammu
+RUN cd $YADOMS_DEPS_PATH \
+	&& wget --no-check-certificate --no-verbose https://dl.cihar.com/gammu/releases/gammu-$gammu_version.tar.bz2  > /dev/null\
+	&& tar xjf gammu-$gammu_version.tar.bz2  > /dev/null\
+	&& cd gammu-$gammu_version \
+	&& patch -p1 < /gammu_osx.patch \
+	&& mkdir rpicc \
+	&& cd rpicc \
+	&& eval `$YADOMS_CCMACOS_CONFTOOL` \
+	&& export OSXCROSS_HOST="$YADOMS_CCMACOS_TRIPLET" \	
+	&& cmake -DCMAKE_C_COMPILER=$YADOMS_CCMACOS_TRIPLET-clang -DCMAKE_CXX_COMPILER=$YADOMS_CCMACOS_TRIPLET-clang++ -DICONV_LIBRARIES="/opt/osxcross/target/macports/pkgs/opt/local/lib/libiconv.a" -DBUILD_SHARED_LIBS=OFF -DCMAKE_TOOLCHAIN_FILE=/gammu.cmake -DWITH_Iconv=OFF -DCMAKE_STAGING_PREFIX=$YADOMS_DEPS_PATH/gammu ..  \
+	&& make\
+	&& make install  > /dev/null\
+	&& cd ../.. && rm -Rf gammu-$gammu_version*
+
 
 # Python 2.7 (Host)
 ARG python2_version_maj=2
@@ -149,22 +172,6 @@ RUN UNATTENDED=1 MACOSX_DEPLOYMENT_TARGET=${DARWIN_OSX_VERSION_MIN} WGETOPTS=--n
 # PostgreSQL
 RUN UNATTENDED=1 MACOSX_DEPLOYMENT_TARGET=${DARWIN_OSX_VERSION_MIN} WGETOPTS=--no-check-certificate osxcross-macports install -s -v postgresql96 postgresql96-server
 
-# Gammu
-#copy cross compile toolchain
-ARG gammu_version=1.41.0
-COPY gammu.cmake /
-RUN cd $YADOMS_DEPS_PATH \
-	&& wget --no-check-certificate --no-verbose https://dl.cihar.com/gammu/releases/gammu-$gammu_version.tar.bz2  > /dev/null\
-	&& tar xjf gammu-$gammu_version.tar.bz2  > /dev/null\
-	&& cd gammu-$gammu_version \
-	&& mkdir rpicc \
-	&& cd rpicc \
-	&& eval `$YADOMS_CCMACOS_CONFTOOL` \
-	&& export OSXCROSS_HOST="$YADOMS_CCMACOS_TRIPLET" \	
-	&& cmake -DCMAKE_C_COMPILER=$YADOMS_CCMACOS_TRIPLET-gcc -DCMAKE_CXX_COMPILER=$YADOMS_CCMACOS_TRIPLET-g++ -DICONV_LIBRARIES="/opt/osxcross/target/macports/pkgs/opt/local/lib/libiconv.a" -DBUILD_SHARED_LIBS=OFF -DCMAKE_TOOLCHAIN_FILE=/gammu.cmake -DCMAKE_STAGING_PREFIX=$YADOMS_DEPS_PATH/gammu ..  > /dev/null\
-	&& make  > /dev/null\
-	&& make install  > /dev/null\
-	&& cd ../.. && rm -Rf gammu-$gammu_version*
 
 # Opencv
 RUN UNATTENDED=1 MACOSX_DEPLOYMENT_TARGET="10.14" WGETOPTS=--no-check-certificate osxcross-macports install -s -v opencv4
