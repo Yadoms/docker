@@ -4,10 +4,9 @@ on: push
 
 jobs:
 
-  build:
-  
+  linux:
+    name : Generate image for Linux
     runs-on: ubuntu-latest
-
     steps:
     - name: Checkout code
       uses: actions/checkout@v2
@@ -17,6 +16,38 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
           registry: docker.pkg.github.com
-          repository: yadoms/docker
+          repository: yadoms/docker/build_for_linux
           tag_with_ref: true
           path: build-linux
+
+  rpi:
+    name : Generate image for RaspberryPI
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+    - name: Build and push Docker images
+      uses: docker/build-push-action@v1
+      with:
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+          registry: docker.pkg.github.com
+          repository: yadoms/docker/build_for_raspberrypi
+          tag_with_ref: true
+          path: build-raspberrypi
+
+  macos:
+    name : Generate image for MacOSX (cross compile)
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+    - name: Build and push Docker images
+      uses: docker/build-push-action@v1
+      with:
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+          registry: docker.pkg.github.com
+          repository: yadoms/docker/build_for_macos
+          tag_with_ref: true
+          path: build-macos
