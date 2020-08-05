@@ -11,16 +11,12 @@ jobs:
     steps:
     - name: Checkout code
       uses: actions/checkout@v2
-      
-   - name: Build and push Docker images
-     uses: docker/build-push-action@v1
-        with:
+    - name: Build and push Docker images
+      uses: docker/build-push-action@v1
+      with:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
           registry: docker.pkg.github.com
           repository: yadoms/docker
           tag_with_ref: true
           path: build-linux
-
-              
-              
