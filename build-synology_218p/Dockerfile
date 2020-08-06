@@ -1,4 +1,4 @@
-FROM yadoms/synology218p_cross_toolchain
+FROM debian:stretch
 MAINTAINER jano42 "https://github.com/jano42"
 LABEL authors=jano42
 
@@ -7,22 +7,44 @@ ENV MAKE_PACKAGE false
 ENV YADOMS_BUILD_TOOLS_PATH /yadoms-build-tools
 ENV YADOMS_DEPS_PATH /yadoms-deps/synology
 
+#############################################################
+## Install all needed packages
+#############################################################
+
 RUN echo "deb http://deb.debian.org/debian/ stretch main contrib non-free" | tee -a /etc/apt/sources.list \
 &&  echo "deb http://security.debian.org/ stretch/updates main contrib non-free" | tee -a /etc/apt/sources.list \
 && echo "deb http://deb.debian.org/debian/ stretch-updates main contrib non-free" | tee -a /etc/apt/sources.list \
 && echo "deb http://deb.debian.org/debian stretch-backports main contrib non-free" | tee -a /etc/apt/sources.list
  
 RUN apt-get update \
-	&& apt-get install -q -y g++ libbz2-dev python-dev python3-dev wget build-essential libssl-dev \
+	&& apt-get dist-upgrade -q -y \
+	&& apt-get install -q -y build-essential gawk gfortran texinfo bison libncurses-dev nano ncdu \
+	g++ libbz2-dev python-dev python3-dev wget build-essential libssl-dev \
 	libopencv-gpu-dev autoconf automake libtool curl make g++ unzip \
 	libpcre3 libpcre3-dev libreadline-dev libpq5 \
 	postgresql-server-dev-all git rpm zip gcc gcc-doc libc6-dev
+
+#############################################################
+## Install toolchain
+#############################################################
+
+RUN wget 'https://sourceforge.net/projects/dsgpl/files/DSM%206.1%20Tool%20Chains/Intel%20x86%20Linux%204.4.15%20%28Apollolake%29/apollolake-gcc493_glibc220_linaro_x86_64-GPL.txz' \
+ && tar xf apollolake-gcc493_glibc220_linaro_x86_64-GPL.txz \
+ && mv x86_64-pc-linux-gnu /opt/x86_64-pc-linux-gnu \
+ && rm -f apollolake-gcc493_glibc220_linaro_x86_64-GPL.txz
+
+ENV PATH /opt/x86_64-pc-linux-gnu/bin:$PATH
+ENV LD_LIBRARY_PATH /opt/x86_64-pc-linux-gnu/lib/gcc/x86_64-pc-linux-gnu/4.9.3:$LD_LIBRARY_PATH
+
+#############################################################
+## Build yadoms dependencies
+#############################################################
 
 RUN mkdir -p $YADOMS_BUILD_TOOLS_PATH
 RUN mkdir -p $YADOMS_DEPS_PATH
 
 # CMake
-ARG cmake_version=3.15.2
+ARG cmake_version=3.17.3
 RUN cd $YADOMS_DEPS_PATH \
 	&& wget --no-check-certificate --no-verbose https://github.com/Kitware/CMake/releases/download/v$cmake_version/cmake-$cmake_version.tar.gz  > /dev/null\
 	&& tar xzf cmake-$cmake_version.tar.gz && cd cmake-$cmake_version  > /dev/null\
@@ -33,8 +55,8 @@ RUN cd $YADOMS_DEPS_PATH \
 RUN x86_64-pc-linux-gnu-gcc --version
 
 # Boost
-ARG boost_version=1_71_0
-ARG boost_version_dot=1.71.0
+ARG boost_version=1_73_0
+ARG boost_version_dot=1.73.0
 RUN cd $YADOMS_DEPS_PATH \
 	&& wget --no-check-certificate --no-verbose https://dl.bintray.com/boostorg/release/$boost_version_dot/source/boost_$boost_version.tar.bz2  > /dev/null\
 	&& tar xjf boost_$boost_version.tar.bz2 && cd boost_$boost_version  > /dev/null\
@@ -49,7 +71,7 @@ RUN cd $YADOMS_DEPS_PATH \
 	
 
 # OpenSSL
-ARG openssl_version=1.1.0g
+ARG openssl_version=1.1.1g
 RUN cd $YADOMS_DEPS_PATH \
 	&& wget --no-check-certificate --no-verbose https://www.openssl.org/source/openssl-$openssl_version.tar.gz  > /dev/null\
 	&& tar xzf openssl-$openssl_version.tar.gz && cd openssl-$openssl_version  > /dev/null\
@@ -76,7 +98,7 @@ RUN cd $YADOMS_DEPS_PATH \
 
 
 # Protobuf (Host)
-ARG protobuf_version=3.11.1
+ARG protobuf_version=3.12.3
 RUN wget --no-check-certificate --no-verbose https://github.com/google/protobuf/releases/download/v$protobuf_version/protobuf-cpp-$protobuf_version.tar.gz  > /dev/null\
 	&& tar xzf protobuf-cpp-$protobuf_version.tar.gz && rm protobuf-cpp-$protobuf_version.tar.gz > /dev/null\
         && cp -R protobuf-$protobuf_version $YADOMS_BUILD_TOOLS_PATH/protobuf-$protobuf_version-host > /dev/null \
@@ -98,7 +120,7 @@ RUN mv protobuf-$protobuf_version $YADOMS_DEPS_PATH/protobuf-$protobuf_version \
 
 
 # Swig
-ARG swig_version=4.0.1
+ARG swig_version=4.0.2
 RUN cd $YADOMS_DEPS_PATH \
 	&& echo "http://prdownloads.sourceforge.net/swig/swig-$swig_version.tar.gz" \
 	&& wget --no-check-certificate --no-verbose http://prdownloads.sourceforge.net/swig/swig-$swig_version.tar.gz  > /dev/null\
@@ -108,14 +130,17 @@ RUN cd $YADOMS_DEPS_PATH \
 	&& make  > /dev/null\
 	&& make install  > /dev/null\
 	&& cd .. \
-	&& rm -f swig-4.0.1\Source\Modules\*.o \
-	&& rm -Rf swig-4.0.1\Examples \
-	&& rm -Rf swig-4.0.1\Docs \
+	&& rm -f swig-$swig_version/Source/Modules/*.o \
+	&& rm -Rf swig-$swig_version/Examples \
+	&& rm -Rf swig-$swig_version/Docs \
 	&& rm $YADOMS_DEPS_PATH/swig-$swig_version.tar.gz
 
 
 # Python 2.7 (Host)
-ARG python2_version=2.7.16
+ARG python2_version_maj=2
+ARG python2_version_min=7
+ARG python2_version_patch=18
+ARG python2_version=$python2_version_maj.$python2_version_min.$python2_version_patch
 RUN wget --no-check-certificate --no-check-certificate --no-verbose https://www.python.org/ftp/python/$python2_version/Python-$python2_version.tgz  > /dev/null\
 	&& tar xzf Python-$python2_version.tgz && rm Python-$python2_version.tgz  > /dev/null\
     && cp -R Python-$python2_version Python-$python2_version-host  > /dev/null\
@@ -123,20 +148,23 @@ RUN wget --no-check-certificate --no-check-certificate --no-verbose https://www.
 	&& ./configure  > /dev/null\
 	&& make python Parser/pgen > /dev/null\
 	&& make install  > /dev/null\
-	&& mkdir -p $YADOMS_BUILD_TOOLS_PATH/pythonhost27 \
-	&& cp python $YADOMS_BUILD_TOOLS_PATH/pythonhost27/ \
-	&& cp Parser/pgen $YADOMS_BUILD_TOOLS_PATH/pythonhost27/ \
+	&& mkdir -p $YADOMS_BUILD_TOOLS_PATH/pythonhost$python2_version_maj$python2_version_min \
+	&& cp python $YADOMS_BUILD_TOOLS_PATH/pythonhost$python2_version_maj$python2_version_min/ \
+	&& cp Parser/pgen $YADOMS_BUILD_TOOLS_PATH/pythonhost$python2_version_maj$python2_version_min/ \
 	&& cd .. && rm -Rf Python-$python2_version-host
 # Python 2.7 (Pi)
 RUN mv Python-$python2_version $YADOMS_DEPS_PATH/Python-$python2_version  > /dev/null\
 	&& cd $YADOMS_DEPS_PATH/Python-$python2_version  > /dev/null\
-	&& ac_cv_file__dev_ptmx=no ac_cv_file__dev_ptc=no ac_cv_have_long_long_format=yes CC=x86_64-pc-linux-gnu-gcc CXX=x86_64-pc-linux-gnu-g++ AR=x86_64-pc-linux-gnu-ar RANLIB=x86_64-pc-linux-gnu-ranlib ./configure --host=x86_64-pc-linux-gnu --target=x86_64-pc-linux-gnu --build=x86_64-linux-gnu --prefix=$YADOMS_DEPS_PATH/python27 --disable-ipv6 --enable-shared\
-	&& make HOSTPYTHON=$YADOMS_BUILD_TOOLS_PATH/pythonhost/python HOSTPGEN=$YADOMS_BUILD_TOOLS_PATH/pythonhost/Parser/pgen BLDSHARED="x86_64-pc-linux-gnu-gcc -shared" CROSS-COMPILE=x86_64-pc-linux-gnu- CROSS_COMPILE_TARGET=yes HOSTARCH=arm-linux BUILDARCH=x86_64-pc-linux-gnu 
+	&& ac_cv_file__dev_ptmx=no ac_cv_file__dev_ptc=no ac_cv_have_long_long_format=yes CC=x86_64-pc-linux-gnu-gcc CXX=x86_64-pc-linux-gnu-g++ AR=x86_64-pc-linux-gnu-ar RANLIB=x86_64-pc-linux-gnu-ranlib ./configure --host=x86_64-pc-linux-gnu --target=x86_64-pc-linux-gnu --build=x86_64-linux-gnu --prefix=$YADOMS_DEPS_PATH/pythonpython$python2_version_maj$python2_version_min --disable-ipv6 --enable-shared\
+	&& make HOSTPYTHON=$YADOMS_BUILD_TOOLS_PATH/pythonhost$python2_version_maj$python2_version_min/python HOSTPGEN=$YADOMS_BUILD_TOOLS_PATH/pythonhost$python2_version_maj$python2_version_min/Parser/pgen BLDSHARED="x86_64-pc-linux-gnu-gcc -shared" CROSS-COMPILE=x86_64-pc-linux-gnu- CROSS_COMPILE_TARGET=yes HOSTARCH=arm-linux BUILDARCH=x86_64-pc-linux-gnu 
 
 RUN apt-get install -y libffi-dev
 
 # Python 3.7 (Host)
-ARG python3_version=3.7.3
+ARG python3_version_maj=3
+ARG python3_version_min=8
+ARG python3_version_patch=3
+ARG python3_version=$python3_version_maj.$python3_version_min.$python3_version_patch
 RUN wget --no-check-certificate --no-check-certificate --no-verbose https://www.python.org/ftp/python/$python3_version/Python-$python3_version.tgz  > /dev/null\
 	&& tar xzf Python-$python3_version.tgz && rm Python-$python3_version.tgz  > /dev/null\
     && cp -R Python-$python3_version Python-$python3_version-host  > /dev/null\
@@ -144,15 +172,15 @@ RUN wget --no-check-certificate --no-check-certificate --no-verbose https://www.
 	&& ./configure \
 	&& make python Parser/pgen > /dev/null\
 	&& make install  > /dev/null\
-	&& mkdir -p $YADOMS_BUILD_TOOLS_PATH/pythonhost37 \
-	&& cp python $YADOMS_BUILD_TOOLS_PATH/pythonhost37/ \
-	&& cp Parser/pgen $YADOMS_BUILD_TOOLS_PATH/pythonhost37/ \
+	&& mkdir -p $YADOMS_BUILD_TOOLS_PATH/pythonhost$python3_version_maj$python3_version_min \
+	&& cp python $YADOMS_BUILD_TOOLS_PATH/pythonhost$python3_version_maj$python3_version_min/ \
+	&& cp Parser/pgen $YADOMS_BUILD_TOOLS_PATH/pythonhost$python3_version_maj$python3_version_min/ \
 	&& cd .. && rm -Rf Python-$python3_version-host
 # Python 3.7 (Pi)
 RUN mv Python-$python3_version $YADOMS_DEPS_PATH/Python-$python3_version  > /dev/null\
 	&& cd $YADOMS_DEPS_PATH/Python-$python3_version  > /dev/null\
 	&& CC=x86_64-pc-linux-gnu-gcc CXX=x86_64-pc-linux-gnu-g++ AR=x86_64-pc-linux-gnu-ar RANLIB=x86_64-pc-linux-gnu-ranlib ./configure --host=x86_64-pc-linux-gnu --target=x86_64-pc-linux-gnu --build=x86_64-linux-gnu --prefix=$YADOMS_DEPS_PATH/python37 --disable-ipv6 ac_cv_file__dev_ptmx=no ac_cv_file__dev_ptc=no ac_cv_have_long_long_format=yes --enable-shared  --without-pymalloc  > /dev/null\
-	&& make HOSTPYTHON=$YADOMS_BUILD_TOOLS_PATH/pythonhost37/python HOSTPGEN=$YADOMS_BUILD_TOOLS_PATH/pythonhost37/Parser/pgen BLDSHARED="x86_64-pc-linux-gnu-gcc -shared" CROSS-COMPILE=x86_64-pc-linux-gnu- CROSS_COMPILE_TARGET=yes HOSTARCH=arm-linux BUILDARCH=x86_64-pc-linux-gnu  > /dev/null
+	&& make HOSTPYTHON=$YADOMS_BUILD_TOOLS_PATH/pythonhost$python3_version_maj$python3_version_min/python HOSTPGEN=$YADOMS_BUILD_TOOLS_PATH/pythonhost$python3_version_maj$python3_version_min/Parser/pgen BLDSHARED="x86_64-pc-linux-gnu-gcc -shared" CROSS-COMPILE=x86_64-pc-linux-gnu- CROSS_COMPILE_TARGET=yes HOSTARCH=arm-linux BUILDARCH=x86_64-pc-linux-gnu  > /dev/null
 
 
 
@@ -169,7 +197,7 @@ RUN cd $YADOMS_DEPS_PATH \
 
 
 COPY synology218p.cmake /
-ARG gammu_version=1.40.0
+ARG gammu_version=1.41.0
 RUN cd $YADOMS_DEPS_PATH \
 	&& wget --no-check-certificate --no-verbose https://dl.cihar.com/gammu/releases/gammu-$gammu_version.tar.bz2  > /dev/null\
 	&& tar xjf gammu-$gammu_version.tar.bz2  > /dev/null\
@@ -181,6 +209,22 @@ RUN cd $YADOMS_DEPS_PATH \
 	&& make install  > /dev/null\
 	&& cd ../.. && rm -Rf gammu-1.40.*
 
+# Opencv
+ARG opencv_version=4.3.0
+RUN cd $YADOMS_DEPS_PATH \
+	&& wget --no-verbose https://github.com/opencv/opencv/archive/$opencv_version.zip  > /dev/null\
+	&& unzip $opencv_version.zip  > /dev/null\
+	&& cd opencv-$opencv_version \
+	&& mkdir build \
+	&& cd build \
+	&& cmake -DWITH_EIGEN:BOOL="0" -DWITH_IMGCODEC_HDR:BOOL="0" -DBUILD_opencv_ts:BOOL="0" -DBUILD_opencv_video:BOOL="0" -DWITH_TIFF:BOOL="0" -DBUILD_PACKAGE:BOOL="0" -DBUILD_opencv_features2d:BOOL="0" -DBUILD_ITT:BOOL="0" -Dthunder:BOOL="0" -Dlzw:BOOL="0" -DCV_TRACE:BOOL="0" -DWITH_MSMF:BOOL="0" -DWITH_FFMPEG:BOOL="0" -DWITH_IMGCODEC_PXM:BOOL="0" -DWITH_MSMF_DXVA:BOOL="0" -DCPACK_SOURCE_ZIP:BOOL="0" -Dpackbits:BOOL="0" -DBUILD_opencv_apps:BOOL="0" -DBUILD_PROTOBUF:BOOL="0" -DBUILD_opencv_objdetect:BOOL="0" -DBUILD_IPP_IW:BOOL="0" -DBUILD_opencv_videoio:BOOL="0" -DBUILD_PERF_TESTS:BOOL="0" -Dmdi:BOOL="0" -DWITH_1394:BOOL="0" -DINSTALL_PDB:BOOL="0" -DWITH_OPENCL:BOOL="0" -DM_LIBRARY:FILEPATH="M_LIBRARY-NOTFOUND" -DUSE_WIN32_FILEIO:BOOL="1" -DCPACK_SOURCE_7Z:BOOL="0" -DBUILD_opencv_stitching:BOOL="0" -Dccitt:BOOL="0" -DVIDEOIO_ENABLE_STRICT_PLUGIN_CHECK:BOOL="0" -DWITH_IPP:BOOL="0" -DBUILD_opencv_dnn:BOOL="0" -DWITH_ITT:BOOL="0" -DCPACK_BINARY_NSIS:BOOL="0" -DBUILD_opencv_photo:BOOL="0" -DBUILD_opencv_calib3d:BOOL="0" -DWITH_QUIRC:BOOL="0" -DWITH_WEBP:BOOL="0" -DBUILD_opencv_python_bindings_generator:BOOL="0" -DWITH_PROTOBUF:BOOL="0" -DBUILD_JASPER:BOOL="1" -DWITH_OPENCLAMDBLAS:BOOL="0" -DBUILD_JAVA:BOOL="0" -DWITH_VTK:BOOL="0" -DBUILD_opencv_java_bindings_generator:BOOL="0" -DBUILD_opencv_highgui:BOOL="0" -DWITH_ARITH_DEC:BOOL="0" -DWITH_IMGCODEC_SUNRASTER:BOOL="0" -DWITH_ADE:BOOL="0" -DBUILD_OPENEXR:BOOL="0" -DWITH_OPENEXR:BOOL="0" -DWITH_OPENCLAMDFFT:BOOL="0" -DVIDEOIO_ENABLE_PLUGINS:BOOL="0" -DWITH_DSHOW:BOOL="0" -DOPENCV_DNN_OPENCL:BOOL="0" -DWITH_LAPACK:BOOL="0" -DWITH_IMGCODEC_PFM:BOOL="0" -Dlogluv:BOOL="0" -DINSTALL_PDB_COMPONENT_EXCLUDE_FROM_ALL:BOOL="0" -DBUILD_opencv_ml:BOOL="0" -DOPENCV_ENABLE_MEMALIGN:BOOL="0" -DBUILD_opencv_python_tests:BOOL="0" -DCV_ENABLE_INTRINSICS:BOOL="0" -DOPENCL_FOUND:BOOL="0" -DWITH_OPENCL_D3D11_NV:BOOL="0" -Dnext:BOOL="0" -DBUILD_opencv_gapi:BOOL="0" -DBUILD_opencv_flann:BOOL="0" -DBUILD_TESTS:BOOL="0" -DWITH_DIRECTX:BOOL="0" -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=$YADOMS_DEPS_PATH/opencv .. >/dev/null \
+	&& make  > /dev/null\
+	&& make install  > /dev/null\
+	&& cmake -DWITH_EIGEN:BOOL="0" -DWITH_IMGCODEC_HDR:BOOL="0" -DBUILD_opencv_ts:BOOL="0" -DBUILD_opencv_video:BOOL="0" -DWITH_TIFF:BOOL="0" -DBUILD_PACKAGE:BOOL="0" -DBUILD_opencv_features2d:BOOL="0" -DBUILD_ITT:BOOL="0" -Dthunder:BOOL="0" -Dlzw:BOOL="0" -DCV_TRACE:BOOL="0" -DWITH_MSMF:BOOL="0" -DWITH_FFMPEG:BOOL="0" -DWITH_IMGCODEC_PXM:BOOL="0" -DWITH_MSMF_DXVA:BOOL="0" -DCPACK_SOURCE_ZIP:BOOL="0" -Dpackbits:BOOL="0" -DBUILD_opencv_apps:BOOL="0" -DBUILD_PROTOBUF:BOOL="0" -DBUILD_opencv_objdetect:BOOL="0" -DBUILD_IPP_IW:BOOL="0" -DBUILD_opencv_videoio:BOOL="0" -DBUILD_PERF_TESTS:BOOL="0" -Dmdi:BOOL="0" -DWITH_1394:BOOL="0" -DINSTALL_PDB:BOOL="0" -DWITH_OPENCL:BOOL="0" -DM_LIBRARY:FILEPATH="M_LIBRARY-NOTFOUND" -DUSE_WIN32_FILEIO:BOOL="1" -DCPACK_SOURCE_7Z:BOOL="0" -DBUILD_opencv_stitching:BOOL="0" -Dccitt:BOOL="0" -DVIDEOIO_ENABLE_STRICT_PLUGIN_CHECK:BOOL="0" -DWITH_IPP:BOOL="0" -DBUILD_opencv_dnn:BOOL="0" -DWITH_ITT:BOOL="0" -DCPACK_BINARY_NSIS:BOOL="0" -DBUILD_opencv_photo:BOOL="0" -DBUILD_opencv_calib3d:BOOL="0" -DWITH_QUIRC:BOOL="0" -DWITH_WEBP:BOOL="0" -DBUILD_opencv_python_bindings_generator:BOOL="0" -DWITH_PROTOBUF:BOOL="0" -DBUILD_JASPER:BOOL="1" -DWITH_OPENCLAMDBLAS:BOOL="0" -DBUILD_JAVA:BOOL="0" -DWITH_VTK:BOOL="0" -DBUILD_opencv_java_bindings_generator:BOOL="0" -DBUILD_opencv_highgui:BOOL="0" -DWITH_ARITH_DEC:BOOL="0" -DWITH_IMGCODEC_SUNRASTER:BOOL="0" -DWITH_ADE:BOOL="0" -DBUILD_OPENEXR:BOOL="0" -DWITH_OPENEXR:BOOL="0" -DWITH_OPENCLAMDFFT:BOOL="0" -DVIDEOIO_ENABLE_PLUGINS:BOOL="0" -DWITH_DSHOW:BOOL="0" -DOPENCV_DNN_OPENCL:BOOL="0" -DWITH_LAPACK:BOOL="0" -DWITH_IMGCODEC_PFM:BOOL="0" -Dlogluv:BOOL="0" -DINSTALL_PDB_COMPONENT_EXCLUDE_FROM_ALL:BOOL="0" -DBUILD_opencv_ml:BOOL="0" -DOPENCV_ENABLE_MEMALIGN:BOOL="0" -DBUILD_opencv_python_tests:BOOL="0" -DCV_ENABLE_INTRINSICS:BOOL="0" -DOPENCL_FOUND:BOOL="0" -DWITH_OPENCL_D3D11_NV:BOOL="0" -Dnext:BOOL="0" -DBUILD_opencv_gapi:BOOL="0" -DBUILD_opencv_flann:BOOL="0" -DBUILD_TESTS:BOOL="0" -DWITH_DIRECTX:BOOL="0" -DCMAKE_BUILD_TYPE=Debug -DCMAKE_INSTALL_PREFIX=$YADOMS_DEPS_PATH/opencv .. >/dev/null \
+	&& make  > /dev/null\
+	&& make install  > /dev/null\	
+	&& cd ../.. && rm -Rf opencv-$opencv_version* && rm -f $opencv_version.zip
+	
 # Yadoms configuration file
 RUN echo 'Configuring Yadoms CMakeListsUserConfig.txt' \
 	&& echo 'set(BOOST_ROOT "'$YADOMS_DEPS_PATH'/boost_'$boost_version'")' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
@@ -193,18 +237,19 @@ RUN echo 'Configuring Yadoms CMakeListsUserConfig.txt' \
 	&& echo 'set(PYTHON_USE_PKGCONFIG OFF)' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
 	&& echo 'set(PYTHON_USE_SOURCES ON)' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
 	&& echo 'set(Python2_ManualSetup ON)' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
-	&& echo 'set(Python2_EXECUTABLE "/usr/local/bin/python2.7")' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
-	&& echo 'set(Python2_LIBRARIES "'$YADOMS_DEPS_PATH'/Python-'$python2_version'/libpython2.7.a")' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
-	&& echo 'set(Python2_INCLUDE_DIRS "'$YADOMS_DEPS_PATH'/Python-'$python2_version'")' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
+	&& echo 'set(Python2_EXECUTABLE "'$YADOMS_DEPS_PATH'/python'$python2_version_maj$python2_version_min'/bin/python'$python2_version_maj'")' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
+	&& echo 'set(Python2_LIBRARIES "'$YADOMS_DEPS_PATH'/python'$python2_version_maj$python2_version_min'/lib/libpython'$python2_version_maj'.'$python2_version_min'.so")' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
+	&& echo 'set(Python2_INCLUDE_DIRS "'$YADOMS_DEPS_PATH'/python'$python2_version_maj$python2_version_min'/include/python'$python2_version_maj'.'$python2_version_min'")' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
 	&& echo 'set(Python3_ManualSetup ON)' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
-	&& echo 'set(Python3_EXECUTABLE "/usr/local/bin/python3.7")' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
-	&& echo 'set(Python3_LIBRARIES "'$YADOMS_DEPS_PATH'/Python-'$python3_version'/libpython3.7.a")' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
-	&& echo 'set(Python3_INCLUDE_DIRS "'$YADOMS_DEPS_PATH'/Python-'$python3_version'")' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
+	&& echo 'set(Python3_EXECUTABLE "'$YADOMS_DEPS_PATH'/python'$python3_version_maj$python3_version_min'/bin/python'$python3_version_maj'")' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
+	&& echo 'set(Python3_LIBRARIES "'$YADOMS_DEPS_PATH'/python'$python3_version_maj$python3_version_min'/lib/libpython'$python3_version_maj'.'$python3_version_min'.so")' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
+	&& echo 'set(Python3_INCLUDE_DIRS "'$YADOMS_DEPS_PATH'/python'$python3_version_maj$python3_version_min'/include/python'$python3_version_maj'.'$python3_version_min'")' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
 	&& echo 'set(PostgreSQL_ROOT ' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
 	&& echo '       "'$YADOMS_DEPS_PATH'/postgresql-'$postgresql_version'/src/interfaces/libpq"' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
 	&& echo '       "'$YADOMS_DEPS_PATH'/postgresql-'$postgresql_version'/src/include")' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
 	&& echo 'set(GAMMU_ROOT "'$YADOMS_DEPS_PATH'/gammu")' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
 	&& echo 'set(SWIG_ROOT "'$YADOMS_DEPS_PATH'/swig-'$swig_version'")' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
+	&& echo 'set(OPENCV_ROOT "'$YADOMS_DEPS_PATH'/opencv")' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
 	&& echo 'SET(COTIRE_USE ON)' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
 	&& echo 'SET(COTIRE_USE_UNITY ON)' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
 	&& echo 'set(CC_RPI_ROOT "/opt/x86_64-pc-linux-gnu")' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt
