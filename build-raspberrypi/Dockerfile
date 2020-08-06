@@ -18,7 +18,7 @@ RUN echo "deb http://deb.debian.org/debian/ stretch main contrib non-free" | tee
 && echo "deb http://deb.debian.org/debian stretch-backports main contrib non-free" | tee -a /etc/apt/sources.list
  
 RUN apt-get update \
-	&& apt-get dist-upgrade -q -y
+	&& apt-get dist-upgrade -q -y \
 	&& apt-get install -q -y gawk gfortran texinfo bison libncurses-dev nano ncdu \
 	g++ libbz2-dev python-dev python3-dev wget build-essential libssl-dev \
 	libopencv-gpu-dev autoconf automake libtool curl make g++ unzip \

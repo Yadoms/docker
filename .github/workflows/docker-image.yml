@@ -50,7 +50,7 @@ jobs:
           registry: docker.pkg.github.com
           repository: yadoms/docker/build-raspberrypi-image
           tag_with_ref: true
-          path: build-raspberrypi
+          path: build-raspberrypi-image
 
   macos:
     name : Generate image for MacOSX (cross compile)
