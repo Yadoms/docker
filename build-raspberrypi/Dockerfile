@@ -30,7 +30,8 @@ RUN apt-get update \
 #############################################################
 
 # Installing arm-linux-gnueabihf cross toolchain
-RUN cd $YADOMS_BUILD_TOOLS_PATH \
+RUN mkdir -p $YADOMS_BUILD_TOOLS_PATH \
+	&& cd $YADOMS_BUILD_TOOLS_PATH \
 	&& GIT_SSL_NO_VERIFY=true git clone --depth=1 https://github.com/raspberrypi/tools.git  > /dev/null
 ENV PATH $PATH:$YADOMS_BUILD_TOOLS_PATH/tools/arm-bcm2708/arm-rpi-4.9.3-linux-gnueabihf/bin
 
