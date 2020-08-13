@@ -75,7 +75,7 @@ ARG openssl_version=1.1.1g
 RUN cd $YADOMS_DEPS_PATH \
 	&& wget --no-check-certificate --no-verbose https://www.openssl.org/source/openssl-$openssl_version.tar.gz  > /dev/null\
 	&& tar xzf openssl-$openssl_version.tar.gz && cd openssl-$openssl_version  > /dev/null\
-	&& ./Configure linux-generic32 --prefix=$YADOMS_DEPS_PATH/openssl --cross-compile-prefix=/opt/cross-pi-gcc-9.1.0-2/bin/x86_64-pc-linux-gnu-  > /dev/null\
+	&& ./Configure linux-generic32 --prefix=$YADOMS_DEPS_PATH/openssl --cross-compile-prefix=x86_64-pc-linux-gnu-  > /dev/null\
 	&& make CC="x86_64-pc-linux-gnu-gcc" AR="x86_64-pc-linux-gnu-ar r" RANLIB="x86_64-pc-linux-gnu-ranlib"  > /dev/null\
 	&& make install  > /dev/null\
 	&& cd .. && rm -Rf openssl-$openssl_version && rm $YADOMS_DEPS_PATH/openssl-$openssl_version.tar.gz

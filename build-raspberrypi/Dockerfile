@@ -29,23 +29,11 @@ RUN apt-get update \
 ## Install toolchain
 #############################################################
 
-# Cross toolcahin for raspberryPI
-# based on https://github.com/abhiTronix/raspberry-pi-cross-compilers
-# -> comptible with all RapsberryPI
-# -> GCC 9.1
-# -> X86_64 COMPILER
+# Installing arm-linux-gnueabihf cross toolchain
+RUN cd $YADOMS_BUILD_TOOLS_PATH \
+	&& GIT_SSL_NO_VERIFY=true git clone --depth=1 https://github.com/raspberrypi/tools.git  > /dev/null
+ENV PATH $PATH:$YADOMS_BUILD_TOOLS_PATH/tools/arm-bcm2708/arm-rpi-4.9.3-linux-gnueabihf/bin
 
-RUN apt-get update  && apt-get install -q -y  
-
-# download Raspberri PI cross compiler gcc 9.1 compatible with all RaspberryPI
-# https://github.com/abhiTronix/raspberry-pi-cross-compiler
-RUN wget 'https://sourceforge.net/projects/raspberry-pi-cross-compilers/files/Raspberry%20Pi%20GCC%20Cross-Compiler%20Toolchains/GCC%209.1.0/Raspberry%20Pi%203A%2B%2C%203B%2B/cross-gcc-9.1.0-pi_3%2B.tar.gz' \
- && tar xf cross-gcc-9.1.0-pi_3+.tar.gz \
- && mv cross-pi-gcc-9.1.0-2 /opt/cross-pi-gcc-9.1.0-2 \
- && rm -f cross-gcc-9.1.0-pi_3+.tar.gz
-
-ENV PATH /opt/cross-pi-gcc-9.1.0-2/bin:$PATH
-ENV LD_LIBRARY_PATH /opt/cross-pi-gcc-9.1.0-2/lib:$LD_LIBRARY_PATH
 
 #############################################################
 ## Build yadoms dependencies
@@ -86,7 +74,7 @@ ARG openssl_version=1.1.1g
 RUN cd $YADOMS_DEPS_PATH \
 	&& wget --no-check-certificate --no-verbose https://www.openssl.org/source/openssl-$openssl_version.tar.gz  > /dev/null\
 	&& tar xzf openssl-$openssl_version.tar.gz && cd openssl-$openssl_version  > /dev/null\
-	&& ./Configure linux-generic32 --prefix=$YADOMS_DEPS_PATH/openssl --cross-compile-prefix=/opt/cross-pi-gcc-9.1.0-2/bin/arm-linux-gnueabihf-  > /dev/null\
+	&& ./Configure linux-generic32 --prefix=$YADOMS_DEPS_PATH/openssl --cross-compile-prefix=$YADOMS_BUILD_TOOLS_PATH/tools/arm-bcm2708/arm-rpi-4.9.3-linux-gnueabihf/bin/arm-linux-gnueabihf-  > /dev/null\
 	&& make CC="arm-linux-gnueabihf-gcc" AR="arm-linux-gnueabihf-ar r" RANLIB="arm-linux-gnueabihf-ranlib"  > /dev/null\
 	&& make install  > /dev/null\
 	&& cd .. && rm -Rf openssl-$openssl_version && rm $YADOMS_DEPS_PATH/openssl-$openssl_version.tar.gz
@@ -263,7 +251,7 @@ RUN echo 'Configuring Yadoms CMakeListsUserConfig.txt' \
 	&& echo 'set(OPENCV_ROOT "'$YADOMS_DEPS_PATH'/opencv")' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
 	&& echo 'SET(COTIRE_USE ON)' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
 	&& echo 'SET(COTIRE_USE_UNITY ON)' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
-	&& echo 'set(CC_RPI_ROOT "/opt/cross-pi-gcc-9.1.0-2")' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt
+	&& echo 'set(CC_RPI_ROOT "'$YADOMS_BUILD_TOOLS_PATH'/tools/arm-bcm2708/arm-rpi-4.9.3-linux-gnueabihf")' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt
 
 ####################################################################################
 #RaspberryPI IMAGE generation
