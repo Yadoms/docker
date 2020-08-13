@@ -72,6 +72,7 @@ RUN cd $YADOMS_DEPS_PATH \
 
 # OpenSSL
 ARG openssl_version=1.1.1g
+RUN apt-get install -qy libssl-dev:i386
 RUN cd $YADOMS_DEPS_PATH \
 	&& wget --no-check-certificate --no-verbose https://www.openssl.org/source/openssl-$openssl_version.tar.gz  > /dev/null\
 	&& tar xzf openssl-$openssl_version.tar.gz && cd openssl-$openssl_version  > /dev/null\
