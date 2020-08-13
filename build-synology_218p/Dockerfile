@@ -28,7 +28,9 @@ RUN apt-get update \
 ## Install toolchain
 #############################################################
 
-RUN wget 'https://sourceforge.net/projects/dsgpl/files/DSM%206.1%20Tool%20Chains/Intel%20x86%20Linux%204.4.15%20%28Apollolake%29/apollolake-gcc493_glibc220_linaro_x86_64-GPL.txz' \
+/download
+
+RUN wget 'https://sourceforge.net/projects/dsgpl/files/Tool%20Chain/DSM%206.2.2%20Tool%20Chains/Intel%20x86%20Linux%204.4.59%20%28Apollolake%29/apollolake-gcc493_glibc220_linaro_x86_64-GPL.txz' \
  && tar xf apollolake-gcc493_glibc220_linaro_x86_64-GPL.txz \
  && mv x86_64-pc-linux-gnu /opt/x86_64-pc-linux-gnu \
  && rm -f apollolake-gcc493_glibc220_linaro_x86_64-GPL.txz
