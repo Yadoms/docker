@@ -51,12 +51,12 @@ RUN cd $YADOMS_DEPS_PATH \
 	
 
 # OpenSSL
-ARG openssl_version=1.1.0g
+ARG openssl_version=1.1.1g
 RUN cd $YADOMS_DEPS_PATH \
 	&& wget --no-check-certificate --no-verbose https://www.openssl.org/source/openssl-$openssl_version.tar.gz  > /dev/null\
 	&& tar xzf openssl-$openssl_version.tar.gz && cd openssl-$openssl_version  > /dev/null\
 	&& ./Configure linux-generic32 --prefix=$YADOMS_DEPS_PATH/openssl --cross-compile-prefix=/opt/cross-pi-gcc-9.1.0-2/bin/arm-marvell-linux-gnueabi-  > /dev/null\
-	&& make CC="arm-marvell-linux-gnueabi-gcc" AR="arm-marvell-linux-gnueabi-ar r" RANLIB="arm-marvell-linux-gnueabi-ranlib"  > /dev/null\
+	&& make CC="arm-marvell-linux-gnueabi-gcc" AR="arm-marvell-linux-gnueabi-ar" RANLIB="arm-marvell-linux-gnueabi-ranlib"  > /dev/null\
 	&& make install  > /dev/null\
 	&& cd .. && rm -Rf openssl-$openssl_version && rm $YADOMS_DEPS_PATH/openssl-$openssl_version.tar.gz
 	

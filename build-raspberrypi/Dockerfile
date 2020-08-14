@@ -23,7 +23,8 @@ RUN apt-get update \
 	g++ libbz2-dev python-dev python3-dev wget build-essential libssl-dev \
 	libopencv-gpu-dev autoconf automake libtool curl make g++ unzip \
 	libpcre3 libpcre3-dev libreadline-dev libpq5 \
-	postgresql-server-dev-all git rpm zip gcc gcc-doc libc6-dev
+	postgresql-server-dev-all git rpm zip gcc gcc-doc libc6-dev \
+	libffi-dev
 	
 #############################################################
 ## Install toolchain
@@ -158,29 +159,27 @@ RUN mv Python-$python2_version $YADOMS_DEPS_PATH/Python-$python2_version  > /dev
 	&& ac_cv_file__dev_ptmx=no ac_cv_file__dev_ptc=no ac_cv_have_long_long_format=yes CC=arm-linux-gnueabihf-gcc CXX=arm-linux-gnueabihf-g++ AR=arm-linux-gnueabihf-ar RANLIB=arm-linux-gnueabihf-ranlib ./configure --host=arm-linux-gnueabihf --target=arm-linux-gnueabihf --build=x86_64-linux-gnu --prefix=$YADOMS_DEPS_PATH/python27 --disable-ipv6 --enable-shared\
 	&& make HOSTPYTHON=$YADOMS_BUILD_TOOLS_PATH/pythonhost/python HOSTPGEN=$YADOMS_BUILD_TOOLS_PATH/pythonhost/Parser/pgen BLDSHARED="arm-linux-gnueabihf-gcc -shared" CROSS-COMPILE=arm-linux-gnueabihf- CROSS_COMPILE_TARGET=yes HOSTARCH=arm-linux BUILDARCH=arm-linux-gnueabihf 
 
-RUN apt-get install -y libffi-dev
-
 # Python 3.7 (Host)
 ARG python3_version_maj=3
 ARG python3_version_min=8
 ARG python3_version_patch=3
 ARG python3_version=$python3_version_maj.$python3_version_min.$python3_version_patch
-RUN wget --no-check-certificate --no-check-certificate --no-verbose https://www.python.org/ftp/python/$python3_version/Python-$python3_version.tgz  > /dev/null\
-	&& tar xzf Python-$python3_version.tgz && rm Python-$python3_version.tgz  > /dev/null\
-    && cp -R Python-$python3_version Python-$python3_version-host  > /dev/null\
-	&& cd Python-$python3_version-host  > /dev/null\
+RUN wget --no-check-certificate --no-check-certificate --no-verbose https://www.python.org/ftp/python/$python3_version/Python-$python3_version.tgz\
+	&& tar xzf Python-$python3_version.tgz && rm Python-$python3_version.tgz\
+    && cp -R Python-$python3_version Python-$python3_version-host\
+	&& cd Python-$python3_version-host\
 	&& ./configure \
-	&& make python Parser/pgen > /dev/null\
-	&& make install  > /dev/null\
+	&& make python Parser/pgen\
+	&& make install\
 	&& mkdir -p $YADOMS_BUILD_TOOLS_PATH/pythonhost$python3_version_maj$python3_version_min \
 	&& cp python $YADOMS_BUILD_TOOLS_PATH/pythonhost$python3_version_maj$python3_version_min/ \
 	&& cp Parser/pgen $YADOMS_BUILD_TOOLS_PATH/pythonhost$python3_version_maj$python3_version_min/ \
 	&& cd .. && rm -Rf Python-$python3_version-host
 # Python 3.7 (Pi)
-RUN mv Python-$python3_version $YADOMS_DEPS_PATH/Python-$python3_version  > /dev/null\
-	&& cd $YADOMS_DEPS_PATH/Python-$python3_version  > /dev/null\
-	&& CC=arm-linux-gnueabihf-gcc CXX=arm-linux-gnueabihf-g++ AR=arm-linux-gnueabihf-ar RANLIB=arm-linux-gnueabihf-ranlib ./configure --host=arm-linux-gnueabihf --target=arm-linux-gnueabihf --build=x86_64-linux-gnu --prefix=$YADOMS_DEPS_PATH/python37 --disable-ipv6 ac_cv_file__dev_ptmx=no ac_cv_file__dev_ptc=no ac_cv_have_long_long_format=yes --enable-shared  --without-pymalloc  > /dev/null\
-	&& make HOSTPYTHON=$YADOMS_BUILD_TOOLS_PATH/pythonhost$python3_version_maj$python3_version_min/python HOSTPGEN=$YADOMS_BUILD_TOOLS_PATH/pythonhost37/Parser/pgen BLDSHARED="arm-linux-gnueabihf-gcc -shared" CROSS-COMPILE=arm-linux-gnueabihf- CROSS_COMPILE_TARGET=yes HOSTARCH=arm-linux BUILDARCH=arm-linux-gnueabihf  > /dev/null
+RUN mv Python-$python3_version $YADOMS_DEPS_PATH/Python-$python3_version\
+	&& cd $YADOMS_DEPS_PATH/Python-$python3_version\
+	&& CC=arm-linux-gnueabihf-gcc CXX=arm-linux-gnueabihf-g++ AR=arm-linux-gnueabihf-ar RANLIB=arm-linux-gnueabihf-ranlib ./configure --host=arm-linux-gnueabihf --target=arm-linux-gnueabihf --build=x86_64-linux-gnu --prefix=$YADOMS_DEPS_PATH/python37 --disable-ipv6 ac_cv_file__dev_ptmx=no ac_cv_file__dev_ptc=no ac_cv_have_long_long_format=yes --enable-shared  --without-pymalloc  \
+	&& make HOSTPYTHON=$YADOMS_BUILD_TOOLS_PATH/pythonhost$python3_version_maj$python3_version_min/python HOSTPGEN=$YADOMS_BUILD_TOOLS_PATH/pythonhost37/Parser/pgen BLDSHARED="arm-linux-gnueabihf-gcc -shared" CROSS-COMPILE=arm-linux-gnueabihf- CROSS_COMPILE_TARGET=yes HOSTARCH=arm-linux BUILDARCH=arm-linux-gnueabihf  
 
 
 
