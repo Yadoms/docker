@@ -11,11 +11,12 @@ set(CMAKE_COMPILER_IS_RASPBERRY_CROSS_COMPILER ON)
 include(CMakeListsUserConfig.txt OPTIONAL)
 
 # cross compiler tools
-set(CC_RPI_ROOT /opt/cross-pi-gcc-9.1.0-2)
+set(CC_RPI_ROOT /yadoms-build-tools/tools/arm-bcm2708/arm-rpi-4.9.3-linux-gnueabihf
 set(CC_RPI_GCC ${CC_RPI_ROOT}/bin/arm-linux-gnueabihf-gcc)
 set(CC_RPI_GXX ${CC_RPI_ROOT}/bin/arm-linux-gnueabihf-g++)
 set(CC_RPI_LIBS ${CC_RPI_ROOT}/arm-linux-gnueabihf/libc)
-set(CMAKE_SYSROOT ${CC_RPI_LIBS})
+set(CMAKE_SYSROOT yadoms-build-tools/tools/arm-bcm2708/arm-rpi-4.9.3-linux-gnueabihf/arm-linux-gnueabihf/sysroot)
+
 
 unset(CMAKE_C_IMPLICIT_INCLUDE_DIRECTORIES)
 unset(CMAKE_CXX_IMPLICIT_INCLUDE_DIRECTORIES)
