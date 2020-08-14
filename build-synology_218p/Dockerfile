@@ -27,9 +27,6 @@ RUN apt-get update \
 #############################################################
 ## Install toolchain
 #############################################################
-
-/download
-
 RUN wget 'https://sourceforge.net/projects/dsgpl/files/Tool%20Chain/DSM%206.2.2%20Tool%20Chains/Intel%20x86%20Linux%204.4.59%20%28Apollolake%29/apollolake-gcc493_glibc220_linaro_x86_64-GPL.txz' \
  && tar xf apollolake-gcc493_glibc220_linaro_x86_64-GPL.txz \
  && mv x86_64-pc-linux-gnu /opt/x86_64-pc-linux-gnu \
@@ -78,7 +75,7 @@ RUN cd $YADOMS_DEPS_PATH \
 	&& wget --no-check-certificate --no-verbose https://www.openssl.org/source/openssl-$openssl_version.tar.gz  > /dev/null\
 	&& tar xzf openssl-$openssl_version.tar.gz && cd openssl-$openssl_version  > /dev/null\
 	&& ./Configure linux-generic32 --prefix=$YADOMS_DEPS_PATH/openssl --cross-compile-prefix=x86_64-pc-linux-gnu-  > /dev/null\
-	&& make CC="x86_64-pc-linux-gnu-gcc" AR="x86_64-pc-linux-gnu-ar" RANLIB="x86_64-pc-linux-gnu-ranlib"  > /dev/null\
+	&& make CC="x86_64-pc-linux-gnu-gcc" AR="x86_64-pc-linux-gnu-ar r" RANLIB="x86_64-pc-linux-gnu-ranlib"  > /dev/null\
 	&& make install  > /dev/null\
 	&& cd .. && rm -Rf openssl-$openssl_version && rm $YADOMS_DEPS_PATH/openssl-$openssl_version.tar.gz
 	
