@@ -1,2 +1,0 @@
-docker tag raspberrypi_croos_toolchain yadoms/raspberrypi_croos_toolchain
-docker push yadoms/raspberrypi_croos_toolchain

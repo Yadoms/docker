@@ -1,2 +1,0 @@
-docker tag synology218p_cross_toolchain yadoms/synology218p_cross_toolchain
-docker push yadoms/synology218p_cross_toolchain

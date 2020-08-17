@@ -21,7 +21,7 @@ RUN mkdir $YADOMS_DEPS_PATH
 RUN echo "check_certificate = off" >> ~/.wgetrc
 
 # CMake
-ARG cmake_version=3.17.3
+ARG cmake_version=3.18.1
 RUN cd $YADOMS_DEPS_PATH \
 	&& wget --no-verbose https://github.com/Kitware/CMake/releases/download/v$cmake_version/cmake-$cmake_version.tar.gz \
 	&& tar xzf cmake-$cmake_version.tar.gz && cd cmake-$cmake_version \
@@ -29,8 +29,12 @@ RUN cd $YADOMS_DEPS_PATH \
 	&& cd .. && rm -Rf cmake-$cmake_version && rm $YADOMS_DEPS_PATH/cmake-$cmake_version.tar.gz
 
 # Boost
-ARG boost_version=1_73_0
-ARG boost_version_dot=1.73.0
+ARG boost_version_major=1
+ARG boost_version_minor=74
+ARG boost_version_patch=0
+ARG boost_underscore=_
+ARG boost_version=$boost_version_major$boost_underscore$boost_version_minor$boost_underscore$boost_version_patch
+ARG boost_version_dot=$boost_version_major.$boost_version_minor.$boost_version_patch
 RUN cd $YADOMS_DEPS_PATH \
 	&& wget --no-verbose https://dl.bintray.com/boostorg/release/$boost_version_dot/source/boost_$boost_version.tar.bz2 \
 	&& tar xjf boost_$boost_version.tar.bz2 && cd boost_$boost_version \
@@ -67,7 +71,7 @@ RUN cd $YADOMS_DEPS_PATH \
 	&& rm $YADOMS_DEPS_PATH/poco-$poco_version-all.tar.gz
 
 # Protobuf
-ARG protobuf_version=3.12.3
+ARG protobuf_version=3.13.0
 RUN cd $YADOMS_DEPS_PATH \
 	&& wget --no-verbose https://github.com/google/protobuf/releases/download/v$protobuf_version/protobuf-cpp-$protobuf_version.tar.gz \
 	&& tar xzf protobuf-cpp-$protobuf_version.tar.gz && cd protobuf-$protobuf_version \
@@ -112,7 +116,7 @@ RUN wget --no-verbose https://www.python.org/ftp/python/$python2_version/Python-
 # Python $python3_version
 ARG python3_version_maj=3
 ARG python3_version_min=8
-ARG python3_version_patch=3
+ARG python3_version_patch=5
 ARG python3_version=$python3_version_maj.$python3_version_min.$python3_version_patch
 RUN wget --no-verbose https://www.python.org/ftp/python/$python3_version/Python-$python3_version.tgz  > /dev/null\
 	&& tar xzf Python-$python3_version.tgz && rm Python-$python3_version.tgz  > /dev/null\

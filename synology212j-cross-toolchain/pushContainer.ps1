@@ -1,2 +1,0 @@
-docker tag synology_marvel_kirkwood_88f6281_cross_toolchain yadoms/synology_marvel_kirkwood_88f6281_cross_toolchain
-docker push yadoms/synology_marvel_kirkwood_88f6281_cross_toolchain

@@ -1,7 +1,28 @@
-FROM yadoms/toolchain_for_macos:clangJune2020
+FROM debian:stable
 MAINTAINER jano42 "https://github.com/jano42"
 LABEL authors=jano42
+
+#############################################################
+## Setup env var && arguments
+#############################################################
+
+
 ENV DEBIAN_FRONTEND noninteractive
+
+ENV OSXCROSS_SDK_VERSION 10.15
+
+#Build arguments
+ARG darwin_sdk_version="10.15"
+ARG darwin_osx_version_min="10.9"
+ARG darwin_version="15"
+ARG sdk_file="MacOSX10.15.sdk.tar.xz"
+
+# ENV available in docker image
+ENV DARWIN_SDK_VERSION="${darwin_sdk_version}"         \
+    DARWIN_VERSION="${darwin_version}"                 \
+    DARWIN_OSX_VERSION_MIN="${darwin_osx_version_min}" \
+    DARWIN_SDK_URL="${darwin_sdk_url}"
+
 
 ENV YADOMS_BUILD_BRANCH develop
 ENV MAKE_PACKAGE false
@@ -11,6 +32,10 @@ ENV YADOMS_CCMACOS_TRIPLET x86_64-apple-darwin19
 ENV YADOMS_CCMACOS_CONFTOOL $YADOMS_CCMACOS_TRIPLET-osxcross-conf
 
 USER root
+
+#############################################################
+## Install all needed packages
+#############################################################
 
 RUN cp /dev/null /etc/apt/sources.list \
  && echo "deb http://deb.debian.org/debian/ buster main contrib non-free" | tee -a /etc/apt/sources.list \
@@ -25,14 +50,39 @@ RUN apt-get update\
 	postgresql-server-dev-all git rpm zip gcc gcc-doc libc6-dev \
 	libgtk2.0-dev pkg-config libavcodec-dev libavformat-dev libswscale-dev \
 	python-numpy libtbb2 libtbb-dev libjpeg-dev libpng-dev libtiff-dev \
-	libudev-dev usbutils libffi-dev
-RUN apt-get purge -y postgresql* && apt autoremove -y
+	libudev-dev usbutils libffi-dev cmake apt-utils \
+	&& apt-get purge -y postgresql* && apt autoremove -y
+	&& apt-get clean
+	
+#############################################################
+## Install toolchain
+#############################################################
+RUN git config --global http.sslVerify false \
+    && cd /opt \
+    && git clone --depth=1 https://github.com/tpoechtrager/osxcross.git \
+	&& cd osxcross \
+    && ./tools/get_dependencies.sh
+	
+COPY $sdk_file /
+RUN cd /opt/osxcross \
+	&& mv /$sdk_file tarballs/MacOSX${DARWIN_SDK_VERSION}.sdk.tar.xz \
+    && UNATTENDED=1 PORTABLE=true SDK_VERSION="${DARWIN_SDK_VERSION}" OSX_VERSION_MIN="${DARWIN_OSX_VERSION_MIN}" ./build.sh \
+    && rm -Rf /opt/osxcross/build
+
+ENV PATH $PATH:/opt/osxcross/target/bin
+
+RUN UNATTENDED=1 MACOSX_DEPLOYMENT_TARGET=${DARWIN_OSX_VERSION_MIN} WGETOPTS=--no-check-certificate osxcross-macports install -s -v libtool
+RUN UNATTENDED=1 MACOSX_DEPLOYMENT_TARGET=${DARWIN_OSX_VERSION_MIN} WGETOPTS=--no-check-certificate osxcross-macports install -s -v openssl
+
+#############################################################
+## Build yadoms dependencies
+#############################################################
 
 RUN mkdir -p $YADOMS_BUILD_TOOLS_PATH
 RUN mkdir -p $YADOMS_DEPS_PATH
 
 # CMake
-ARG cmake_version=3.17.3
+ARG cmake_version=3.18.1
 RUN cd $YADOMS_DEPS_PATH \
 	&& wget --no-check-certificate https://github.com/Kitware/CMake/releases/download/v$cmake_version/cmake-$cmake_version.tar.gz \
 	&& tar xzf cmake-$cmake_version.tar.gz && cd cmake-$cmake_version\
@@ -45,7 +95,7 @@ RUN eval `$YADOMS_CCMACOS_TRIPLET-osxcross-conf` \
 
 # Boost
 ARG boost_version_major=1
-ARG boost_version_minor=73
+ARG boost_version_minor=74
 ARG boost_version_patch=0
 ARG boost_underscore=_
 ARG boost_version=$boost_version_major$boost_underscore$boost_version_minor$boost_underscore$boost_version_patch
@@ -78,7 +128,7 @@ RUN cd $YADOMS_DEPS_PATH \
 
 
 # Protobuf (Host)
-ARG protobuf_version=3.12.3
+ARG protobuf_version=3.13.0
 RUN wget --no-check-certificate --no-verbose https://github.com/google/protobuf/releases/download/v$protobuf_version/protobuf-cpp-$protobuf_version.tar.gz  > /dev/null\
 	&& tar xzf protobuf-cpp-$protobuf_version.tar.gz && rm protobuf-cpp-$protobuf_version.tar.gz > /dev/null\
     && cp -R protobuf-$protobuf_version $YADOMS_BUILD_TOOLS_PATH/protobuf-$protobuf_version-host > /dev/null \
@@ -157,7 +207,7 @@ RUN UNATTENDED=1 MACOSX_DEPLOYMENT_TARGET=${DARWIN_OSX_VERSION_MIN} WGETOPTS=--n
 # Python 3 (Host)
 ARG python3_version_maj=3
 ARG python3_version_min=8
-ARG python3_version_patch=3
+ARG python3_version_patch=5
 ARG python3_version=$python3_version_maj.$python3_version_min.$python3_version_patch
 RUN wget --no-check-certificate --no-verbose https://www.python.org/ftp/python/$python3_version/Python-$python3_version.tgz  > /dev/null\
 	&& tar xzf Python-$python3_version.tgz && rm Python-$python3_version.tgz  > /dev/null\
