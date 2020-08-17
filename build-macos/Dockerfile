@@ -51,7 +51,7 @@ RUN apt-get update\
 	libgtk2.0-dev pkg-config libavcodec-dev libavformat-dev libswscale-dev \
 	python-numpy libtbb2 libtbb-dev libjpeg-dev libpng-dev libtiff-dev \
 	libudev-dev usbutils libffi-dev cmake apt-utils \
-	&& apt-get purge -y postgresql* && apt autoremove -y
+	&& apt-get purge -y postgresql* && apt autoremove -y \
 	&& apt-get clean
 	
 #############################################################
