@@ -1,7 +1,10 @@
 #!/bin/bash
 set -e
 
-cd yadoms
+ls -al /
+ls -al /work
+
+cd /work
 
 echo "Copy build config file"
 cp $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt sources/
