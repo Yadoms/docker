@@ -3,14 +3,12 @@ set -e
 
 cd /work
 
+
 echo "Copy build config file"
 cp $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt sources/
 
-echo "Display config content"
-cat sources/CMakeListsUserConfig.txt
-
 echo "Create makefile"
-sh cmake_linux.sh r
+sh cmake_synology218p.sh r
 
 echo "Build Yadoms"
 cd projects
@@ -24,5 +22,6 @@ if [ $MAKE_PACKAGE == "true" ]; then
 	cd -
 	
 	cd update
-	sh make_package.sh Linux
+	sh make_package.sh Synology218p
+	
 fi

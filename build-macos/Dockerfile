@@ -257,6 +257,8 @@ RUN echo 'Configuring Yadoms CMakeListsUserConfig.txt' \
 	&& echo 'set(CC_RPI_ROOT "/opt/osxcross/target/SDK")' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt
 
 COPY entrypoint.sh /
+COPY entrypoint_docker.sh /
 
 #ensure entrypoint is executable (force flags update, because file flags may change if a commit is made under Windows)
 RUN chmod +x /entrypoint.sh
+RUN chmod +x /entrypoint_docker.sh

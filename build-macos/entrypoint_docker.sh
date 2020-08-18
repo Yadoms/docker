@@ -6,15 +6,12 @@ cd /work
 echo "Copy build config file"
 cp $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt sources/
 
-echo "Display config content"
-cat sources/CMakeListsUserConfig.txt
-
 echo "Create makefile"
-sh cmake_linux.sh r
+sh cmake_macosx.sh d
 
 echo "Build Yadoms"
 cd projects
-make all_unity
+OSXCROSS_MP_INC=1 make all_unity
 cd -
 
 if [ $MAKE_PACKAGE == "true" ]; then
@@ -24,5 +21,6 @@ if [ $MAKE_PACKAGE == "true" ]; then
 	cd -
 	
 	cd update
-	sh make_package.sh Linux
+	sh make_package.sh Darwin
+	
 fi
