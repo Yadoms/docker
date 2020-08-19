@@ -161,7 +161,8 @@ RUN wget --no-check-certificate --no-check-certificate --no-verbose https://www.
 RUN mv Python-$python2_version $YADOMS_DEPS_PATH/Python-$python2_version  > /dev/null\
 	&& cd $YADOMS_DEPS_PATH/Python-$python2_version  > /dev/null\
 	&& ac_cv_file__dev_ptmx=no ac_cv_file__dev_ptc=no ac_cv_have_long_long_format=yes CC=arm-linux-gnueabihf-gcc CXX=arm-linux-gnueabihf-g++ AR=arm-linux-gnueabihf-ar RANLIB=arm-linux-gnueabihf-ranlib ./configure --host=arm-linux-gnueabihf --target=arm-linux-gnueabihf --build=x86_64-linux-gnu --prefix=$YADOMS_DEPS_PATH/python$python2_version_maj$python2_version_min --disable-ipv6 --enable-shared\
-	&& make HOSTPYTHON=$YADOMS_BUILD_TOOLS_PATH/pythonhost/python HOSTPGEN=$YADOMS_BUILD_TOOLS_PATH/pythonhost/Parser/pgen BLDSHARED="arm-linux-gnueabihf-gcc -shared" CROSS-COMPILE=arm-linux-gnueabihf- CROSS_COMPILE_TARGET=yes HOSTARCH=arm-linux BUILDARCH=arm-linux-gnueabihf 
+	&& make HOSTPYTHON=$YADOMS_BUILD_TOOLS_PATH/pythonhost/python HOSTPGEN=$YADOMS_BUILD_TOOLS_PATH/pythonhost/Parser/pgen BLDSHARED="arm-linux-gnueabihf-gcc -shared" CROSS-COMPILE=arm-linux-gnueabihf- CROSS_COMPILE_TARGET=yes HOSTARCH=arm-linux BUILDARCH=arm-linux-gnueabihf \
+	&& make install
 
 # Python 3.7 (Host)
 ARG python3_version_maj=3
@@ -276,5 +277,4 @@ COPY entrypoint_docker.sh /
 RUN chmod +x /entrypoint.sh
 RUN chmod +x /entrypoint_docker.sh
 
-RUN ls -alR $YADOMS_DEPS_PATH
-RUN ls -alR $YADOMS_DEPS_PATH/python$python2_version_maj$python2_version_min
+RUN ls -al $YADOMS_DEPS_PATH
