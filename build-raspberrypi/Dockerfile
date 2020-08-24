@@ -160,9 +160,10 @@ RUN wget --no-check-certificate --no-check-certificate --no-verbose https://www.
 # Python 2.7 (Pi)
 RUN mv Python-$python2_version $YADOMS_DEPS_PATH/Python-$python2_version  > /dev/null\
 	&& cd $YADOMS_DEPS_PATH/Python-$python2_version  > /dev/null\
-	&& ./configure ac_cv_file__dev_ptmx=no ac_cv_file__dev_ptc=no ac_cv_have_long_long_format=yes --host=x86_64-linux-gnu --target=arm-linux-gnueabihf --build=arm-linux-gnueabihf --prefix=$YADOMS_DEPS_PATH/python$python2_version_maj$python2_version_min --disable-ipv6 --enable-shared\
-	&& make && make install || true
-
+	&& ac_cv_file__dev_ptmx=no ac_cv_file__dev_ptc=no ac_cv_have_long_long_format=yes CC=arm-linux-gnueabihf-gcc CXX=arm-linux-gnueabihf-g++ AR=arm-linux-gnueabihf-ar RANLIB=arm-linux-gnueabihf-ranlib ./configure --host=arm-linux-gnueabihf --target=arm-linux-gnueabihf --build=x86_64-linux-gnu --prefix=$YADOMS_DEPS_PATH/python$python2_version_maj$python2_version_min --disable-ipv6 --enable-shared\
+	&& make HOSTPYTHON=$YADOMS_BUILD_TOOLS_PATH/pythonhost/python HOSTPGEN=$YADOMS_BUILD_TOOLS_PATH/pythonhost/Parser/pgen BLDSHARED="arm-linux-gnueabihf-gcc -shared" CROSS-COMPILE=arm-linux-gnueabihf- CROSS_COMPILE_TARGET=yes HOSTARCH=arm-linux BUILDARCH=arm-linux-gnueabihf \
+	&& make HOSTPYTHON=$YADOMS_BUILD_TOOLS_PATH/pythonhost/python HOSTPGEN=$YADOMS_BUILD_TOOLS_PATH/pythonhost/Parser/pgen BLDSHARED="arm-linux-gnueabihf-gcc -shared" CROSS-COMPILE=arm-linux-gnueabihf- CROSS_COMPILE_TARGET=yes HOSTARCH=arm-linux BUILDARCH=arm-linux-gnueabihf install || true\
+	&& cd $YADOMS_DEPS_PATH && rm -Rf Python-$python2_version
 
 # Python 3.7 (Host)
 ARG python3_version_maj=3
@@ -183,9 +184,10 @@ RUN wget --no-check-certificate --no-check-certificate --no-verbose https://www.
 # Python 3.7 (Pi)
 RUN mv Python-$python3_version $YADOMS_DEPS_PATH/Python-$python3_version\
 	&& cd $YADOMS_DEPS_PATH/Python-$python3_version\
-	&& ./configure ac_cv_file__dev_ptmx=no ac_cv_file__dev_ptc=no ac_cv_have_long_long_format=yes --host=x86_64-linux-gnu --target=arm-linux-gnueabihf --build=arm-linux-gnueabihf --prefix=$YADOMS_DEPS_PATH/python$python3_version_maj$python3_version_min --disable-ipv6 --enable-shared  --without-pymalloc \
-	&& make && make install || true
-
+	&& CC=arm-linux-gnueabihf-gcc CXX=arm-linux-gnueabihf-g++ AR=arm-linux-gnueabihf-ar RANLIB=arm-linux-gnueabihf-ranlib ./configure --host=arm-linux-gnueabihf --target=arm-linux-gnueabihf --build=x86_64-linux-gnu --prefix=$YADOMS_DEPS_PATH/python$python3_version_maj$python3_version_min --disable-ipv6 ac_cv_file__dev_tmx=no ac_cv_file__dev_ptc=no ac_cv_have_long_long_format=yes --enable-shared  --without-pymalloc \
+	&& make HOSTPYTHON=$YADOMS_BUILD_TOOLS_PATH/pythonhost37/python HOSTPGEN=$YADOMS_BUILD_TOOLS_PATH/pythonhost37/Parser/pgen BLDSHARED="arm-linux-gnueabihf-gcc -shared" CROSS-COMPILE=arm-linux-gnueabihf- CROSS_COMPILE_TARGET=yes HOSTARCH=arm-linux BUILDARCH=arm-linux-gnueabihf  \
+	&& make HOSTPYTHON=$YADOMS_BUILD_TOOLS_PATH/pythonhost37/python HOSTPGEN=$YADOMS_BUILD_TOOLS_PATH/pythonhost37/Parser/pgen BLDSHARED="arm-linux-gnueabihf-gcc -shared" CROSS-COMPILE=arm-linux-gnueabihf- CROSS_COMPILE_TARGET=yes HOSTARCH=arm-linux BUILDARCH=arm-linux-gnueabihf  install || true \
+	&& cd $YADOMS_DEPS_PATH && rm -Rf Python-$python3_version
 
 # PostgreSQL
 ARG postgresql_version=9.6.2

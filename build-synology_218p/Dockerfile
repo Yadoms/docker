@@ -158,8 +158,11 @@ RUN wget --no-check-certificate --no-check-certificate --no-verbose https://www.
 # Python 2.7 (Pi)
 RUN mv Python-$python2_version $YADOMS_DEPS_PATH/Python-$python2_version  > /dev/null\
 	&& cd $YADOMS_DEPS_PATH/Python-$python2_version  > /dev/null\
-	&& ./configure ac_cv_file__dev_ptmx=no ac_cv_file__dev_ptc=no ac_cv_have_long_long_format=yes --host=x86_64-linux-gnu --target=x86_64-pc-linux-gnu --build=x86_64-pc-linux-gnu --prefix=$YADOMS_DEPS_PATH/python$python2_version_maj$python2_version_min --disable-ipv6 --enable-shared\
-	&& make && make install || true
+	&& ac_cv_file__dev_ptmx=no ac_cv_file__dev_ptc=no ac_cv_have_long_long_format=yes CC=x86_64-pc-linux-gnu-gcc CXX=x86_64-pc-linux-gnu-g++ AR=x86_64-pc-linux-gnu-ar RANLIB=x86_64-pc-linux-gnu-ranlib ./configure --host=x86_64-pc-linux-gnu --target=x86_64-pc-linux-gnu --build=x86_64-linux-gnu --prefix=$YADOMS_DEPS_PATH/python$python2_version_maj$python2_version_min --disable-ipv6 --enable-shared\
+	&& make HOSTPYTHON=$YADOMS_BUILD_TOOLS_PATH/pythonhost/python HOSTPGEN=$YADOMS_BUILD_TOOLS_PATH/pythonhost/Parser/pgen BLDSHARED="x86_64-pc-linux-gnu-gcc -shared" CROSS-COMPILE=x86_64-pc-linux-gnu- CROSS_COMPILE_TARGET=yes HOSTARCH=arm-linux BUILDARCH=x86_64-pc-linux-gnu \
+	&& make HOSTPYTHON=$YADOMS_BUILD_TOOLS_PATH/pythonhost/python HOSTPGEN=$YADOMS_BUILD_TOOLS_PATH/pythonhost/Parser/pgen BLDSHARED="x86_64-pc-linux-gnu-gcc -shared" CROSS-COMPILE=x86_64-pc-linux-gnu- CROSS_COMPILE_TARGET=yes HOSTARCH=arm-linux BUILDARCH=x86_64-pc-linux-gnu install || true\
+	&& cd $YADOMS_DEPS_PATH && rm -Rf Python-$python2_version
+
 
 RUN apt-get install -y libffi-dev
 
@@ -182,8 +185,10 @@ RUN wget --no-check-certificate --no-check-certificate --no-verbose https://www.
 # Python 3.7 (Pi)
 RUN mv Python-$python3_version $YADOMS_DEPS_PATH/Python-$python3_version  > /dev/null\
 	&& cd $YADOMS_DEPS_PATH/Python-$python3_version  > /dev/null\
-	&& ./configure ac_cv_file__dev_ptmx=no ac_cv_file__dev_ptc=no ac_cv_have_long_long_format=yes --host=x86_64-linux-gnu --target=x86_64-pc-linux-gnu --build=x86_64-pc-linux-gnu --prefix=$YADOMS_DEPS_PATH/python$python3_version_maj$python3_version_min --disable-ipv6 --enable-shared  --without-pymalloc \
-	&& make && make install || true
+	&& CC=x86_64-pc-linux-gnu-gcc CXX=x86_64-pc-linux-gnu-g++ AR=x86_64-pc-linux-gnu-ar RANLIB=x86_64-pc-linux-gnu-ranlib ./configure --host=x86_64-pc-linux-gnu --target=x86_64-pc-linux-gnu --build=x86_64-linux-gnu --prefix=$YADOMS_DEPS_PATH/python$python3_version_maj$python3_version_min --disable-ipv6 ac_cv_file__dev_tmx=no ac_cv_file__dev_ptc=no ac_cv_have_long_long_format=yes --enable-shared  --without-pymalloc \
+	&& make HOSTPYTHON=$YADOMS_BUILD_TOOLS_PATH/pythonhost37/python HOSTPGEN=$YADOMS_BUILD_TOOLS_PATH/pythonhost37/Parser/pgen BLDSHARED="x86_64-pc-linux-gnu-gcc -shared" CROSS-COMPILE=x86_64-pc-linux-gnu- CROSS_COMPILE_TARGET=yes HOSTARCH=arm-linux BUILDARCH=x86_64-pc-linux-gnu  \
+	&& make HOSTPYTHON=$YADOMS_BUILD_TOOLS_PATH/pythonhost37/python HOSTPGEN=$YADOMS_BUILD_TOOLS_PATH/pythonhost37/Parser/pgen BLDSHARED="x86_64-pc-linux-gnu-gcc -shared" CROSS-COMPILE=x86_64-pc-linux-gnu- CROSS_COMPILE_TARGET=yes HOSTARCH=arm-linux BUILDARCH=x86_64-pc-linux-gnu  install || true \
+	&& cd $YADOMS_DEPS_PATH && rm -Rf Python-$python3_version
 
 
 # PostgreSQL
