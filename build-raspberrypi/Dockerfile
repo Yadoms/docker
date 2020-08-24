@@ -1,4 +1,4 @@
-FROM i386/debian:stretch
+FROM debian:stretch
 MAINTAINER jano42 "https://github.com/jano42"
 LABEL authors=jano42
 
@@ -24,7 +24,7 @@ RUN apt-get update \
 	libopencv-gpu-dev autoconf automake libtool curl make g++ unzip \
 	libpcre3 libpcre3-dev libreadline-dev libpq5 \
 	postgresql-server-dev-all git rpm zip gcc gcc-doc libc6-dev \
-	libffi-dev
+	libffi-dev libffi-dev:i386
 	
 #############################################################
 ## Install toolchain
@@ -178,15 +178,14 @@ RUN wget --no-check-certificate --no-check-certificate --no-verbose https://www.
 	&& make install\
 	&& mkdir -p $YADOMS_BUILD_TOOLS_PATH/pythonhost$python3_version_maj$python3_version_min \
 	&& cp python $YADOMS_BUILD_TOOLS_PATH/pythonhost$python3_version_maj$python3_version_min/ \
-	&& cp -r Parser/pgen $YADOMS_BUILD_TOOLS_PATH/pythonhost$python3_version_maj$python3_version_min/ \
 	&& cd .. && rm -Rf Python-$python3_version-host
+
 # Python 3.7 (Pi)
 RUN mv Python-$python3_version $YADOMS_DEPS_PATH/Python-$python3_version\
 	&& cd $YADOMS_DEPS_PATH/Python-$python3_version\
-	&& ac_cv_file__dev_ptmx=no ac_cv_file__dev_ptc=no ac_cv_have_long_long_format=yes ./configure CFLAGS=-m32 CXXFLAGS=-m32 LDFLAGS=-m32 --host=x86_64-linux-gnu --target=arm-linux-gnueabihf --build=arm-linux-gnueabihf --prefix=$YADOMS_DEPS_PATH/python$python3_version_maj$python3_version_min --disable-ipv6 --enable-shared  --without-pymalloc \
-	&& make && make install || true \
-	&& cd $YADOMS_DEPS_PATH && rm -Rf Python-$python3_version
-
+	&& CC=arm-linux-gnueabihf-gcc CXX=arm-linux-gnueabihf-g++ AR=arm-linux-gnueabihf-ar RANLIB=arm-linux-gnueabihf-ranlib ./configure --host=arm-linux-gnueabihf --target=arm-linux-gnueabihf --build=x86_64-linux-gnu --prefix=$YADOMS_DEPS_PATH/python$python3_version_maj$python3_version_min --disable-ipv6 ac_cv_file__dev_ptmx=no ac_cv_file__dev_ptc=no ac_cv_have_long_long_format=yes --enable-shared  --without-pymalloc --with-openssl=$YADOMS_DEPS_PATH/openssl > /dev/null\
+	&& make HOSTPYTHON=$YADOMS_BUILD_TOOLS_PATH/pythonhost$python3_version_maj$python3_version_min/python BLDSHARED="arm-linux-gnueabihf-gcc -shared" CROSS-COMPILE=arm-linux-gnueabihf- CROSS_COMPILE_TARGET=yes HOSTARCH=arm-linux BUILDARCH=arm-linux-gnueabihf  > /dev/null
+	
 # PostgreSQL
 ARG postgresql_version=9.6.2
 RUN cd $YADOMS_DEPS_PATH \
