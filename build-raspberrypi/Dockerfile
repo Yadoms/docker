@@ -1,4 +1,4 @@
-FROM debian:stretch
+FROM i386/debian:stretch
 MAINTAINER jano42 "https://github.com/jano42"
 LABEL authors=jano42
 
@@ -183,7 +183,7 @@ RUN wget --no-check-certificate --no-check-certificate --no-verbose https://www.
 # Python 3.7 (Pi)
 RUN mv Python-$python3_version $YADOMS_DEPS_PATH/Python-$python3_version\
 	&& cd $YADOMS_DEPS_PATH/Python-$python3_version\
-	&& ac_cv_file__dev_ptmx=no ac_cv_file__dev_ptc=no ac_cv_have_long_long_format=yes ./configure --host=x86_64-linux-gnu --target=arm-linux-gnueabihf --build=arm-linux-gnueabihf --prefix=$YADOMS_DEPS_PATH/python$python3_version_maj$python3_version_min --disable-ipv6 --enable-shared  --without-pymalloc \
+	&& ac_cv_file__dev_ptmx=no ac_cv_file__dev_ptc=no ac_cv_have_long_long_format=yes ./configure CFLAGS=-m32 CXXFLAGS=-m32 LDFLAGS=-m32 --host=x86_64-linux-gnu --target=arm-linux-gnueabihf --build=arm-linux-gnueabihf --prefix=$YADOMS_DEPS_PATH/python$python3_version_maj$python3_version_min --disable-ipv6 --enable-shared  --without-pymalloc \
 	&& make && make install || true \
 	&& cd $YADOMS_DEPS_PATH && rm -Rf Python-$python3_version
 
