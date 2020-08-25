@@ -262,6 +262,3 @@ COPY entrypoint_docker.sh /
 #ensure entrypoint is executable (force flags update, because file flags may change if a commit is made under Windows)
 RUN chmod +x /entrypoint.sh
 RUN chmod +x /entrypoint_docker.sh
-
-RUN ls -al $YADOMS_DEPS_PATH/python$python2_version_maj$python2_version_min/bin
-RUN ls -alR $YADOMS_DEPS_PATH
