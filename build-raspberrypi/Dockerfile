@@ -20,11 +20,11 @@ RUN echo "deb http://deb.debian.org/debian/ buster main contrib non-free" | tee 
 RUN apt-get update \
 	&& apt-get dist-upgrade -q -y \
 	&& apt-get install -q -y gawk gfortran texinfo bison libncurses-dev nano ncdu \
-	g++ libbz2-dev python-dev python3-dev wget build-essential libssl-dev \
+	g++ libbz2-dev wget build-essential \
 	autoconf automake libtool curl make g++ unzip \
 	libpcre3 libpcre3-dev libreadline-dev libpq5 \
 	postgresql-server-dev-all git rpm zip gcc gcc-doc libc6-dev \
-	libffi-dev
+	libffi-dev libssl-dev zlib1g-dev
 	
 #############################################################
 ## Install toolchain
@@ -55,6 +55,21 @@ RUN cd $YADOMS_DEPS_PATH \
 # Check GCC version
 RUN arm-linux-gnueabihf-gcc --version
 
+
+# OpenSSL (both cross compile and for host)
+ARG openssl_version=1.1.1g
+RUN cd $YADOMS_DEPS_PATH \
+	&& wget --no-check-certificate --no-verbose https://www.openssl.org/source/openssl-$openssl_version.tar.gz  > /dev/null\
+	&& tar xzf openssl-$openssl_version.tar.gz && cd openssl-$openssl_version  > /dev/null\
+	&& ./Configure linux-generic32 --prefix=$YADOMS_DEPS_PATH/openssl --cross-compile-prefix=$YADOMS_BUILD_TOOLS_PATH/tools/arm-bcm2708/arm-rpi-4.9.3-linux-gnueabihf/bin/arm-linux-gnueabihf-  > /dev/null\
+	&& make CC="arm-linux-gnueabihf-gcc" AR="arm-linux-gnueabihf-ar" RANLIB="arm-linux-gnueabihf-ranlib"  > /dev/null\
+	&& make install  > /dev/null\
+	&& cd .. && rm -Rf openssl-$openssl_version \
+	&& tar xzf openssl-$openssl_version.tar.gz && cd openssl-$openssl_version  > /dev/null\
+	&& ./configure && make && make install\
+	&& cd .. && rm -Rf openssl-$openssl_version && rm $YADOMS_DEPS_PATH/openssl-$openssl_version.tar.gz
+	
+
 # Boost
 ARG boost_version_major=1
 ARG boost_version_minor=74
@@ -74,18 +89,6 @@ RUN cd $YADOMS_DEPS_PATH \
 	&& rm -Rf tools \
 	&& cd .. && rm $YADOMS_DEPS_PATH/boost_$boost_version.tar.bz2
 	
-
-# OpenSSL
-ARG openssl_version=1.1.1g
-RUN cd $YADOMS_DEPS_PATH \
-	&& wget --no-check-certificate --no-verbose https://www.openssl.org/source/openssl-$openssl_version.tar.gz  > /dev/null\
-	&& tar xzf openssl-$openssl_version.tar.gz && cd openssl-$openssl_version  > /dev/null\
-	&& ./Configure linux-generic32 --prefix=$YADOMS_DEPS_PATH/openssl --cross-compile-prefix=$YADOMS_BUILD_TOOLS_PATH/tools/arm-bcm2708/arm-rpi-4.9.3-linux-gnueabihf/bin/arm-linux-gnueabihf-  > /dev/null\
-	&& make CC="arm-linux-gnueabihf-gcc" AR="arm-linux-gnueabihf-ar" RANLIB="arm-linux-gnueabihf-ranlib"  > /dev/null\
-	&& make install  > /dev/null\
-	&& cd .. && rm -Rf openssl-$openssl_version && rm $YADOMS_DEPS_PATH/openssl-$openssl_version.tar.gz
-	
-
 # Poco
 ARG poco_version=1.9.4
 RUN cd $YADOMS_DEPS_PATH \
