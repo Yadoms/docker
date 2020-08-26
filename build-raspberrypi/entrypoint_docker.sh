@@ -43,6 +43,6 @@ if [ $MAKE_PACKAGE == "true" ]; then
 	cd yadoms-build_raspberrypi_image
 
 	#make the image
-	./create-yadoms-pi-image
+	./create-yadoms-pi-image /work
 
 fi
