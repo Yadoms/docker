@@ -9,14 +9,14 @@ ENV YADOMS_DEPS_PATH  C:\\yadoms-deps
 
 # Create working folders
 SHELL ["powershell"]
-RUN New-Item -ItemType Directory -Path '$YADOMS_DEPS_PATH'
+RUN New-Item -ItemType Directory -Path "$env:YADOMS_DEPS_PATH"
 
 ###################################################################
 # Install VisualStudio Tools
 ###################################################################
 
 # Download the Build Tools bootstrapper.
-RUN (New-Object System.Net.WebClient).DownloadFile('https://aka.ms/vs/16/release/vs_buildtools.exe', "$env:YADOMS_DEPS_PATH\\vs_buildtools.exe")
+RUN (New-Object System.Net.WebClient).DownloadFile("https://aka.ms/vs/16/release/vs_buildtools.exe", "$env:YADOMS_DEPS_PATH\\vs_buildtools.exe")
  
  # Restore the default Windows shell for correct batch processing.
 SHELL ["cmd", "/S", "/C"]
