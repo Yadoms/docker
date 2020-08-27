@@ -31,6 +31,9 @@ SHELL ["powershell"]
 # Start developer command prompt with any other commands specified.
 #ENTRYPOINT C:\BuildTools\Common7\Tools\VsDevCmd.bat -arch=amd64 &&
 
+# install chocolatey
+RUN iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))
+
 # CMake
 ARG cmake_version=3.18.1
 RUN choco install cmake --installargs 'ADD_CMAKE_TO_PATH=System' -y --no-progress --version $cmake_version
