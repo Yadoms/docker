@@ -58,7 +58,7 @@ ARG boost_underscore=_
 ARG boost_version=$boost_version_major$boost_underscore$boost_version_minor$boost_underscore$boost_version_patch
 ARG boost_version_dot=$boost_version_major.$boost_version_minor.$boost_version_patch
 RUN cd $YADOMS_DEPS_PATH \
-   (New-Object System.Net.WebClient).DownloadFile('https://dl.bintray.com/boostorg/release/$boost_version_dot/source/boost_$boost_version.zip', '$YADOMS_DEPS_PATH\boost_$boost_version.zip') \
+   (New-Object System.Net.WebClient).DownloadFile("https://dl.bintray.com/boostorg/release/$boost_version_dot/source/boost_$boost_version.zip", $YADOMS_DEPS_PATH\boost_$boost_version.zip) \
    ; Expand-Archive -Path boost_$boost_version.zip '$YADOMS_DEPS_PATH' ; cd boost_$boost_version \
    ; .\bootstrap.bat \
    ; b2.exe --with-atomic --with-chrono --with-date_time --with-filesystem --with-regex --with-thread --with-system --with-test link=static runtime-link=static \
