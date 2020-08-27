@@ -51,7 +51,7 @@ RUN apt-get update\
 	libgtk2.0-dev pkg-config libavcodec-dev libavformat-dev libswscale-dev \
 	python-numpy libtbb2 libtbb-dev libjpeg-dev libpng-dev libtiff-dev \
 	libudev-dev usbutils libffi-dev cmake apt-utils \
-	&& apt-get purge -y postgresql* && apt autoremove -y
+	&& apt-get purge -y postgresql* && apt autoremove -y \
 	&& apt-get clean
 	
 #############################################################
@@ -257,6 +257,8 @@ RUN echo 'Configuring Yadoms CMakeListsUserConfig.txt' \
 	&& echo 'set(CC_RPI_ROOT "/opt/osxcross/target/SDK")' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt
 
 COPY entrypoint.sh /
+COPY entrypoint_docker.sh /
 
 #ensure entrypoint is executable (force flags update, because file flags may change if a commit is made under Windows)
 RUN chmod +x /entrypoint.sh
+RUN chmod +x /entrypoint_docker.sh

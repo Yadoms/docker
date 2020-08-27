@@ -1,4 +1,4 @@
-FROM debian:stretch
+FROM debian:stable
 MAINTAINER jano42 "https://github.com/jano42"
 LABEL authors=jano42
 
@@ -12,19 +12,19 @@ ENV YADOMS_DEPS_PATH /yadoms-deps/raspberry
 #############################################################
 
 
-RUN echo "deb http://deb.debian.org/debian/ stretch main contrib non-free" | tee -a /etc/apt/sources.list \
-&&  echo "deb http://security.debian.org/ stretch/updates main contrib non-free" | tee -a /etc/apt/sources.list \
-&& echo "deb http://deb.debian.org/debian/ stretch-updates main contrib non-free" | tee -a /etc/apt/sources.list \
-&& echo "deb http://deb.debian.org/debian stretch-backports main contrib non-free" | tee -a /etc/apt/sources.list
+RUN echo "deb http://deb.debian.org/debian/ buster main contrib non-free" | tee -a /etc/apt/sources.list \
+&&  echo "deb http://security.debian.org/ buster/updates main contrib non-free" | tee -a /etc/apt/sources.list \
+&& echo "deb http://deb.debian.org/debian/ buster-updates main contrib non-free" | tee -a /etc/apt/sources.list \
+&& echo "deb http://deb.debian.org/debian buster-backports main contrib non-free" | tee -a /etc/apt/sources.list
  
 RUN apt-get update \
 	&& apt-get dist-upgrade -q -y \
 	&& apt-get install -q -y gawk gfortran texinfo bison libncurses-dev nano ncdu \
-	g++ libbz2-dev python-dev python3-dev wget build-essential libssl-dev \
-	libopencv-gpu-dev autoconf automake libtool curl make g++ unzip \
+	g++ libbz2-dev wget build-essential \
+	autoconf automake libtool curl make g++ unzip \
 	libpcre3 libpcre3-dev libreadline-dev libpq5 \
 	postgresql-server-dev-all git rpm zip gcc gcc-doc libc6-dev \
-	libffi-dev
+	libffi-dev libssl-dev zlib1g-dev
 	
 #############################################################
 ## Install toolchain
@@ -55,6 +55,21 @@ RUN cd $YADOMS_DEPS_PATH \
 # Check GCC version
 RUN arm-linux-gnueabihf-gcc --version
 
+
+# OpenSSL (both cross compile and for host)
+ARG openssl_version=1.1.1g
+RUN cd $YADOMS_DEPS_PATH \
+	&& wget --no-check-certificate --no-verbose https://www.openssl.org/source/openssl-$openssl_version.tar.gz  > /dev/null\
+	&& tar xzf openssl-$openssl_version.tar.gz && cd openssl-$openssl_version  > /dev/null\
+	&& ./Configure linux-generic32 --prefix=$YADOMS_DEPS_PATH/openssl --cross-compile-prefix=$YADOMS_BUILD_TOOLS_PATH/tools/arm-bcm2708/arm-rpi-4.9.3-linux-gnueabihf/bin/arm-linux-gnueabihf-  > /dev/null\
+	&& make CC="arm-linux-gnueabihf-gcc" AR="arm-linux-gnueabihf-ar" RANLIB="arm-linux-gnueabihf-ranlib"  > /dev/null\
+	&& make install  > /dev/null\
+	&& cd .. && rm -Rf openssl-$openssl_version \
+	&& tar xzf openssl-$openssl_version.tar.gz && cd openssl-$openssl_version  > /dev/null\
+	&& ./config && make && make install\
+	&& cd .. && rm -Rf openssl-$openssl_version && rm $YADOMS_DEPS_PATH/openssl-$openssl_version.tar.gz
+	
+
 # Boost
 ARG boost_version_major=1
 ARG boost_version_minor=74
@@ -74,18 +89,6 @@ RUN cd $YADOMS_DEPS_PATH \
 	&& rm -Rf tools \
 	&& cd .. && rm $YADOMS_DEPS_PATH/boost_$boost_version.tar.bz2
 	
-
-# OpenSSL
-ARG openssl_version=1.1.1g
-RUN cd $YADOMS_DEPS_PATH \
-	&& wget --no-check-certificate --no-verbose https://www.openssl.org/source/openssl-$openssl_version.tar.gz  > /dev/null\
-	&& tar xzf openssl-$openssl_version.tar.gz && cd openssl-$openssl_version  > /dev/null\
-	&& ./Configure linux-generic32 --prefix=$YADOMS_DEPS_PATH/openssl --cross-compile-prefix=$YADOMS_BUILD_TOOLS_PATH/tools/arm-bcm2708/arm-rpi-4.9.3-linux-gnueabihf/bin/arm-linux-gnueabihf-  > /dev/null\
-	&& make CC="arm-linux-gnueabihf-gcc" AR="arm-linux-gnueabihf-ar" RANLIB="arm-linux-gnueabihf-ranlib"  > /dev/null\
-	&& make install  > /dev/null\
-	&& cd .. && rm -Rf openssl-$openssl_version && rm $YADOMS_DEPS_PATH/openssl-$openssl_version.tar.gz
-	
-
 # Poco
 ARG poco_version=1.9.4
 RUN cd $YADOMS_DEPS_PATH \
@@ -160,9 +163,9 @@ RUN wget --no-check-certificate --no-check-certificate --no-verbose https://www.
 # Python 2.7 (Pi)
 RUN mv Python-$python2_version $YADOMS_DEPS_PATH/Python-$python2_version  > /dev/null\
 	&& cd $YADOMS_DEPS_PATH/Python-$python2_version  > /dev/null\
-	&& ac_cv_file__dev_ptmx=no ac_cv_file__dev_ptc=no ac_cv_have_long_long_format=yes CC=arm-linux-gnueabihf-gcc CXX=arm-linux-gnueabihf-g++ AR=arm-linux-gnueabihf-ar RANLIB=arm-linux-gnueabihf-ranlib ./configure --host=arm-linux-gnueabihf --target=arm-linux-gnueabihf --build=x86_64-linux-gnu --prefix=$YADOMS_DEPS_PATH/python27 --disable-ipv6 --enable-shared\
+	&& ac_cv_file__dev_ptmx=no ac_cv_file__dev_ptc=no ac_cv_have_long_long_format=yes CC=arm-linux-gnueabihf-gcc CXX=arm-linux-gnueabihf-g++ AR=arm-linux-gnueabihf-ar RANLIB=arm-linux-gnueabihf-ranlib ./configure --host=arm-linux-gnueabihf --target=arm-linux-gnueabihf --build=x86_64-linux-gnu --disable-ipv6 --enable-shared\
 	&& make HOSTPYTHON=$YADOMS_BUILD_TOOLS_PATH/pythonhost/python HOSTPGEN=$YADOMS_BUILD_TOOLS_PATH/pythonhost/Parser/pgen BLDSHARED="arm-linux-gnueabihf-gcc -shared" CROSS-COMPILE=arm-linux-gnueabihf- CROSS_COMPILE_TARGET=yes HOSTARCH=arm-linux BUILDARCH=arm-linux-gnueabihf 
-
+	
 # Python 3.7 (Host)
 ARG python3_version_maj=3
 ARG python3_version_min=8
@@ -177,16 +180,14 @@ RUN wget --no-check-certificate --no-check-certificate --no-verbose https://www.
 	&& make install\
 	&& mkdir -p $YADOMS_BUILD_TOOLS_PATH/pythonhost$python3_version_maj$python3_version_min \
 	&& cp python $YADOMS_BUILD_TOOLS_PATH/pythonhost$python3_version_maj$python3_version_min/ \
-	&& cp -r Parser/pgen $YADOMS_BUILD_TOOLS_PATH/pythonhost$python3_version_maj$python3_version_min/ \
 	&& cd .. && rm -Rf Python-$python3_version-host
+
 # Python 3.7 (Pi)
 RUN mv Python-$python3_version $YADOMS_DEPS_PATH/Python-$python3_version\
 	&& cd $YADOMS_DEPS_PATH/Python-$python3_version\
-	&& CC=arm-linux-gnueabihf-gcc CXX=arm-linux-gnueabihf-g++ AR=arm-linux-gnueabihf-ar RANLIB=arm-linux-gnueabihf-ranlib ./configure --host=arm-linux-gnueabihf --target=arm-linux-gnueabihf --build=x86_64-linux-gnu --prefix=$YADOMS_DEPS_PATH/python37 --disable-ipv6 ac_cv_file__dev_ptmx=no ac_cv_file__dev_ptc=no ac_cv_have_long_long_format=yes --enable-shared  --without-pymalloc  \
-	&& make HOSTPYTHON=$YADOMS_BUILD_TOOLS_PATH/pythonhost$python3_version_maj$python3_version_min/python HOSTPGEN=$YADOMS_BUILD_TOOLS_PATH/pythonhost$python3_version_maj$python3_version_min/Parser/pgen BLDSHARED="arm-linux-gnueabihf-gcc -shared" CROSS-COMPILE=arm-linux-gnueabihf- CROSS_COMPILE_TARGET=yes HOSTARCH=arm-linux BUILDARCH=arm-linux-gnueabihf  
-
-
-
+	&& CC=arm-linux-gnueabihf-gcc CXX=arm-linux-gnueabihf-g++ AR=arm-linux-gnueabihf-ar RANLIB=arm-linux-gnueabihf-ranlib ./configure --host=arm-linux-gnueabihf --target=arm-linux-gnueabihf --build=x86_64-linux-gnu --disable-ipv6 ac_cv_file__dev_ptmx=no ac_cv_file__dev_ptc=no ac_cv_have_long_long_format=yes --enable-shared  --without-pymalloc --with-openssl=$YADOMS_DEPS_PATH/openssl > /dev/null\
+	&& make HOSTPYTHON=$YADOMS_BUILD_TOOLS_PATH/pythonhost$python3_version_maj$python3_version_min/python BLDSHARED="arm-linux-gnueabihf-gcc -shared" CROSS-COMPILE=arm-linux-gnueabihf- CROSS_COMPILE_TARGET=yes HOSTARCH=arm-linux BUILDARCH=arm-linux-gnueabihf  > /dev/null
+	
 # PostgreSQL
 ARG postgresql_version=9.6.2
 RUN cd $YADOMS_DEPS_PATH \
@@ -228,6 +229,8 @@ RUN cd $YADOMS_DEPS_PATH \
 	&& make install  > /dev/null\	
 	&& cd ../.. && rm -Rf opencv-$opencv_version* && rm -f $opencv_version.zip
 
+
+
 # Yadoms configuration file
 RUN echo 'Configuring Yadoms CMakeListsUserConfig.txt' \
 	&& echo 'set(BOOST_ROOT "'$YADOMS_DEPS_PATH'/boost_'$boost_version'")' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
@@ -240,13 +243,13 @@ RUN echo 'Configuring Yadoms CMakeListsUserConfig.txt' \
 	&& echo 'set(PYTHON_USE_PKGCONFIG OFF)' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
 	&& echo 'set(PYTHON_USE_SOURCES ON)' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
 	&& echo 'set(Python2_ManualSetup ON)' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
-	&& echo 'set(Python2_EXECUTABLE "'$YADOMS_DEPS_PATH'/python'$python2_version_maj$python2_version_min'/bin/python'$python2_version_maj'")' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
-	&& echo 'set(Python2_LIBRARIES "'$YADOMS_DEPS_PATH'/python'$python2_version_maj$python2_version_min'/lib/libpython'$python2_version_maj'.'$python2_version_min'.so")' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
-	&& echo 'set(Python2_INCLUDE_DIRS "'$YADOMS_DEPS_PATH'/python'$python2_version_maj$python2_version_min'/include/python'$python2_version_maj'.'$python2_version_min'")' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
+	&& echo 'set(Python2_EXECUTABLE "/usr/local/bin/python'$python2_version_maj'.'$python2_version_min'")' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
+	&& echo 'set(Python2_LIBRARIES "'$YADOMS_DEPS_PATH'/Python-'$python2_version'/libpython'$python2_version_maj'.'$python2_version_min'.a")' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
+	&& echo 'set(Python2_INCLUDE_DIRS "'$YADOMS_DEPS_PATH'/Python-'$python2_version'")' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
 	&& echo 'set(Python3_ManualSetup ON)' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
-	&& echo 'set(Python3_EXECUTABLE "'$YADOMS_DEPS_PATH'/python'$python3_version_maj$python3_version_min'/bin/python'$python3_version_maj'")' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
-	&& echo 'set(Python3_LIBRARIES "'$YADOMS_DEPS_PATH'/python'$python3_version_maj$python3_version_min'/lib/libpython'$python3_version_maj'.'$python3_version_min'.so")' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
-	&& echo 'set(Python3_INCLUDE_DIRS "'$YADOMS_DEPS_PATH'/python'$python3_version_maj$python3_version_min'/include/python'$python3_version_maj'.'$python3_version_min'")' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
+	&& echo 'set(Python3_EXECUTABLE "/usr/local/bin/python'$python3_version_maj'.'$python3_version_min'")' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
+	&& echo 'set(Python3_LIBRARIES "'$YADOMS_DEPS_PATH'/Python-'$python3_version'/libpython'$python3_version_maj'.'$python3_version_min'.a")' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
+	&& echo 'set(Python3_INCLUDE_DIRS "'$YADOMS_DEPS_PATH'/Python-'$python3_version'")' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
 	&& echo 'set(PostgreSQL_ROOT ' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
 	&& echo '       "'$YADOMS_DEPS_PATH'/postgresql-'$postgresql_version'/src/interfaces/libpq"' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
 	&& echo '       "'$YADOMS_DEPS_PATH'/postgresql-'$postgresql_version'/src/include")' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
@@ -256,6 +259,9 @@ RUN echo 'Configuring Yadoms CMakeListsUserConfig.txt' \
 	&& echo 'SET(COTIRE_USE ON)' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
 	&& echo 'SET(COTIRE_USE_UNITY ON)' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
 	&& echo 'set(CC_RPI_ROOT "'$YADOMS_BUILD_TOOLS_PATH'/tools/arm-bcm2708/arm-rpi-4.9.3-linux-gnueabihf")' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt
+
+#For debug purpose only
+RUN cat $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt
 
 ####################################################################################
 #RaspberryPI IMAGE generation
@@ -270,8 +276,9 @@ USER root
 
 #copy entrypoint at root
 COPY entrypoint.sh /
+COPY entrypoint_docker.sh /
 
 #ensure entrypoint is executable (force flags update, because file flags may change if a commit is made under Windows)
 RUN chmod +x /entrypoint.sh
-
+RUN chmod +x /entrypoint_docker.sh
 

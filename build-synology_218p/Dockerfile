@@ -158,8 +158,8 @@ RUN wget --no-check-certificate --no-check-certificate --no-verbose https://www.
 # Python 2.7 (Pi)
 RUN mv Python-$python2_version $YADOMS_DEPS_PATH/Python-$python2_version  > /dev/null\
 	&& cd $YADOMS_DEPS_PATH/Python-$python2_version  > /dev/null\
-	&& ac_cv_file__dev_ptmx=no ac_cv_file__dev_ptc=no ac_cv_have_long_long_format=yes CC=x86_64-pc-linux-gnu-gcc CXX=x86_64-pc-linux-gnu-g++ AR=x86_64-pc-linux-gnu-ar RANLIB=x86_64-pc-linux-gnu-ranlib ./configure --host=x86_64-pc-linux-gnu --target=x86_64-pc-linux-gnu --build=x86_64-linux-gnu --prefix=$YADOMS_DEPS_PATH/pythonpython$python2_version_maj$python2_version_min --disable-ipv6 --enable-shared\
-	&& make HOSTPYTHON=$YADOMS_BUILD_TOOLS_PATH/pythonhost$python2_version_maj$python2_version_min/python HOSTPGEN=$YADOMS_BUILD_TOOLS_PATH/pythonhost$python2_version_maj$python2_version_min/Parser/pgen BLDSHARED="x86_64-pc-linux-gnu-gcc -shared" CROSS-COMPILE=x86_64-pc-linux-gnu- CROSS_COMPILE_TARGET=yes HOSTARCH=arm-linux BUILDARCH=x86_64-pc-linux-gnu 
+	&& ac_cv_file__dev_ptmx=no ac_cv_file__dev_ptc=no ac_cv_have_long_long_format=yes CC=x86_64-pc-linux-gnu-gcc CXX=x86_64-pc-linux-gnu-g++ AR=x86_64-pc-linux-gnu-ar RANLIB=x86_64-pc-linux-gnu-ranlib ./configure --host=x86_64-pc-linux-gnu --target=x86_64-pc-linux-gnu --build=x86_64-linux-gnu --disable-ipv6 --enable-shared\
+	&& make HOSTPYTHON=$YADOMS_BUILD_TOOLS_PATH/pythonhost/python HOSTPGEN=$YADOMS_BUILD_TOOLS_PATH/pythonhost/Parser/pgen BLDSHARED="x86_64-pc-linux-gnu-gcc -shared" CROSS-COMPILE=x86_64-pc-linux-gnu- CROSS_COMPILE_TARGET=yes HOSTARCH=arm-linux BUILDARCH=x86_64-pc-linux-gnu 
 
 RUN apt-get install -y libffi-dev
 
@@ -177,15 +177,13 @@ RUN wget --no-check-certificate --no-check-certificate --no-verbose https://www.
 	&& make install  > /dev/null\
 	&& mkdir -p $YADOMS_BUILD_TOOLS_PATH/pythonhost$python3_version_maj$python3_version_min \
 	&& cp python $YADOMS_BUILD_TOOLS_PATH/pythonhost$python3_version_maj$python3_version_min/ \
-	&& cp -r Parser/pgen $YADOMS_BUILD_TOOLS_PATH/pythonhost$python3_version_maj$python3_version_min/ \
 	&& cd .. && rm -Rf Python-$python3_version-host
+	
 # Python 3.7 (Pi)
 RUN mv Python-$python3_version $YADOMS_DEPS_PATH/Python-$python3_version  > /dev/null\
 	&& cd $YADOMS_DEPS_PATH/Python-$python3_version  > /dev/null\
-	&& CC=x86_64-pc-linux-gnu-gcc CXX=x86_64-pc-linux-gnu-g++ AR=x86_64-pc-linux-gnu-ar RANLIB=x86_64-pc-linux-gnu-ranlib ./configure --host=x86_64-pc-linux-gnu --target=x86_64-pc-linux-gnu --build=x86_64-linux-gnu --prefix=$YADOMS_DEPS_PATH/python37 --disable-ipv6 ac_cv_file__dev_ptmx=no ac_cv_file__dev_ptc=no ac_cv_have_long_long_format=yes --enable-shared  --without-pymalloc  > /dev/null\
-	&& make HOSTPYTHON=$YADOMS_BUILD_TOOLS_PATH/pythonhost$python3_version_maj$python3_version_min/python HOSTPGEN=$YADOMS_BUILD_TOOLS_PATH/pythonhost$python3_version_maj$python3_version_min/Parser/pgen BLDSHARED="x86_64-pc-linux-gnu-gcc -shared" CROSS-COMPILE=x86_64-pc-linux-gnu- CROSS_COMPILE_TARGET=yes HOSTARCH=arm-linux BUILDARCH=x86_64-pc-linux-gnu  > /dev/null
-
-
+	&& CC=x86_64-pc-linux-gnu-gcc CXX=x86_64-pc-linux-gnu-g++ AR=x86_64-pc-linux-gnu-ar RANLIB=x86_64-pc-linux-gnu-ranlib ./configure --host=x86_64-pc-linux-gnu --target=x86_64-pc-linux-gnu --build=x86_64-linux-gnu --disable-ipv6 ac_cv_file__dev_ptmx=no ac_cv_file__dev_ptc=no ac_cv_have_long_long_format=yes --enable-shared  --without-pymalloc --with-openssl=$YADOMS_DEPS_PATH/openssl > /dev/null\
+	&& make HOSTPYTHON=$YADOMS_BUILD_TOOLS_PATH/pythonhost$python3_version_maj$python3_version_min/python BLDSHARED="x86_64-pc-linux-gnu-gcc -shared" CROSS-COMPILE=x86_64-pc-linux-gnu- CROSS_COMPILE_TARGET=yes HOSTARCH=arm-linux BUILDARCH=x86_64-pc-linux-gnu  > /dev/null
 
 # PostgreSQL
 ARG postgresql_version=9.6.2
@@ -240,13 +238,13 @@ RUN echo 'Configuring Yadoms CMakeListsUserConfig.txt' \
 	&& echo 'set(PYTHON_USE_PKGCONFIG OFF)' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
 	&& echo 'set(PYTHON_USE_SOURCES ON)' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
 	&& echo 'set(Python2_ManualSetup ON)' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
-	&& echo 'set(Python2_EXECUTABLE "'$YADOMS_DEPS_PATH'/python'$python2_version_maj$python2_version_min'/bin/python'$python2_version_maj'")' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
-	&& echo 'set(Python2_LIBRARIES "'$YADOMS_DEPS_PATH'/python'$python2_version_maj$python2_version_min'/lib/libpython'$python2_version_maj'.'$python2_version_min'.so")' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
-	&& echo 'set(Python2_INCLUDE_DIRS "'$YADOMS_DEPS_PATH'/python'$python2_version_maj$python2_version_min'/include/python'$python2_version_maj'.'$python2_version_min'")' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
+	&& echo 'set(Python2_EXECUTABLE "/usr/local/bin/python'$python2_version_maj'.'$python2_version_min'")' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
+	&& echo 'set(Python2_LIBRARIES "'$YADOMS_DEPS_PATH'/Python-'$python2_version'/libpython'$python2_version_maj'.'$python2_version_min'.a")' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
+	&& echo 'set(Python2_INCLUDE_DIRS "'$YADOMS_DEPS_PATH'/Python-'$python2_version'")' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
 	&& echo 'set(Python3_ManualSetup ON)' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
-	&& echo 'set(Python3_EXECUTABLE "'$YADOMS_DEPS_PATH'/python'$python3_version_maj$python3_version_min'/bin/python'$python3_version_maj'")' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
-	&& echo 'set(Python3_LIBRARIES "'$YADOMS_DEPS_PATH'/python'$python3_version_maj$python3_version_min'/lib/libpython'$python3_version_maj'.'$python3_version_min'.so")' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
-	&& echo 'set(Python3_INCLUDE_DIRS "'$YADOMS_DEPS_PATH'/python'$python3_version_maj$python3_version_min'/include/python'$python3_version_maj'.'$python3_version_min'")' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
+	&& echo 'set(Python3_EXECUTABLE "/usr/local/bin/python'$python3_version_maj'.'$python3_version_min'")' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
+	&& echo 'set(Python3_LIBRARIES "'$YADOMS_DEPS_PATH'/Python-'$python3_version'/libpython'$python3_version_maj'.'$python3_version_min'.a")' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
+	&& echo 'set(Python3_INCLUDE_DIRS "'$YADOMS_DEPS_PATH'/Python-'$python3_version'")' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
 	&& echo 'set(PostgreSQL_ROOT ' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
 	&& echo '       "'$YADOMS_DEPS_PATH'/postgresql-'$postgresql_version'/src/interfaces/libpq"' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
 	&& echo '       "'$YADOMS_DEPS_PATH'/postgresql-'$postgresql_version'/src/include")' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
@@ -259,8 +257,8 @@ RUN echo 'Configuring Yadoms CMakeListsUserConfig.txt' \
 
 #copy entrypoint at root
 COPY entrypoint.sh /
+COPY entrypoint_docker.sh /
 
 #ensure entrypoint is executable (force flags update, because file flags may change if a commit is made under Windows)
 RUN chmod +x /entrypoint.sh
-
-
+RUN chmod +x /entrypoint_docker.sh
