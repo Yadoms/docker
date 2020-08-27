@@ -10,12 +10,11 @@ SHELL ["powershell"]
 
 RUN New-Item -ItemType Directory -Path '$YADOMS_DEPS_PATH'
 
+# Download the Build Tools bootstrapper.
+RUN (New-Object System.Net.WebClient).DownloadFile('https://aka.ms/vs/16/release/vs_buildtools.exe', '$YADOMS_DEPS_PATH\vs_buildtools.exe')
+ 
  # Restore the default Windows shell for correct batch processing.
 SHELL ["cmd", "/S", "/C"]
-
-# Download the Build Tools bootstrapper.
-ADD https://aka.ms/vs/16/release/vs_buildtools.exe "$YADOMS_DEPS_PATH\vs_buildtools.exe"
-
 # Install Build Tools with the Microsoft.VisualStudio.Workload.AzureBuildTools workload, excluding workloads and components with known issues.
 RUN $YADOMS_DEPS_PATH\vs_buildtools.exe --quiet --wait --norestart --nocache \
     --installPath C:\BuildTools \
