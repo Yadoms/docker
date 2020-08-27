@@ -1,6 +1,6 @@
 FROM mcr.microsoft.com/windows/servercore:ltsc2019
 MAINTAINER jano42 "https://github.com/jano42"
-LABEL authors=jano42,sgallou
+LABEL authors=jano42
 
 ENV YADOMS_BUILD_BRANCH develop
 ENV MAKE_PACKAGE false
@@ -13,27 +13,25 @@ SHELL ["cmd", "/S", "/C"]
 ADD https://aka.ms/vs/16/release/vs_buildtools.exe C:\TEMP\vs_buildtools.exe
 
 # Install Build Tools with the Microsoft.VisualStudio.Workload.AzureBuildTools workload, excluding workloads and components with known issues.
-RUN C:\TEMP\vs_buildtools.exe --quiet --wait --norestart --nocache `
-    --installPath C:\BuildTools `
-    --add Microsoft.VisualStudio.Workload.MSBuildTools `
-    --add Microsoft.VisualStudio.Workload.VCTools `
-    --remove Microsoft.VisualStudio.Component.Windows10SDK.10240 `
-    --remove Microsoft.VisualStudio.Component.Windows10SDK.10586 `
-    --remove Microsoft.VisualStudio.Component.Windows10SDK.14393 `
-    --remove Microsoft.VisualStudio.Component.Windows81SDK `
+RUN C:\TEMP\vs_buildtools.exe --quiet --wait --norestart --nocache \
+    --installPath C:\BuildTools \
+    --add Microsoft.VisualStudio.Workload.MSBuildTools \
+    --add Microsoft.VisualStudio.Workload.VCTools \
+    --remove Microsoft.VisualStudio.Component.Windows10SDK.10240 \
+    --remove Microsoft.VisualStudio.Component.Windows10SDK.10586 \
+    --remove Microsoft.VisualStudio.Component.Windows10SDK.14393 \
+    --remove Microsoft.VisualStudio.Component.Windows81SDK \
  || IF "%ERRORLEVEL%"=="3010" EXIT 0
  
 # Start developer command prompt with any other commands specified.
-ENTRYPOINT C:\BuildTools\Common7\Tools\VsDevCmd.bat -arch=amd64 &&
+#ENTRYPOINT C:\BuildTools\Common7\Tools\VsDevCmd.bat -arch=amd64 &&
 
 SHELL ["powershell"]
 
 RUN md $YADOMS_DEPS_PATH
 
-
 ARG cmake_version=3.18.1
 RUN choco install cmake --installargs 'ADD_CMAKE_TO_PATH=System' -y --no-progress --version $cmake_version
-
 
 
 # Boost
