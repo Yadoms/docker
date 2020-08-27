@@ -6,10 +6,8 @@ ENV YADOMS_BUILD_BRANCH develop
 ENV MAKE_PACKAGE false
 ENV YADOMS_DEPS_PATH  C:\\yadoms-deps
 
-
 # Create working folders
-SHELL ["powershell", "-Command"]
-RUN echo "$env:YADOMS_DEPS_PATH"
+RUN powershell.exe -Command New-Item -ItemType Directory -Path "$YADOMS_DEPS_PATH"
 
 
 ###################################################################
@@ -17,7 +15,7 @@ RUN echo "$env:YADOMS_DEPS_PATH"
 ###################################################################
 
 # Download the Build Tools bootstrapper.
-RUN (New-Object System.Net.WebClient).DownloadFile('https://aka.ms/vs/16/release/vs_buildtools.exe', $env:YADOMS_DEPS_PATH + "\\vs_buildtools.exe")
+RUN powershell.exe -Command (New-Object System.Net.WebClient).DownloadFile('https://aka.ms/vs/16/release/vs_buildtools.exe', "$YADOMS_DEPS_PATH\\vs_buildtools.exe")
 
 RUN plop
  
