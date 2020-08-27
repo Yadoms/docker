@@ -5,14 +5,7 @@ LABEL authors=jano42
 ENV YADOMS_BUILD_BRANCH develop
 ENV MAKE_PACKAGE false
 ENV YADOMS_DEPS_PATH  C:\\yadoms-deps
-ARG test_version=3.18.1
 
-SHELL ["powershell"]
-RUN echo \"Test 2 $env:YADOMS_DEPS_PATH $env:test_version\"
-RUN echo $env:YADOMS_DEPS_PATH $env:test_version
-RUN ls  "$env:YADOMS_DEPS_PATH\\vs_buildtools.exe"
-
-RUN plop
 
 # Create working folders
 SHELL ["powershell"]
@@ -23,7 +16,7 @@ RUN New-Item -ItemType Directory -Path '$YADOMS_DEPS_PATH'
 ###################################################################
 
 # Download the Build Tools bootstrapper.
-RUN (New-Object System.Net.WebClient).DownloadFile('https://aka.ms/vs/16/release/vs_buildtools.exe', '$YADOMS_DEPS_PATH\vs_buildtools.exe')
+RUN (New-Object System.Net.WebClient).DownloadFile('https://aka.ms/vs/16/release/vs_buildtools.exe', "$env:YADOMS_DEPS_PATH\vs_buildtools.exe")
  
  # Restore the default Windows shell for correct batch processing.
 SHELL ["cmd", "/S", "/C"]
@@ -56,7 +49,7 @@ RUN iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.or
 
 # CMake
 ARG cmake_version=3.18.1
-RUN choco install cmake --installargs 'ADD_CMAKE_TO_PATH=System' -y --no-progress
+RUN choco install cmake --installargs 'ADD_CMAKE_TO_PATH=System' -y --no-progress --version $env:cmake_version
 
 # Boost
 ARG boost_version_major=1
@@ -66,19 +59,20 @@ ARG boost_underscore=_
 ARG boost_version=$boost_version_major$boost_underscore$boost_version_minor$boost_underscore$boost_version_patch
 ARG boost_version_dot=$boost_version_major.$boost_version_minor.$boost_version_patch
 RUN cd $YADOMS_DEPS_PATH \
-   (New-Object System.Net.WebClient).DownloadFile('https://dl.bintray.com/boostorg/release/$boost_version_dot/source/boost_$Env:boost_version.zip', '$YADOMS_DEPS_PATH\boost_$Env:boost_version.zip') \
-   ; Expand-Archive -Path boost_$Env:boost_version.zip '$Env:YADOMS_DEPS_PATH' ; cd boost_$Env:boost_version \
+   (New-Object System.Net.WebClient).DownloadFile("https://dl.bintray.com/boostorg/release/$env:boost_version_dot/source/boost_$env:boost_version.zip", "$env:YADOMS_DEPS_PATH\\boost_$Env:boost_version.zip") \
+   ; Expand-Archive -Path boost_$env:boost_version.zip "$env:YADOMS_DEPS_PATH" ; cd boost_$env:boost_version \
    ; .\bootstrap.bat \
    ; b2.exe --with-atomic --with-chrono --with-date_time --with-filesystem --with-regex --with-thread --with-system --with-test link=static runtime-link=static \
    ; Remove-Item -Path bin.v2 -Recurse \
    ; Remove-Item -Path doc -Recurse \
    ; Remove-Item -Path libs -Recurse \
    ; Remove-Item -Path tools -Recurse \
-   ; cd .. ; Remove-Item -Path boost_$Env:boost_versionn.zip
+   ; cd .. ; Remove-Item -Path boost_$env:boost_versionn.zip
 
-# OpenSSL
-RUN choco install openssl --x86 -y --no-progress
-
+# OpenSSL (for chocolatey, 1.1.1.700 match 1.1.1g (g is the 7th...)
+ARG openssl_version=1.1.1.700
+RUN choco install openssl --x86 -y --no-progress --version $env:openssl_version
+ 
 
 ## 	RUN cd $YADOMS_DEPS_PATH \
 ## 		&& wget --no-verbose https://dl.bintray.com/boostorg/release/$boost_version_dot/source/boost_$boost_version.tar.bz2 \
