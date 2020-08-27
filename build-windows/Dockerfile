@@ -9,8 +9,9 @@ ENV YADOMS_DEPS_PATH  C:\\yadoms-deps
 # Create working folders
 SHELL ["cmd", "/S", "/C"]
 RUN echo $env:YADOMS_DEPS_PATH
-RUN ehoc $YADOMS_DEPS_PATH
-RUN powershell.exe -Command New-Item -ItemType Directory -Path $env:YADOMS_DEPS_PATH
+RUN echo $YADOMS_DEPS_PATH
+RUN echo %YADOMS_DEPS_PATH%
+RUN powershell.exe -Command New-Item -ItemType Directory -Path %YADOMS_DEPS_PATH%
 
 
 
