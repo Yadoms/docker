@@ -4,7 +4,7 @@ LABEL authors=jano42
 
 ENV YADOMS_BUILD_BRANCH develop
 ENV MAKE_PACKAGE false
-ENV YADOMS_DEPS_PATH  C:\yadoms-deps
+ENV YADOMS_DEPS_PATH  C:\\yadoms-deps
 
 SHELL ["powershell"]
 RUN echo %YADOMS_DEPS_PATH%
@@ -13,6 +13,15 @@ RUN echo $YADOMS_DEPS_PATH
 RUN echo "Test $YADOMS_DEPS_PATH"
 RUN echo $env:YADOMS_DEPS_PATH
 RUN echo "Test $env:YADOMS_DEPS_PATH"
+
+ARG test_version=3.18.1
+RUN echo %test_version%
+RUN echo "Test %test_version%"
+RUN echo $test_version
+RUN echo "Test $test_version"
+RUN echo $env:test_version
+RUN echo "Test $env:test_version"
+
 
 # Create working folders
 SHELL ["powershell"]
