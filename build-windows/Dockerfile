@@ -17,7 +17,7 @@ RUN echo "$env:YADOMS_DEPS_PATH"
 ###################################################################
 
 # Download the Build Tools bootstrapper.
-RUN (New-Object System.Net.WebClient).DownloadFile('https://aka.ms/vs/16/release/vs_buildtools.exe', "$env:YADOMS_DEPS_PATH\\vs_buildtools.exe")
+RUN (New-Object System.Net.WebClient).DownloadFile('https://aka.ms/vs/16/release/vs_buildtools.exe', $env:YADOMS_DEPS_PATH + "\\vs_buildtools.exe")
 
 RUN plop
  
