@@ -7,7 +7,9 @@ ENV MAKE_PACKAGE false
 ENV YADOMS_DEPS_PATH  C:\\yadoms-deps
 
 # Create working folders
-RUN powershell.exe -Command New-Item -ItemType Directory -Path "$YADOMS_DEPS_PATH"
+SHELL ["cmd", "/S", "/C"]
+RUN powershell.exe -Command New-Item -ItemType Directory -Path $YADOMS_DEPS_PATH
+RUN mkdir $YADOMS_DEPS_PATH
 
 
 ###################################################################
