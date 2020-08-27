@@ -67,6 +67,7 @@ RUN cd %YADOMS_DEPS_PATH% \
    && powershell.exe -Command (New-Object System.Net.WebClient).DownloadFile('https://dl.bintray.com/boostorg/release/%boost_version_dot%/source/boost_%boost_version%.zip', '%YADOMS_DEPS_PATH%\\boost_%boost_version%.zip') \
    && powershell.exe -Command Expand-Archive -Path boost_%boost_version%.zip '%YADOMS_DEPS_PATH%'\
    && cd boost_%boost_version% \
+   && C:\BuildTools\Common7\Tools\VsDevCmd.bat \
    &&.\bootstrap.bat \
    && b2.exe --with-atomic --with-chrono --with-date_time --with-filesystem --with-regex --with-thread --with-system --with-test link=static runtime-link=static \
    && powershell.exe -Command Remove-Item -Path bin.v2 -Recurse \
