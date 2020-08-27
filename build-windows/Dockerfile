@@ -6,9 +6,13 @@ ENV YADOMS_BUILD_BRANCH develop
 ENV MAKE_PACKAGE false
 ENV YADOMS_DEPS_PATH  C:\yadoms-deps
 
+# Create working folders
 SHELL ["powershell"]
-
 RUN New-Item -ItemType Directory -Path '$YADOMS_DEPS_PATH'
+
+###################################################################
+# Install VisualStudio Tools
+###################################################################
 
 # Download the Build Tools bootstrapper.
 RUN (New-Object System.Net.WebClient).DownloadFile('https://aka.ms/vs/16/release/vs_buildtools.exe', '$YADOMS_DEPS_PATH\vs_buildtools.exe')
@@ -26,17 +30,24 @@ RUN $YADOMS_DEPS_PATH\vs_buildtools.exe --quiet --wait --norestart --nocache \
     --remove Microsoft.VisualStudio.Component.Windows81SDK \
  || IF "%ERRORLEVEL%"=="3010" EXIT 0
  
-SHELL ["powershell"]
- 
+
 # Start developer command prompt with any other commands specified.
 #ENTRYPOINT C:\BuildTools\Common7\Tools\VsDevCmd.bat -arch=amd64 &&
+
+###################################################################
+# Install chocolatey
+###################################################################
+SHELL ["powershell"]
 
 # install chocolatey
 RUN iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))
 
+###################################################################
+# Install yadoms dependencies
+###################################################################
+
 # CMake
 ARG cmake_version=3.18.1
-#RUN choco install cmake --installargs 'ADD_CMAKE_TO_PATH=System' -y --no-progress --version $cmake_version
 RUN choco install cmake --installargs 'ADD_CMAKE_TO_PATH=System' -y --no-progress
 
 # Boost
@@ -48,14 +59,17 @@ ARG boost_version=$boost_version_major$boost_underscore$boost_version_minor$boos
 ARG boost_version_dot=$boost_version_major.$boost_version_minor.$boost_version_patch
 RUN cd $YADOMS_DEPS_PATH \
    (New-Object System.Net.WebClient).DownloadFile('https://dl.bintray.com/boostorg/release/$boost_version_dot/source/boost_$boost_version.zip', '$YADOMS_DEPS_PATH\boost_$boost_version.zip') \
-   && Expand-Archive -Path boost_$boost_version.zip '$YADOMS_DEPS_PATH' && cd boost_$boost_version \
-   && .\bootstrap.bat \
-   && b2.exe --with-atomic --with-chrono --with-date_time --with-filesystem --with-regex --with-thread --with-system --with-test link=static runtime-link=static \
-   && Remove-Item -Path bin.v2 -Recurse \
-   && Remove-Item -Path doc -Recurse \
-   && Remove-Item -Path libs -Recurse \
-   && Remove-Item -Path tools -Recurse \
-   && cd .. && Remove-Item -Path boost_$boost_version.zip
+   ; Expand-Archive -Path boost_$boost_version.zip '$YADOMS_DEPS_PATH' ; cd boost_$boost_version \
+   ; .\bootstrap.bat \
+   ; b2.exe --with-atomic --with-chrono --with-date_time --with-filesystem --with-regex --with-thread --with-system --with-test link=static runtime-link=static \
+   ; Remove-Item -Path bin.v2 -Recurse \
+   ; Remove-Item -Path doc -Recurse \
+   ; Remove-Item -Path libs -Recurse \
+   ; Remove-Item -Path tools -Recurse \
+   ; cd .. ; Remove-Item -Path boost_$boost_version.zip
+
+# OpenSSL
+RUN choco install openssl --x86 -y --no-progress
 
 
 ## 	RUN cd $YADOMS_DEPS_PATH \
