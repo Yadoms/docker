@@ -8,10 +8,10 @@ ENV YADOMS_DEPS_PATH  C:\yadoms-deps
 
 SHELL ["powershell"]
 
-RUN New-Item -ItemType Directory -Path "$YADOMS_DEPS_PATH"
+RUN New-Item -ItemType Directory -Path '$YADOMS_DEPS_PATH'
 
 # Install Build Tools with the Microsoft.VisualStudio.Workload.AzureBuildTools workload, excluding workloads and components with known issues.
-RUN (New-Object System.Net.WebClient).DownloadFile('https://aka.ms/vs/16/release/vs_buildtools.exe', YADOMS_DEPS_PATH\vs_buildtools.exe') \
+RUN (New-Object System.Net.WebClient).DownloadFile('https://aka.ms/vs/16/release/vs_buildtools.exe', '$YADOMS_DEPS_PATH\vs_buildtools.exe') \
 	$YADOMS_DEPS_PATH\vs_buildtools.exe --quiet --wait --norestart --nocache \
     --installPath C:\BuildTools \
     --add Microsoft.VisualStudio.Workload.MSBuildTools \
