@@ -36,7 +36,8 @@ RUN iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.or
 
 # CMake
 ARG cmake_version=3.18.1
-RUN choco install cmake --installargs 'ADD_CMAKE_TO_PATH=System' -y --no-progress --version $cmake_version
+#RUN choco install cmake --installargs 'ADD_CMAKE_TO_PATH=System' -y --no-progress --version $cmake_version
+RUN choco install cmake --installargs 'ADD_CMAKE_TO_PATH=System' -y --no-progress
 
 # Boost
 ARG boost_version_major=1
