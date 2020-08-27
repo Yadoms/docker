@@ -7,21 +7,12 @@ ENV MAKE_PACKAGE false
 ENV YADOMS_DEPS_PATH  C:\\yadoms-deps
 
 SHELL ["powershell"]
-RUN echo %YADOMS_DEPS_PATH%
-RUN echo "Test %YADOMS_DEPS_PATH%"
-RUN echo $YADOMS_DEPS_PATH
-RUN echo "Test $YADOMS_DEPS_PATH"
-RUN echo $env:YADOMS_DEPS_PATH
-RUN echo "Test $env:YADOMS_DEPS_PATH"
-
+RUN echo "Test 1 $env:YADOMS_DEPS_PATH"
 ARG test_version=3.18.1
-RUN echo %test_version%
-RUN echo "Test %test_version%"
-RUN echo $test_version
-RUN echo "Test $test_version"
-RUN echo $env:test_version
-RUN echo "Test $env:test_version"
+RUN echo "Test 2 $env:YADOMS_DEPS_PATH $env:test_version"
+RUN echo 'Test 3 $env:YADOMS_DEPS_PATH $env:test_version'
 
+RUN plop
 
 # Create working folders
 SHELL ["powershell"]
