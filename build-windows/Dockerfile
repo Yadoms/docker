@@ -26,12 +26,8 @@ RUN powershell.exe -Command New-Item -ItemType Directory -Path %YADOMS_DEPS_PATH
 # Download the Build Tools bootstrapper.
 RUN powershell.exe -Command (New-Object System.Net.WebClient).DownloadFile('https://aka.ms/vs/16/release/vs_buildtools.exe', '%YADOMS_DEPS_PATH%\\vs_buildtools.exe')
 
-RUN plop
- 
- # Restore the default Windows shell for correct batch processing.
-SHELL ["cmd", "/S", "/C"]
 # Install Build Tools with the Microsoft.VisualStudio.Workload.AzureBuildTools workload, excluding workloads and components with known issues.
-RUN $YADOMS_DEPS_PATH\vs_buildtools.exe --quiet --wait --norestart --nocache \
+RUN %YADOMS_DEPS_PATH%\\vs_buildtools.exe --quiet --wait --norestart --nocache \
     --installPath C:\BuildTools \
     --add Microsoft.VisualStudio.Workload.MSBuildTools \
     --add Microsoft.VisualStudio.Workload.VCTools \
@@ -48,10 +44,9 @@ RUN $YADOMS_DEPS_PATH\vs_buildtools.exe --quiet --wait --norestart --nocache \
 ###################################################################
 # Install chocolatey
 ###################################################################
-SHELL ["powershell"]
 
 # install chocolatey
-RUN iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))
+RUN powershell.exe -Command iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))
 
 ###################################################################
 # Install yadoms dependencies
@@ -59,7 +54,7 @@ RUN iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.or
 
 # CMake
 ARG cmake_version=3.18.1
-RUN choco install cmake --installargs 'ADD_CMAKE_TO_PATH=System' -y --no-progress --version $env:cmake_version
+RUN choco install cmake --installargs 'ADD_CMAKE_TO_PATH=System' -y --no-progress --version %cmake_version%
 
 # Boost
 ARG boost_version_major=1
@@ -68,20 +63,21 @@ ARG boost_version_patch=0
 ARG boost_underscore=_
 ARG boost_version=$boost_version_major$boost_underscore$boost_version_minor$boost_underscore$boost_version_patch
 ARG boost_version_dot=$boost_version_major.$boost_version_minor.$boost_version_patch
-RUN cd $YADOMS_DEPS_PATH \
-   (New-Object System.Net.WebClient).DownloadFile("https://dl.bintray.com/boostorg/release/$env:boost_version_dot/source/boost_$env:boost_version.zip", "$env:YADOMS_DEPS_PATH\\boost_$Env:boost_version.zip") \
-   ; Expand-Archive -Path boost_$env:boost_version.zip "$env:YADOMS_DEPS_PATH" ; cd boost_$env:boost_version \
-   ; .\bootstrap.bat \
-   ; b2.exe --with-atomic --with-chrono --with-date_time --with-filesystem --with-regex --with-thread --with-system --with-test link=static runtime-link=static \
-   ; Remove-Item -Path bin.v2 -Recurse \
-   ; Remove-Item -Path doc -Recurse \
-   ; Remove-Item -Path libs -Recurse \
-   ; Remove-Item -Path tools -Recurse \
-   ; cd .. ; Remove-Item -Path boost_$env:boost_versionn.zip
+RUN cd %YADOMS_DEPS_PATH% \
+   && powershell.exe -Command (New-Object System.Net.WebClient).DownloadFile('https://dl.bintray.com/boostorg/release/%boost_version_dot%/source/boost_%boost_version%.zip", '%YADOMS_DEPS_PATH%\\boost_%boost_version%.zip') \
+   && powershell.exe -Command Expand-Archive -Path boost_%boost_version%.zip '%YADOMS_DEPS_PATH%'
+   && cd boost_%boost_version% \
+   &&.\bootstrap.bat \
+   && b2.exe --with-atomic --with-chrono --with-date_time --with-filesystem --with-regex --with-thread --with-system --with-test link=static runtime-link=static \
+   && powershell.exe -Command Remove-Item -Path bin.v2 -Recurse \
+   && powershell.exe -Command Remove-Item -Path doc -Recurse \
+   && powershell.exe -Command Remove-Item -Path libs -Recurse \
+   && powershell.exe -Command Remove-Item -Path tools -Recurse \
+   && cd .. && powershell.exe -Command Remove-Item -Path boost_%boost_versionn%.zip
 
 # OpenSSL (for chocolatey, 1.1.1.700 match 1.1.1g (g is the 7th...)
 ARG openssl_version=1.1.1.700
-RUN choco install openssl --x86 -y --no-progress --version $env:openssl_version
+RUN choco install openssl --x86 -y --no-progress --version %openssl_version%
  
 
 ## 	RUN cd $YADOMS_DEPS_PATH \
