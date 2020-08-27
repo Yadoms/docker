@@ -92,11 +92,4 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v2
     - name: Build and push Docker images
-      uses: docker/build-push-action@v1
-      with:
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-          registry: docker.pkg.github.com
-          repository: yadoms/docker/build_for_windows
-          tag_with_ref: true
-          path: build-windows
+      run: docker build -t temp build-windows
