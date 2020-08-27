@@ -4,16 +4,18 @@ LABEL authors=jano42
 
 ENV YADOMS_BUILD_BRANCH develop
 ENV MAKE_PACKAGE false
-ENV YADOMS_DEPS_PATH  C:\TEMP\yadoms-deps
+ENV YADOMS_DEPS_PATH  C:\yadoms-deps
 
 # Restore the default Windows shell for correct batch processing.
 SHELL ["cmd", "/S", "/C"]
 
+RUN New-Item -ItemType Directory -Path "$YADOMS_DEPS_PATH"
+
 # Download the Build Tools bootstrapper.
-ADD https://aka.ms/vs/16/release/vs_buildtools.exe C:\TEMP\vs_buildtools.exe
+ADD https://aka.ms/vs/16/release/vs_buildtools.exe $YADOMS_DEPS_PATH\vs_buildtools.exe
 
 # Install Build Tools with the Microsoft.VisualStudio.Workload.AzureBuildTools workload, excluding workloads and components with known issues.
-RUN C:\TEMP\vs_buildtools.exe --quiet --wait --norestart --nocache \
+RUN $YADOMS_DEPS_PATH\vs_buildtools.exe --quiet --wait --norestart --nocache \
     --installPath C:\BuildTools \
     --add Microsoft.VisualStudio.Workload.MSBuildTools \
     --add Microsoft.VisualStudio.Workload.VCTools \
