@@ -6,6 +6,9 @@ ENV YADOMS_BUILD_BRANCH develop
 ENV MAKE_PACKAGE false
 ENV YADOMS_DEPS_PATH  C:\yadoms-deps
 
+RUN echo %YADOMS_DEPS_PATH%
+RUN echo "Test %YADOMS_DEPS_PATH%"
+
 # Create working folders
 SHELL ["powershell"]
 RUN New-Item -ItemType Directory -Path '$YADOMS_DEPS_PATH'
