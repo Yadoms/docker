@@ -44,7 +44,7 @@ RUN %YADOMS_DEPS_PATH%\\vs_buildtools.exe --quiet --wait --norestart --nocache \
 # Start developer command prompt with any other commands specified.
 #ENTRYPOINT C:\BuildTools\Common7\Tools\VsDevCmd.bat -arch=amd64 &&
 
-SHELL ["C:\BuildTools\Common7\Tools\VsDevCmd.bat", "/S", "/C"]
+SHELL ["cmd", "/S", "/C", "C:\\BuildTools\\Common7\\Tools\\VsDevCmd.bat"]
 
 RUN cl
 
