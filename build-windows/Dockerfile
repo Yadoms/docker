@@ -31,6 +31,9 @@ RUN %YADOMS_DEPS_PATH%\\vs_buildtools.exe --quiet --wait --norestart --nocache \
     --installPath C:\BuildTools \
     --add Microsoft.VisualStudio.Workload.MSBuildTools \
     --add Microsoft.VisualStudio.Workload.VCTools \
+    --add Microsoft.VisualStudio.Component.VC.CLI.Support \
+    --add Microsoft.VisualStudio.Component.VC.Llvm.Clang \
+    --add Microsoft.VisualStudio.Component.VC.Llvm.ClangToolset \
     --remove Microsoft.VisualStudio.Component.Windows10SDK.10240 \
     --remove Microsoft.VisualStudio.Component.Windows10SDK.10586 \
     --remove Microsoft.VisualStudio.Component.Windows10SDK.14393 \
@@ -40,6 +43,10 @@ RUN %YADOMS_DEPS_PATH%\\vs_buildtools.exe --quiet --wait --norestart --nocache \
 
 # Start developer command prompt with any other commands specified.
 #ENTRYPOINT C:\BuildTools\Common7\Tools\VsDevCmd.bat -arch=amd64 &&
+
+SHELL ["C:\BuildTools\Common7\Tools\VsDevCmd.bat", "/S", "/C"]
+
+RUN cl
 
 ###################################################################
 # Install chocolatey
