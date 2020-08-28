@@ -44,9 +44,10 @@ RUN %YADOMS_DEPS_PATH%\\vs_buildtools.exe --quiet --wait --norestart --nocache \
 # Start developer command prompt with any other commands specified.
 #ENTRYPOINT C:\BuildTools\Common7\Tools\VsDevCmd.bat -arch=amd64 &&
 
-SHELL ["cmd", "/S", "/C", "C:\\BuildTools\\Common7\\Tools\\VsDevCmd.bat"]
+SHELL ["cmd", "/S", "/C"]
 
-RUN cl
+RUN powershell.exe -Command cat C:\BuildTools\Common7\Tools\VsDevCmd.bat
+    && C:\BuildTools\Common7\Tools\VsDevCmd.bat && cl.exe
 
 ###################################################################
 # Install chocolatey
