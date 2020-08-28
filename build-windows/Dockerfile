@@ -46,7 +46,7 @@ RUN %YADOMS_DEPS_PATH%\\vs_buildtools.exe --quiet --wait --norestart --nocache \
 
 SHELL ["cmd", "/S", "/C"]
 
-RUN powershell.exe -Command cat C:\BuildTools\Common7\Tools\VsDevCmd.bat
+RUN powershell.exe -Command cat C:\BuildTools\Common7\Tools\VsDevCmd.bat \
     && C:\BuildTools\Common7\Tools\VsDevCmd.bat && cl.exe
 
 ###################################################################
