@@ -1,4 +1,4 @@
-FROM docker.pkg.github.com/yadoms/docker/vstools:latest
+FROM yadoms/vstools:latest
 MAINTAINER jano42 "https://github.com/jano42"
 LABEL authors=jano42
 
