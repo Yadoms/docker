@@ -90,11 +90,29 @@ jobs:
           path: build-synology_218p
      
           
-  Windows:
+  Windows_1_VSTools:
     name : Generate for Windows
     runs-on: windows-latest
     steps:
     - name: Checkout code
       uses: actions/checkout@v2
-    - name: Build and push Docker images
-      run: docker build -t temp build-windows
+    - name: Build VSTools container
+      run: docker build -t docker.pkg.github.com/yadoms/docker/vstools -m 2GB build-windows/1.vstools
+    - name: login tp docker
+      run: docker login --username ${{ github.actor }} --password ${{ secrets.GITHUB_TOKEN }}  docker.pkg.github.com
+    - name: Push VSTools container
+      run: docker push docker.pkg.github.com/yadoms/docker/vstools
+
+  Windows_2_Yadoms:
+    name : Generate for Windows
+    runs-on: windows-latest
+    needs: Windows_1_VSTools
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+    - name: Build VSTools container
+      run: docker build -t docker.pkg.github.com/yadoms/docker/build-windows build-windows/2.build-windows
+    - name: login to docker
+      run: docker login --username ${{ github.actor }} --password ${{ secrets.GITHUB_TOKEN }}  docker.pkg.github.com
+    - name: Push VSTools container
+      run: docker push docker.pkg.github.com/yadoms/docker/build-windows

@@ -1,4 +1,4 @@
-FROM mcr.microsoft.com/windows/servercore:ltsc2019
+FROM docker.pkg.github.com/yadoms/docker/vstools
 MAINTAINER jano42 "https://github.com/jano42"
 LABEL authors=jano42
 
@@ -6,48 +6,16 @@ ENV YADOMS_BUILD_BRANCH develop
 ENV MAKE_PACKAGE false
 ENV YADOMS_DEPS_PATH  C:\\yadoms-deps
 
-#Setup default shell
-SHELL ["cmd", "/S", "/C"]
-
 #ok for Powershell (shell)
 #RUN echo $env:YADOMS_DEPS_PATH
 #ok for Cmd (shell)
 #RUN echo %YADOMS_DEPS_PATH%
 
+
+RUN cl.exe
+
 # Create working folders
 RUN powershell.exe -Command New-Item -ItemType Directory -Path %YADOMS_DEPS_PATH%
-
-
-
-###################################################################
-# Install VisualStudio Tools
-###################################################################
-
-# Download the Build Tools bootstrapper.
-RUN powershell.exe -Command (New-Object System.Net.WebClient).DownloadFile('https://aka.ms/vs/16/release/vs_buildtools.exe', '%YADOMS_DEPS_PATH%\\vs_buildtools.exe')
-
-# Install Build Tools with the Microsoft.VisualStudio.Workload.AzureBuildTools workload, excluding workloads and components with known issues.
-RUN %YADOMS_DEPS_PATH%\\vs_buildtools.exe --quiet --wait --norestart --nocache \
-    --installPath C:\BuildTools \
-    --add Microsoft.VisualStudio.Workload.MSBuildTools \
-    --add Microsoft.VisualStudio.Workload.VCTools \
-    --add Microsoft.VisualStudio.Component.VC.CLI.Support \
-    --add Microsoft.VisualStudio.Component.VC.Llvm.Clang \
-    --add Microsoft.VisualStudio.Component.VC.Llvm.ClangToolset \
-    --remove Microsoft.VisualStudio.Component.Windows10SDK.10240 \
-    --remove Microsoft.VisualStudio.Component.Windows10SDK.10586 \
-    --remove Microsoft.VisualStudio.Component.Windows10SDK.14393 \
-    --remove Microsoft.VisualStudio.Component.Windows81SDK \
- || IF "%ERRORLEVEL%"=="3010" EXIT 0
- 
-
-# Start developer command prompt with any other commands specified.
-#ENTRYPOINT C:\BuildTools\Common7\Tools\VsDevCmd.bat -arch=amd64 &&
-
-SHELL ["cmd", "/S", "/C"]
-
-RUN powershell.exe -Command cat C:\BuildTools\Common7\Tools\VsDevCmd.bat \
-    && C:\BuildTools\Common7\Tools\VsDevCmd.bat && cl.exe
 
 ###################################################################
 # Install chocolatey
