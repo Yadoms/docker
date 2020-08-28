@@ -11,8 +11,8 @@ ENV YADOMS_DEPS_PATH  C:\\yadoms-deps
 #ok for Cmd (shell)
 #RUN echo %YADOMS_DEPS_PATH%
 
-
-RUN cl.exe
+RUN C:\BuildTools\Common7\Tools\vcvarsall.bat x86 \
+     &&  cl.exe
 
 # Create working folders
 RUN powershell.exe -Command New-Item -ItemType Directory -Path %YADOMS_DEPS_PATH%

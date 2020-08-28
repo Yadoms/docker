@@ -110,9 +110,9 @@ jobs:
     steps:
     - name: Checkout code
       uses: actions/checkout@v2
-    - name: Build VSTools container
+    - name: Build container
       run: docker build -t yadoms/build_for_windows:latest build-windows/2.build-windows
     - name: login to docker
       run: docker login --username ${{ github.actor }} --password ${{ secrets.DOCKERHUB_OAUTH }}
-    - name: Push VSTools container
+    - name: Push container
       run: docker push yadoms/build_for_windows
