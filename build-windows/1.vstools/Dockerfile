@@ -18,9 +18,9 @@ RUN powershell.exe -Command (New-Object System.Net.WebClient).DownloadFile('http
     --add Microsoft.VisualStudio.Component.VC.CLI.Support \
     --add Microsoft.VisualStudio.Component.VC.Llvm.Clang \
     --add Microsoft.VisualStudio.Component.VC.Llvm.ClangToolset \
-    --remove Microsoft.VisualStudio.Component.Windows10SDK.10240 `
-    --remove Microsoft.VisualStudio.Component.Windows10SDK.10586 `
-    --remove Microsoft.VisualStudio.Component.Windows10SDK.14393 `
+    --remove Microsoft.VisualStudio.Component.Windows10SDK.10240 \
+    --remove Microsoft.VisualStudio.Component.Windows10SDK.10586 \
+    --remove Microsoft.VisualStudio.Component.Windows10SDK.14393 \
     --remove Microsoft.VisualStudio.Component.Windows81SDK \
  || IF "%ERRORLEVEL%"=="3010" EXIT 0
  
