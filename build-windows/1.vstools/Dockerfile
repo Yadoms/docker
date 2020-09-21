@@ -27,5 +27,8 @@ RUN powershell.exe -Command (New-Object System.Net.WebClient).DownloadFile('http
 
 # Define the entry point for the docker container.
 # This entry point starts the developer command prompt and launches the PowerShell shell.
-ENTRYPOINT ["C:\\BuildTools\\Common7\\Tools\\VsDevCmd.bat", "&&", "powershell.exe", "-NoLogo", "-ExecutionPolicy", "Bypass"]
+#ENTRYPOINT ["C:\\BuildTools\\Common7\\Tools\\VsDevCmd.bat", "&&", "powershell.exe", "-NoLogo", "-ExecutionPolicy", "Bypass"]
 
+# Use developer command prompt and start PowerShell if no other command specified.
+ENTRYPOINT C:\BuildTools\Common7\Tools\VsDevCmd.bat &&
+CMD ["powershell.exe", "-NoLogo", "-ExecutionPolicy", "Bypass"]
