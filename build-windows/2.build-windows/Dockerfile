@@ -13,9 +13,9 @@ ENV YADOMS_DEPS_PATH  C:\\yadoms-deps
 
 RUN dir C:\BuildTools\Common7\Tools
 
-RUN C:\BuildTools\Common7\Tools\VsMSBuildCmd.bat &&  cl.exe
-
 RUN C:\BuildTools\Common7\Tools\VsDevCmd.bat &&  cl.exe
+
+RUN C:\BuildTools\Common7\Tools\VsMSBuildCmd.bat &&  cl.exe
 
 RUN C:\BuildTools\Common7\Tools\vcvarsall.bat x86 &&  cl.exe
 
