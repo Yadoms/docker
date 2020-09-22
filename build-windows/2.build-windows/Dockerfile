@@ -60,98 +60,50 @@ ARG openssl_version=1.1.1.700
 RUN choco install openssl --x86 -y --no-progress --version %openssl_version%
  
 
-## 	RUN cd $YADOMS_DEPS_PATH \
-## 		&& wget --no-verbose https://dl.bintray.com/boostorg/release/$boost_version_dot/source/boost_$boost_version.tar.bz2 \
-## 		&& tar xjf boost_$boost_version.tar.bz2 && cd boost_$boost_version \
-## 		&& ./bootstrap.sh \
-## 		&& ./b2 --with-atomic --with-chrono --with-date_time --with-filesystem --with-locale --with-regex --with-thread --with-system link=static runtime-link=static --no-samples --no-tests cxxflags=-fPIC \
-## 		&& rm -Rf bin.v2 \
-## 		&& rm -Rf doc \
-## 		&& rm -Rf libs \
-## 		&& rm -Rf tools \
-## 		&& cd .. && rm $YADOMS_DEPS_PATH/boost_$boost_version.tar.bz2
-## 	
-## 	# OpenSSL
-## 	ARG openssl_version=1.1.1g
-## 	RUN cd $YADOMS_DEPS_PATH \
-## 		&& wget --no-verbose https://www.openssl.org/source/openssl-$openssl_version.tar.gz \
-## 		&& tar xzf openssl-$openssl_version.tar.gz && cd openssl-$openssl_version \
-## 		&& ./Configure --prefix=$YADOMS_DEPS_PATH/openssl -fPIC linux-x86_64\
-## 		&& make \
-## 		&& make install \
-## 		&& cd .. && rm -Rf openssl-$openssl_version && rm $YADOMS_DEPS_PATH/openssl-$openssl_version.tar.gz \
-## 		&& rm -Rf $YADOMS_DEPS_PATH/openssl/share
-## 	
 ## 	# Poco
-## 	ARG poco_version=1.9.4
-## 	RUN cd $YADOMS_DEPS_PATH \
-## 		&& wget --no-verbose https://pocoproject.org/releases/poco-$poco_version/poco-$poco_version-all.tar.gz \
-## 		&& tar xzf poco-$poco_version-all.tar.gz && cd poco-$poco_version-all \
-## 		&& echo 'STATICOPT_CC = -fPIC' >> build/config/Linux \
-## 		&& echo 'STATICOPT_CXX = -fPIC' >> build/config/Linux \
-## 		&& ./configure --static --config=Linux --no-samples --no-tests --omit=CppUnit,CppUnit/WinTestRunner,Data,Data/SQLite,Data/ODBCData/MySQL,MongoDB,PageCompiler,PageCompiler/File2Page --include-path=$HOME/depsBuild/openssl/include --library-path=$HOME/depsBuild/openssl/lib \
-## 		&& make \
-## 		&& cd .. \
-## 		&& find . -name obj -type d -print0 | xargs -0 rm -rf \
-## 		&& rm $YADOMS_DEPS_PATH/poco-$poco_version-all.tar.gz
-## 	
-## 	# Protobuf
-## 	ARG protobuf_version=3.13.0
-## 	RUN cd $YADOMS_DEPS_PATH \
-## 		&& wget --no-verbose https://github.com/google/protobuf/releases/download/v$protobuf_version/protobuf-cpp-$protobuf_version.tar.gz \
-## 		&& tar xzf protobuf-cpp-$protobuf_version.tar.gz && cd protobuf-$protobuf_version \
-## 		&& ./autogen.sh \
-## 		&& ./configure --enable-shared=no --prefix=$YADOMS_DEPS_PATH/protobuf --with-pic \
-## 		&& make \
-## 		&& make install \
-## 		&& ldconfig \
-## 		&& cd .. && rm -Rf protobuf-$protobuf_version && rm $YADOMS_DEPS_PATH/protobuf-cpp-$protobuf_version.tar.gz \
-## 		&& rm -f $YADOMS_DEPS_PATH/protobuf/lib/libprotoc.* && rm -f $YADOMS_DEPS_PATH/protobuf/lib/libprotobuf-lite.*
-## 	
-## 	
-## 	# Swig
-## 	ARG swig_version=4.0.2
-## 	RUN cd $YADOMS_DEPS_PATH \
-## 		&& wget --no-verbose http://prdownloads.sourceforge.net/swig/swig-$swig_version.tar.gz \
-## 		&& tar xzf swig-$swig_version.tar.gz \
-## 		&& cd swig-$swig_version \
-## 		&& ./configure \
-## 		&& make \
-## 		&& make install \
-## 		&& cd .. \
-## 		&& rm -f swig-$swig_version/Source/Modules/*.o \
-## 		&& rm -Rf swig-$swig_version/Examples \
-## 		&& rm -Rf swig-$swig_version/Docs \
-## 		&& rm $YADOMS_DEPS_PATH/swig-$swig_version.tar.gz
-## 	
-## 	# Python 2.7 
-## 	ARG python2_version_maj=2
-## 	ARG python2_version_min=7
-## 	ARG python2_version_patch=18
-## 	ARG python2_version=$python2_version_maj.$python2_version_min.$python2_version_patch
-## 	RUN wget --no-verbose https://www.python.org/ftp/python/$python2_version/Python-$python2_version.tgz  > /dev/null\
-## 		&& tar xzf Python-$python2_version.tgz && rm Python-$python2_version.tgz  > /dev/null\
-## 		&& cd Python-$python2_version \
-## 		&& ./configure --enable-shared --prefix=$YADOMS_DEPS_PATH/python$python2_version_maj$python2_version_min > /dev/null\
-## 		&& make > /dev/null\
-## 		&& make install  > /dev/null\
-## 		&& cd .. \
-## 		&& rm -Rf Python-$python2_version && rm -Rf $YADOMS_DEPS_PATH/python$python2_version_maj$python2_version_min/lib/python$python2_version_maj$.python2_version_min
-## 	
-## 	# Python $python3_version
-## 	ARG python3_version_maj=3
-## 	ARG python3_version_min=8
-## 	ARG python3_version_patch=5
-## 	ARG python3_version=$python3_version_maj.$python3_version_min.$python3_version_patch
-## 	RUN wget --no-verbose https://www.python.org/ftp/python/$python3_version/Python-$python3_version.tgz  > /dev/null\
-## 		&& tar xzf Python-$python3_version.tgz && rm Python-$python3_version.tgz  > /dev/null\
-## 		&& cd Python-$python3_version \
-## 		&& ./configure --enable-shared --without-pymalloc --prefix=$YADOMS_DEPS_PATH/python$python3_version_maj$python3_version_min > /dev/null\
-## 		&& make > /dev/null\
-## 		&& make install  > /dev/null\
-## 		&& cd ..\
-## 		&& rm -Rf Python-$python3_version && rm -Rf $YADOMS_DEPS_PATH/python$python3_version_maj$python3_version_min/lib/python$python3_version_maj.$python3_version_min
-## 	
+ARG poco_version=1.10.1
+RUN cd $YADOMS_DEPS_PATH \
+   && powershell.exe -Command (New-Object System.Net.WebClient).DownloadFile('https://pocoproject.org/releases/poco-%poco_version%/poco-%poco_version%-all.zip', '%YADOMS_DEPS_PATH%\\poco.zip') \
+   && powershell.exe -Command Expand-Archive -Path poco.zip '%YADOMS_DEPS_PATH%'\
+   && cd poco-%poco_version%-all \
+   && cmake . -DOPENSSL_ROOT_DIR="C:\\Program Files (x86)\\OpenSSL-Win32" -DENABLE_SEVENZIP=OFF -DENABLE_MONGODB=OFF -DENABLE_REDIS=OFF -DENABLE_DATA=OFF -DENABLE_DATA_SQLITE=OFF -DENABLE_DATA_MYSQL=OFF -DENABLE_DATA_ODBC=OFF -DENABLE_PAGECOMPILER=OFF -DENABLE_PAGECOMPILER_FILE2PAGE=OFF -DENABLE_JWT=OFF  -DBUILD_SHARED_LIBS=OFF -DPOCO_MT=ON -DFORCE_OPENSSL=ON -A Win32 \
+   && cmake --build . \
+   && cmake --build . --config Release \
+   && cd .. && powershell.exe -Command Remove-Item -Path poco.zip 
+
+
+# Protobuf
+ARG protobuf_version=3.13.0
+RUN cd $YADOMS_DEPS_PATH \
+   && powershell.exe -Command (New-Object System.Net.WebClient).DownloadFile('https://github.com/google/protobuf/releases/download/v%protobuf_version%/protobuf-cpp-%protobuf_version%.zip', '%YADOMS_DEPS_PATH%\\protobuf.zip') \
+   && powershell.exe -Command Expand-Archive -Path protobuf.zip '%YADOMS_DEPS_PATH%'\
+   && cd protobuf-%protobuf_version%-all \
+   && md vsprojects \
+   && cd vsprojects \
+   && cmake ..\cmake -Dprotobuf_BUILD_TESTS=OFF  -A Win32 \
+   && cmake --build . \
+   && cmake --build . --config Release \
+   && cd .. && cd .. && powershell.exe -Command Remove-Item -Path protobuf.zip 
+
+# Swig
+ARG swig_version=4.0.2
+RUN choco install swig --x86 -y --no-progress --version %swig_version%
+
+# Python2
+ARG python2_version_maj=2
+ARG python2_version_min=7
+ARG python2_version_patch=18
+ARG python2_version=$python2_version_maj.$python2_version_min.$python2_version_patch
+RUN choco install python2 -y --no-progress --version %python2_version%
+
+
+# Python
+ARG python3_version_maj=3
+ARG python3_version_min=8
+ARG python3_version_patch=5
+ARG python3_version=$python3_version_maj.$python3_version_min.$python3_version_patch
+RUN choco install python3 -y --no-progress --version %python3_version%
+
 ## 	# PostgreSQL
 ## 	ARG postgresql_version=9.6.2
 ## 	RUN cd $YADOMS_DEPS_PATH \
