@@ -53,7 +53,7 @@ RUN cd %YADOMS_DEPS_PATH% \
    && powershell.exe -Command Remove-Item -Path doc -Recurse \
    && powershell.exe -Command Remove-Item -Path libs -Recurse \
    && powershell.exe -Command Remove-Item -Path tools -Recurse \
-   && cd .. && powershell.exe -Command Remove-Item -Path boost_%boost_versionn%.zip
+   && cd .. && powershell.exe -Command Remove-Item -Path boost_%boost_version%.zip
 
 # OpenSSL (for chocolatey, 1.1.1.700 match 1.1.1g (g is the 7th...)
 ARG openssl_version=1.1.1.700

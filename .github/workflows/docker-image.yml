@@ -93,7 +93,7 @@ jobs:
   Windows_1_VSTools:
     name : Generate for VSTools container
     runs-on: windows-latest
-    #if: ${{ github.ref == 'master' }}
+    if: ${{ github.ref == 'master' }}
     steps:
     - name: Checkout code
       uses: actions/checkout@v2
@@ -107,7 +107,7 @@ jobs:
   Windows_2_Yadoms:
     name : Generate for Windows
     runs-on: windows-latest
-    needs: Windows_1_VSTools
+    #needs: Windows_1_VSTools
     steps:
     - name: Checkout code
       uses: actions/checkout@v2
