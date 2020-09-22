@@ -13,8 +13,9 @@ SHELL ["cmd", "/S", "/C"]
 RUN powershell.exe -Command (New-Object System.Net.WebClient).DownloadFile('https://aka.ms/vs/16/release/vs_buildtools.exe', 'C:\\vs_buildtools.exe') \
     && C:\\vs_buildtools.exe --quiet --wait --norestart --nocache \
     --installPath C:\BuildTools \
+	 --includeRecommended \
     --add Microsoft.VisualStudio.Workload.MSBuildTools \
-    --add Microsoft.VisualStudio.Workload.VCTools \
+    --add Microsoft.VisualStudio.Workload.VCTools\
     --add Microsoft.VisualStudio.Component.VC.CLI.Support \
     --add Microsoft.VisualStudio.Component.VC.Llvm.Clang \
     --add Microsoft.VisualStudio.Component.VC.Llvm.ClangToolset \
@@ -30,5 +31,5 @@ RUN powershell.exe -Command (New-Object System.Net.WebClient).DownloadFile('http
 #ENTRYPOINT ["C:\\BuildTools\\Common7\\Tools\\VsDevCmd.bat", "&&", "powershell.exe", "-NoLogo", "-ExecutionPolicy", "Bypass"]
 
 # Use developer command prompt and start PowerShell if no other command specified.
-ENTRYPOINT C:\BuildTools\Common7\Tools\VsDevCmd.bat &&
-CMD ["powershell.exe", "-NoLogo", "-ExecutionPolicy", "Bypass"]
+#ENTRYPOINT C:\BuildTools\Common7\Tools\VsDevCmd.bat &&
+#CMD ["powershell.exe", "-NoLogo", "-ExecutionPolicy", "Bypass"]

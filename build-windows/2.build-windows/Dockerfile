@@ -11,7 +11,11 @@ ENV YADOMS_DEPS_PATH  C:\\yadoms-deps
 #ok for Cmd (shell)
 #RUN echo %YADOMS_DEPS_PATH%
 
-RUN cl.exe
+#shell commad for powershell
+#SHELL ["C:\\BuildTools\\Common7\\Tools\\VsDevCmd.bat", "&&", "powershell.exe", "-NoLogo", "-ExecutionPolicy", "Bypass"]
+
+#classic sheel start script
+SHELL ["C:\\BuildTools\\Common7\\Tools\\VsDevCmd.bat", "&&"]
 
 # Create working folders
 RUN powershell.exe -Command New-Item -ItemType Directory -Path %YADOMS_DEPS_PATH%
