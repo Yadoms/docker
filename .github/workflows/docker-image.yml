@@ -111,19 +111,8 @@ jobs:
     steps:
     - name: Checkout code
       uses: actions/checkout@v2
-    - id: cache-docker
-      uses: actions/cache@v1
-      with:
-        path: C:\tmp\docker-save
-        key: docker-save-${{ hashFiles('Dockerfile') }}
-    - name: Load cache
-      run: docker load -i C:\tmp\docker-save\snapshot.tar || true
-      if: steps.cache-docker.outputs.cache-hit == 'true'        
     - name: Build container
-      run: docker build -t build_for_windows build-windows/2.build-windows  --cache-from=build_for_windows-cache
-    - name: Tag and save
-      run: docker tag build_for_windows yadoms/build_for_windows:latest && docker tag build_for_windows build_for_windows-cache && md C:\tmp\docker-save && docker save build_for_windows-cache -o C:\tmp\docker-save\snapshot.tar && dir C:\tmp\docker-save || true
-      if: always() && steps.cache-docker.outputs.cache-hit != 'true'
+      run: docker build -t yadoms/build_for_windows:latest build-windows/2.build-windows
     - name: login to docker
       run: docker login --username ${{ github.actor }} --password ${{ secrets.DOCKERHUB_OAUTH }}
     - name: Push container
