@@ -82,7 +82,7 @@ RUN cd %YADOMS_DEPS_PATH% \
 # Swig
 ARG swig_version=4.0.2
 RUN cd %YADOMS_DEPS_PATH% \
-   && powershell.exe -Command (New-Object System.Net.WebClient).DownloadFile(' http://prdownloads.sourceforge.net/swigwin/swigwin-%swig_version%.zip', '%YADOMS_DEPS_PATH%\\swig.zip') \
+   && powershell.exe -Command (New-Object System.Net.WebClient).DownloadFile('https://freefr.dl.sourceforge.net/project/swig/swigwin/swigwin-%swig_version%/swigwin-%swig_version%.zip', '%YADOMS_DEPS_PATH%\\swig.zip') \
    && powershell.exe -Command Expand-Archive -Path swig.zip '%YADOMS_DEPS_PATH%'\
    && powershell.exe -Command Remove-Item -Path swig.zip 
 
@@ -148,7 +148,7 @@ RUN echo 'Configuring Yadoms CMakeListsUserConfig.txt' \
    && echo set(OPENCV_ROOT "%YADOMS_DEPS_PATH%/opencv-%opencv_version%/build") >> %YADOMS_DEPS_PATH%/CMakeListsUserConfig.txt \
    && echo set(PostgreSQL_ROOT "%YADOMS_DEPS_PATH%/pgsql") >> %YADOMS_DEPS_PATH%/CMakeListsUserConfig.txt \
    && echo set(GAMMU_ROOT "%YADOMS_DEPS_PATH%/gammu-%gammu_version%") >> %YADOMS_DEPS_PATH%/CMakeListsUserConfig.txt \
-   && echo set(SWIG_ROOT "%YADOMS_DEPS_PATH%/swigwin") >> %YADOMS_DEPS_PATH%/CMakeListsUserConfig.txt \
+   && echo set(SWIG_ROOT "%YADOMS_DEPS_PATH%/swigwin-%swig_version%") >> %YADOMS_DEPS_PATH%/CMakeListsUserConfig.txt \
    && echo SET(COTIRE_USE ON) >> %YADOMS_DEPS_PATH%/CMakeListsUserConfig.txt \
    && echo SET(COTIRE_USE_UNITY ON) >> %YADOMS_DEPS_PATH%/CMakeListsUserConfig.txt
    
