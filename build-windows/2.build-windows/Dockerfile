@@ -91,7 +91,7 @@ ARG python2_version_maj=2
 ARG python2_version_min=7
 ARG python2_version_patch=18
 ARG python2_version=$python2_version_maj.$python2_version_min.$python2_version_patch
-RUN choco install python2 -y --no-progress --version %python2_version%
+RUN choco install python2 --x86 -y --no-progress --version %python2_version%
 
 
 # Python3
@@ -99,7 +99,7 @@ ARG python3_version_maj=3
 ARG python3_version_min=8
 ARG python3_version_patch=5
 ARG python3_version=$python3_version_maj.$python3_version_min.$python3_version_patch
-RUN choco install python3 -y --no-progress --version %python3_version%
+RUN choco install python3 --x86 -y --no-progress --version %python3_version%
 
 # PostgreSQL
 ARG postgresql_version=9.6.19-1
