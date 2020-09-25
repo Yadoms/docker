@@ -30,6 +30,9 @@ RUN powershell.exe -Command iex ((New-Object System.Net.WebClient).DownloadStrin
 ARG cmake_version=3.18.1
 RUN choco install cmake --installargs 'ADD_CMAKE_TO_PATH=System' -y --no-progress --version %cmake_version%
 
+#NSIS and 7zip
+RUN choco install nsis 7zip
+
 # Boost
 ARG boost_version_major=1
 ARG boost_version_minor=74
