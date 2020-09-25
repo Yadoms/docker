@@ -31,7 +31,7 @@ ARG cmake_version=3.18.1
 RUN choco install cmake --installargs 'ADD_CMAKE_TO_PATH=System' -y --no-progress --version %cmake_version%
 
 #NSIS and 7zip
-RUN choco install nsis 7zip
+RUN choco install nsis 7zip git
 
 # Boost
 ARG boost_version_major=1
