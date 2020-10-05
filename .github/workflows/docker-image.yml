@@ -24,7 +24,6 @@ jobs:
   rpi:
     name : Generate for RaspberryPI
     runs-on: ubuntu-latest
-    if: ${{ github.ref == 'master' }}
     steps:
     - name: Checkout code
       uses: actions/checkout@v2
@@ -107,6 +106,7 @@ jobs:
   Windows_2_Yadoms:
     name : Generate for Windows
     runs-on: windows-latest
+    if: ${{ github.ref == 'master' }}
     #needs: Windows_1_VSTools
     steps:
     - name: Checkout code
