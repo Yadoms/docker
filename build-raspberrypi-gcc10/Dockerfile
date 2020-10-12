@@ -38,13 +38,12 @@ RUN apt-get update \
 # -> GCC 10.2
 # -> X86_64 COMPILER
 # https://github.com/abhiTronix/raspberry-pi-cross-compiler
-RUN wget https://sourceforge.net/projects/raspberry-pi-cross-compilers/files/Raspberry%20Pi%20GCC%20Cross-Compiler%20Toolchains/$crosstoolchain_target_distro/GCC%2010.2.0/Raspberry%20Pi%203A%2B%2C%203B%2B%2C%204/cross-gcc-10.2.0-pi_3%2B.tar.gz \
+RUN wget 'https://master.dl.sourceforge.net/project/raspberry-pi-cross-compilers/Raspberry%20Pi%20GCC%20Cross-Compiler%20Toolchains/Buster/GCC%2010.2.0/Raspberry%20Pi%203A%2B%2C%203B%2B%2C%204/cross-gcc-10.2.0-pi_3%2B.tar.gz' \
  && tar xf cross-gcc-10.2.0-pi_3+.tar.gz \
  && mv cross-pi-gcc-10.2.0-2 /opt/cross-pi-gcc-10.2.0-2 \
  && rm -f cross-gcc-10.2.0-pi_3+.tar.gz
 ENV PATH /opt/cross-pi-gcc-10.2.0-2/bin:$PATH
 ENV LD_LIBRARY_PATH /opt/cross-pi-gcc-10.2.0-2/lib:$LD_LIBRARY_PATH
-
 
 #############################################################
 ## Build yadoms dependencies
