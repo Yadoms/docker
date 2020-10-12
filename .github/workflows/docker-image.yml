@@ -54,6 +54,23 @@ jobs:
           tag_with_ref: true
           path: build-raspberrypi-image
 
+  rpi10:
+    name : Generate for RaspberryPI with GCC10
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+    - name: Build and push Docker images
+      uses: docker/build-push-action@v1
+      with:
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+          registry: docker.pkg.github.com
+          repository: yadoms/docker/build_for_raspberrypi-gcc10
+          tag_with_ref: true
+          path: build-raspberrypi-gcc10
+
+
   macos:
     name : Generate image for MacOSX (cross compile)
     runs-on: ubuntu-latest
@@ -70,7 +87,25 @@ jobs:
           repository: yadoms/docker/build_for_macos
           tag_with_ref: true
           path: build-macos
-          
+        
+        
+  Syno212j:
+    name : Generate for Synology 212j
+    runs-on: ubuntu-latest
+    if: ${{ github.ref == 'master' }}
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+    - name: Build and push Docker images
+      uses: docker/build-push-action@v1
+      with:
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+          registry: docker.pkg.github.com
+          repository: yadoms/docker/build_for_synology212j
+          tag_with_ref: true
+          path: build-synology_212
+
   Syno218p:
     name : Generate for Synology 218+
     runs-on: ubuntu-latest
