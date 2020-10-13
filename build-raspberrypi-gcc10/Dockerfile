@@ -208,7 +208,7 @@ RUN cd $YADOMS_DEPS_PATH \
 	&& cd ../../../.. && rm -Rf postgresql-$postgresql_version/doc
 
 
-COPY raspberrypi.cmake /
+COPY raspberrypi.gammu.cmake /raspberrypi.cmake
 ARG gammu_version=1.41.0
 RUN cd $YADOMS_DEPS_PATH \
 	&& wget --no-check-certificate --no-verbose https://dl.cihar.com/gammu/releases/gammu-$gammu_version.tar.bz2  > /dev/null\
@@ -270,6 +270,9 @@ RUN echo 'Configuring Yadoms CMakeListsUserConfig.txt' \
 
 #For debug purpose only
 RUN cat $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt
+
+COPY raspberrypi.yadoms.cmake $YADOMS_DEPS_PATH/raspberrypi.cmake
+
 
 ####################################################################################
 #RaspberryPI IMAGE generation
