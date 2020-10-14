@@ -1,0 +1,38 @@
+name: Docker Image RaspberryPI
+
+on: push
+
+jobs:
+
+  rpiImage:
+    name : Generate for RaspberryPI Image
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+    - name: Build and push Docker images
+      uses: docker/build-push-action@v1
+      with:
+          username: ${{ github.actor }}
+          password: ${{ secrets.CONTAINER_GH_TOKEN }}
+          registry: ghcr.io
+          repository: yadoms/build-raspberrypi-image
+          tag_with_ref: true
+          path: build-raspberrypi-image
+
+  rpi10:
+    name : Generate for RaspberryPI with GCC10
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+    - name: Build and push Docker images
+      uses: docker/build-push-action@v1
+      with:
+          username: ${{ github.actor }}
+          password: ${{ secrets.CONTAINER_GH_TOKEN }}
+          registry: ghcr.io
+          repository: yadoms/build_for_raspberrypi_gcc10
+          tag_with_ref: true
+          path: build-raspberrypi-gcc10
+
