@@ -7,7 +7,6 @@ jobs:
   linux:
     name : Generate for Linux
     runs-on: ubuntu-latest
-    if: ${{ github.ref == 'master' }}
     steps:
     - name: Checkout code
       uses: actions/checkout@v2
@@ -15,9 +14,9 @@ jobs:
       uses: docker/build-push-action@v1
       with:
           username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-          registry: docker.pkg.github.com
-          repository: yadoms/docker/build_for_linux
+          password: ${{ secrets.CONTAINER_GH_TOKEN }}
+          registry: ghcr.io
+          repository: yadoms/build_for_linux
           tag_with_ref: true
           path: build-linux
 
@@ -32,16 +31,15 @@ jobs:
       uses: docker/build-push-action@v1
       with:
           username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-          registry: docker.pkg.github.com
-          repository: yadoms/docker/build_for_raspberrypi
+          password: ${{ secrets.CONTAINER_GH_TOKEN }}
+          registry: ghcr.io
+          repository: yadoms/build_for_raspberrypi
           tag_with_ref: true
           path: build-raspberrypi
 
   rpiImage:
     name : Generate for RaspberryPI Image
     runs-on: ubuntu-latest
-    if: ${{ github.ref == 'master' }}
     steps:
     - name: Checkout code
       uses: actions/checkout@v2
@@ -49,9 +47,9 @@ jobs:
       uses: docker/build-push-action@v1
       with:
           username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-          registry: docker.pkg.github.com
-          repository: yadoms/docker/build-raspberrypi-image
+          password: ${{ secrets.CONTAINER_GH_TOKEN }}
+          registry: ghcr.io
+          repository: yadoms/build-raspberrypi-image
           tag_with_ref: true
           path: build-raspberrypi-image
 
@@ -65,9 +63,9 @@ jobs:
       uses: docker/build-push-action@v1
       with:
           username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-          registry: docker.pkg.github.com
-          repository: yadoms/docker/build_for_raspberrypi-gcc10
+          password: ${{ secrets.CONTAINER_GH_TOKEN }}
+          registry: ghcr.io
+          repository: yadoms/build_for_raspberrypi_gcc10
           tag_with_ref: true
           path: build-raspberrypi-gcc10
 
@@ -75,7 +73,6 @@ jobs:
   macos:
     name : Generate image for MacOSX (cross compile)
     runs-on: ubuntu-latest
-    if: ${{ github.ref == 'master' }}
     steps:
     - name: Checkout code
       uses: actions/checkout@v2
@@ -83,9 +80,9 @@ jobs:
       uses: docker/build-push-action@v1
       with:
           username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-          registry: docker.pkg.github.com
-          repository: yadoms/docker/build_for_macos
+          password: ${{ secrets.CONTAINER_GH_TOKEN }}
+          registry: ghcr.io
+          repository: yadoms/build_for_macos
           tag_with_ref: true
           path: build-macos
         
@@ -93,7 +90,6 @@ jobs:
   Syno212j:
     name : Generate for Synology 212j
     runs-on: ubuntu-latest
-    if: ${{ github.ref == 'master' }}
     steps:
     - name: Checkout code
       uses: actions/checkout@v2
@@ -101,16 +97,15 @@ jobs:
       uses: docker/build-push-action@v1
       with:
           username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-          registry: docker.pkg.github.com
-          repository: yadoms/docker/build_for_synology212j
+          password: ${{ secrets.CONTAINER_GH_TOKEN }}
+          registry: ghcr.io
+          repository: yadoms/build_for_synology212j
           tag_with_ref: true
           path: build-synology_212
 
   Syno218p:
     name : Generate for Synology 218+
     runs-on: ubuntu-latest
-    if: ${{ github.ref == 'master' }}
     steps:
     - name: Checkout code
       uses: actions/checkout@v2
@@ -118,9 +113,9 @@ jobs:
       uses: docker/build-push-action@v1
       with:
           username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-          registry: docker.pkg.github.com
-          repository: yadoms/docker/build_for_synology218p
+          password: ${{ secrets.CONTAINER_GH_TOKEN }}
+          registry: ghcr.io
+          repository: yadoms/build_for_synology218p
           tag_with_ref: true
           path: build-synology_218p
      
@@ -128,28 +123,26 @@ jobs:
   Windows_1_VSTools:
     name : Generate for VSTools container
     runs-on: windows-latest
-    if: ${{ github.ref == 'master' }}
     steps:
     - name: Checkout code
       uses: actions/checkout@v2
     - name: Build VSTools container
-      run: docker build -t yadoms/vstools:latest -m 2GB build-windows/1.vstools
+      run: docker build -t ghcr.io/yadoms/vstools:latest -m 2GB build-windows/1.vstools
     - name: login tp docker
-      run: docker login --username ${{ github.actor }} --password ${{ secrets.DOCKERHUB_OAUTH }} 
+      run: docker login ghcr.io --username ${{ github.actor }} --password ${{ secrets.CONTAINER_GH_TOKEN }} 
     - name: Push VSTools container
-      run: docker push yadoms/vstools:latest
+      run: docker push ghcr.io/yadoms/vstools:latest
 
   Windows_2_Yadoms:
     name : Generate for Windows
     runs-on: windows-latest
-    if: ${{ github.ref == 'master' }}
-    #needs: Windows_1_VSTools
+    needs: Windows_1_VSTools
     steps:
     - name: Checkout code
       uses: actions/checkout@v2
     - name: Build container
-      run: docker build -t yadoms/build_for_windows:latest build-windows/2.build-windows
+      run: docker build -t ghcr.io/yadoms/build_for_windows:latest build-windows/2.build-windows
     - name: login to docker
-      run: docker login --username ${{ github.actor }} --password ${{ secrets.DOCKERHUB_OAUTH }}
+      run: docker login ghcr.io --username ${{ github.actor }} --password ${{ secrets.DOCKERHUB_OAUTH }}
     - name: Push container
-      run: docker push yadoms/build_for_windows
+      run: docker push ghcr.io/yadoms/build_for_windows

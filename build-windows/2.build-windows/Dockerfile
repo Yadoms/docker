@@ -1,4 +1,4 @@
-FROM yadoms/vstools:latest
+FROM ghcr.io/yadoms/vstools:latest
 MAINTAINER jano42 "https://github.com/jano42"
 LABEL authors=jano42
 
