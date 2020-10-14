@@ -1,6 +1,5 @@
 # this one is important
 SET(CMAKE_SYSTEM_NAME Linux)
-set(CMAKE_SYSTEM_PROCESSOR x86)
 
 #this one not so much
 SET(CMAKE_SYSTEM_VERSION 1)

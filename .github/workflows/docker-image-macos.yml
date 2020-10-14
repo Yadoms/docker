@@ -1,0 +1,22 @@
+name: Docker Image MacOS (cross)
+
+on: push
+
+jobs:
+
+  macos:
+    name : Generate image for MacOSX (cross compile)
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+    - name: Build and push Docker images
+      uses: docker/build-push-action@v1
+      with:
+          username: ${{ github.actor }}
+          password: ${{ secrets.CONTAINER_GH_TOKEN }}
+          registry: ghcr.io
+          repository: yadoms/build_for_macos
+          tag_with_ref: true
+          path: build-macos
+  

@@ -1,0 +1,32 @@
+name: Docker Image Windows
+
+on: push
+
+jobs:
+               
+  Windows_1_VSTools:
+    name : Generate for VSTools container
+    runs-on: windows-latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+    - name: Build VSTools container
+      run: docker build -t ghcr.io/yadoms/vstools:latest -m 2GB build-windows/1.vstools
+    - name: login tp docker
+      run: docker login ghcr.io --username ${{ github.actor }} --password ${{ secrets.CONTAINER_GH_TOKEN }} 
+    - name: Push VSTools container
+      run: docker push ghcr.io/yadoms/vstools:latest
+
+  Windows_2_Yadoms:
+    name : Generate for Windows
+    runs-on: windows-latest
+    needs: Windows_1_VSTools
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+    - name: Build container
+      run: docker build -t ghcr.io/yadoms/build_for_windows:latest build-windows/2.build-windows
+    - name: login to docker
+      run: docker login ghcr.io --username ${{ github.actor }} --password ${{ secrets.CONTAINER_GH_TOKEN }}
+    - name: Push container
+      run: docker push ghcr.io/yadoms/build_for_windows
