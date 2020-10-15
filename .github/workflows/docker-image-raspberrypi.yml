@@ -3,36 +3,72 @@ name: Docker Image RaspberryPI
 on: push
 
 jobs:
-
+  rpi:
+    name : Generate for RaspberryPI
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+    - name: Prepare
+      id: prep
+      run: |
+        DOCKER_IMAGE=yadoms/build_for_raspberrypi
+        TAGS="${DOCKER_IMAGE}:latest"
+        if [[ $GITHUB_REF == refs/heads/master ]]; then
+          VERSION=latest
+        elif [[ $GITHUB_REF == refs/heads/* ]]; then
+          branch=$(echo ${GITHUB_REF#refs/heads/} | sed -r 's#/+#-#g')
+          TAGS="$TAGS,${DOCKER_IMAGE}:${branch}"
+        fi
+        echo ::set-output name=tags::${TAGS}
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v1
+    - name: Login to GitHub Packages Docker Registry
+      uses: docker/login-action@v1
+      with:
+        registry: ghcr.io
+        username: ${{ secrets.CONTAINER_GH_LOGIN }}
+        password: ${{ secrets.CONTAINER_GH_TOKEN }}
+    - name: Build and push Docker images
+      uses: docker/build-push-action@v2
+      with:
+          context: build-raspberrypi
+          tags: ${{ steps.prep.outputs.tags }}
+          cache-from: type=registry,ref=yadoms/build_for_raspberrypi:latest
+          cache-to: type=inline         
+          
+          
   rpiImage:
     name : Generate for RaspberryPI Image
     runs-on: ubuntu-latest
     steps:
     - name: Checkout code
       uses: actions/checkout@v2
-    - name: Build and push Docker images
-      uses: docker/build-push-action@v1
+    - name: Prepare
+      id: prep
+      run: |
+        DOCKER_IMAGE=yadoms/build-raspberrypi-image
+        TAGS="${DOCKER_IMAGE}:latest"
+        if [[ $GITHUB_REF == refs/heads/master ]]; then
+          VERSION=latest
+        elif [[ $GITHUB_REF == refs/heads/* ]]; then
+          branch=$(echo ${GITHUB_REF#refs/heads/} | sed -r 's#/+#-#g')
+          TAGS="$TAGS,${DOCKER_IMAGE}:${branch}"
+        fi
+        echo ::set-output name=tags::${TAGS}
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v1
+    - name: Login to GitHub Packages Docker Registry
+      uses: docker/login-action@v1
       with:
-          username: ${{ secrets.CONTAINER_GH_LOGIN }}
-          password: ${{ secrets.CONTAINER_GH_TOKEN }}
-          registry: ghcr.io
-          repository: yadoms/build-raspberrypi-image
-          tag_with_ref: true
-          path: build-raspberrypi-image
-
-  rpi10:
-    name : Generate for RaspberryPI with GCC10
-    runs-on: ubuntu-latest
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v2
+        registry: ghcr.io
+        username: ${{ secrets.CONTAINER_GH_LOGIN }}
+        password: ${{ secrets.CONTAINER_GH_TOKEN }}
     - name: Build and push Docker images
-      uses: docker/build-push-action@v1
+      uses: docker/build-push-action@v2
       with:
-          username: ${{ secrets.CONTAINER_GH_LOGIN }}
-          password: ${{ secrets.CONTAINER_GH_TOKEN }}
-          registry: ghcr.io
-          repository: yadoms/build_for_raspberrypi_gcc10
-          tag_with_ref: true
-          path: build-raspberrypi-gcc10
+          context: build-raspberrypi-image
+          tags: ${{ steps.prep.outputs.tags }}
+          cache-from: type=registry,ref=yadoms/build-raspberrypi-image:latest
+          cache-to: type=inline          
 
