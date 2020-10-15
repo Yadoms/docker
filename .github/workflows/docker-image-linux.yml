@@ -13,7 +13,7 @@ jobs:
     - name: Build and push Docker images
       uses: docker/build-push-action@v1
       with:
-          username: ${{ github.actor }}
+          username: ${{ secrets.CONTAINER_GH_LOGIN }}
           password: ${{ secrets.CONTAINER_GH_TOKEN }}
           registry: ghcr.io
           repository: yadoms/build_for_linux

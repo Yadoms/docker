@@ -5,6 +5,7 @@ cd /work
 
 echo "Copy build config file"
 cp $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt sources/
+cp /ccmacos.cmake sources
 
 echo "Create makefile"
 sh cmake_macosx.sh d

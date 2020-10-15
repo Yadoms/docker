@@ -197,7 +197,7 @@ RUN cd $YADOMS_DEPS_PATH \
 	&& cd ../../../.. && rm -Rf postgresql-$postgresql_version/doc
 
 
-COPY synology218p.cmake /
+COPY synology218p.gammu.cmake /
 ARG gammu_version=1.41.0
 RUN cd $YADOMS_DEPS_PATH \
 	&& wget --no-check-certificate --no-verbose https://dl.cihar.com/gammu/releases/gammu-$gammu_version.tar.bz2  > /dev/null\
@@ -256,9 +256,9 @@ RUN echo 'Configuring Yadoms CMakeListsUserConfig.txt' \
 	&& echo 'set(CC_RPI_ROOT "/opt/x86_64-pc-linux-gnu")' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt
 
 #copy entrypoint at root
-COPY entrypoint.sh /
 COPY entrypoint_docker.sh /
+COPY synology218p.yadoms.cmake $YADOMS_DEPS_PATH/synology218p.cmake
+
 
 #ensure entrypoint is executable (force flags update, because file flags may change if a commit is made under Windows)
-RUN chmod +x /entrypoint.sh
 RUN chmod +x /entrypoint_docker.sh

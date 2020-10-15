@@ -155,4 +155,4 @@ RUN echo 'Configuring Yadoms CMakeListsUserConfig.txt' \
    && echo SET(COTIRE_USE ON) >> %YADOMS_DEPS_PATH%/CMakeListsUserConfig.txt \
    && echo SET(COTIRE_USE_UNITY ON) >> %YADOMS_DEPS_PATH%/CMakeListsUserConfig.txt
    
-#COPY entrypoint_docker.cmd C:
+COPY entrypoint_docker.ps1 C:

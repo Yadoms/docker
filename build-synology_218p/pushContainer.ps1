@@ -1,2 +1,0 @@
-docker tag build_for_synology218p yadoms/build_for_synology218p
-docker push yadoms/build_for_synology218p

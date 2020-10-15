@@ -1,6 +1,7 @@
-FROM debian:stretch
+FROM debian:stable
 MAINTAINER jano42 "https://github.com/jano42"
 LABEL authors=jano42
+ENV DEBIAN_FRONTEND noninteractive
 
 ENV YADOMS_BUILD_BRANCH develop
 ENV MAKE_PACKAGE false
@@ -25,17 +26,24 @@ RUN apt-get update \
 	libpcre3 libpcre3-dev libreadline-dev libpq5 \
 	postgresql-server-dev-all git rpm zip gcc gcc-doc libc6-dev \
 	libffi-dev libssl-dev zlib1g-dev
+ 
 	
 #############################################################
 ## Install toolchain
 #############################################################
 
-# Installing arm-linux-gnueabihf cross toolchain
-RUN mkdir -p $YADOMS_BUILD_TOOLS_PATH \
-	&& cd $YADOMS_BUILD_TOOLS_PATH \
-	&& GIT_SSL_NO_VERIFY=true git clone --depth=1 https://github.com/raspberrypi/tools.git  > /dev/null
-ENV PATH $PATH:$YADOMS_BUILD_TOOLS_PATH/tools/arm-bcm2708/arm-rpi-4.9.3-linux-gnueabihf/bin
-
+# Cross toolchain for raspberryPI
+# based on https://github.com/abhiTronix/raspberry-pi-cross-compilers
+# -> comptible with all RapsberryPI
+# -> GCC 10.2
+# -> X86_64 COMPILER
+# https://github.com/abhiTronix/raspberry-pi-cross-compiler
+RUN wget 'https://master.dl.sourceforge.net/project/raspberry-pi-cross-compilers/Raspberry%20Pi%20GCC%20Cross-Compiler%20Toolchains/Buster/GCC%2010.2.0/Raspberry%20Pi%203A%2B%2C%203B%2B%2C%204/cross-gcc-10.2.0-pi_3%2B.tar.gz' \
+ && tar xf cross-gcc-10.2.0-pi_3+.tar.gz \
+ && mv cross-pi-gcc-10.2.0-2 /opt/cross-pi-gcc-10.2.0-2 \
+ && rm -f cross-gcc-10.2.0-pi_3+.tar.gz
+ENV PATH /opt/cross-pi-gcc-10.2.0-2/bin:$PATH
+ENV LD_LIBRARY_PATH /opt/cross-pi-gcc-10.2.0-2/lib:$LD_LIBRARY_PATH
 
 #############################################################
 ## Build yadoms dependencies
@@ -61,7 +69,7 @@ ARG openssl_version=1.1.1g
 RUN cd $YADOMS_DEPS_PATH \
 	&& wget --no-check-certificate --no-verbose https://www.openssl.org/source/openssl-$openssl_version.tar.gz  > /dev/null\
 	&& tar xzf openssl-$openssl_version.tar.gz && cd openssl-$openssl_version  > /dev/null\
-	&& ./Configure linux-generic32 --prefix=$YADOMS_DEPS_PATH/openssl --cross-compile-prefix=$YADOMS_BUILD_TOOLS_PATH/tools/arm-bcm2708/arm-rpi-4.9.3-linux-gnueabihf/bin/arm-linux-gnueabihf-  > /dev/null\
+	&& ./Configure linux-generic32 --prefix=$YADOMS_DEPS_PATH/openssl --cross-compile-prefix=/opt/cross-pi-gcc-10.2.0-2/bin/arm-linux-gnueabihf-  > /dev/null\
 	&& make CC="arm-linux-gnueabihf-gcc" AR="arm-linux-gnueabihf-ar" RANLIB="arm-linux-gnueabihf-ranlib"  > /dev/null\
 	&& make install  > /dev/null\
 	&& cd .. && rm -Rf openssl-$openssl_version \
@@ -200,7 +208,7 @@ RUN cd $YADOMS_DEPS_PATH \
 	&& cd ../../../.. && rm -Rf postgresql-$postgresql_version/doc
 
 
-COPY raspberrypi.cmake /
+COPY raspberrypi.gammu.cmake /raspberrypi.cmake
 ARG gammu_version=1.41.0
 RUN cd $YADOMS_DEPS_PATH \
 	&& wget --no-check-certificate --no-verbose https://dl.cihar.com/gammu/releases/gammu-$gammu_version.tar.bz2  > /dev/null\
@@ -258,10 +266,14 @@ RUN echo 'Configuring Yadoms CMakeListsUserConfig.txt' \
 	&& echo 'set(OPENCV_ROOT "'$YADOMS_DEPS_PATH'/opencv")' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
 	&& echo 'SET(COTIRE_USE ON)' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
 	&& echo 'SET(COTIRE_USE_UNITY ON)' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
-	&& echo 'set(CC_RPI_ROOT "'$YADOMS_BUILD_TOOLS_PATH'/tools/arm-bcm2708/arm-rpi-4.9.3-linux-gnueabihf")' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt
+	&& echo 'set(CC_RPI_ROOT "/opt/cross-pi-gcc-10.2.0-2")' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt
 
 #For debug purpose only
 RUN cat $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt
+
+COPY raspberrypi.yadoms.cmake $YADOMS_DEPS_PATH/raspberrypi.cmake
+COPY entrypoint_docker.sh /entrypoint_docker.sh
+
 
 ####################################################################################
 #RaspberryPI IMAGE generation
@@ -270,15 +282,6 @@ RUN cat $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt
 RUN apt-get update -y
 RUN apt-get install -y dialog apt-utils
 RUN apt-get install -y --allow-unauthenticated build-essential wget git lzop u-boot-tools binfmt-support qemu qemu-user-static multistrap parted dosfstools file udev zip curl
-ENV DEBIAN_FRONTEND noninteractive
 USER root
 
-
-#copy entrypoint at root
-COPY entrypoint.sh /
-COPY entrypoint_docker.sh /
-
-#ensure entrypoint is executable (force flags update, because file flags may change if a commit is made under Windows)
-RUN chmod +x /entrypoint.sh
-RUN chmod +x /entrypoint_docker.sh
 
