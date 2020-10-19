@@ -5,10 +5,10 @@ cd /work
 
 echo "Copy build config file"
 cp $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt sources/
-cp $YADOMS_DEPS_PATH/raspberrypi.cmake sources
+cp $YADOMS_DEPS_PATH/synology218p.cmake sources
 
 echo "Create makefile"
-sh cmake_cross.sh Synology218p /work/sources/raspberrypi.cmake Release
+sh cmake_cross.sh Synology218p /work/sources/synology218p.cmake Release
 
 echo "Build Yadoms"
 cd projects

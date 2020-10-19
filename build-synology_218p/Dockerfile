@@ -205,7 +205,7 @@ RUN cd $YADOMS_DEPS_PATH \
 	&& cd gammu-$gammu_version \
 	&& mkdir rpicc \
 	&& cd rpicc \
-	&& cmake -DCC_RPI_GCC=x86_64-pc-linux-gnu-gcc -DCC_RPI_GXX=x86_64-pc-linux-gnu-g++ -DBUILD_SHARED_LIBS=OFF -DCMAKE_TOOLCHAIN_FILE=/synology218p.cmake -DCMAKE_STAGING_PREFIX=$YADOMS_DEPS_PATH/gammu ..  > /dev/null\
+	&& cmake -DCC_RPI_GCC=x86_64-pc-linux-gnu-gcc -DCC_RPI_GXX=x86_64-pc-linux-gnu-g++ -DBUILD_SHARED_LIBS=OFF -DCMAKE_TOOLCHAIN_FILE=/synology218p.gammu.cmake -DCMAKE_STAGING_PREFIX=$YADOMS_DEPS_PATH/gammu ..  > /dev/null\
 	&& make  > /dev/null\
 	&& make install  > /dev/null\
 	&& cd ../.. && rm -Rf gammu-1.40.*
