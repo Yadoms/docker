@@ -39,7 +39,7 @@ RUN cd $YADOMS_DEPS_PATH \
 	&& wget --no-verbose https://dl.bintray.com/boostorg/release/$boost_version_dot/source/boost_$boost_version.tar.bz2 \
 	&& tar xjf boost_$boost_version.tar.bz2 && cd boost_$boost_version \
 	&& ./bootstrap.sh \
-	&& ./b2 --with-atomic --with-chrono --with-date_time --with-filesystem --with-locale --with-regex --with-thread --with-system link=static runtime-link=static --no-samples --no-tests cxxflags=-fPIC \
+	&& ./b2 --with-atomic --with-chrono --with-date_time --with-filesystem --with-locale --with-regex --with-test --with-thread --with-system link=static runtime-link=static --no-samples --no-tests cxxflags=-fPIC \
 	&& rm -Rf bin.v2 \
 	&& rm -Rf doc \
 	&& rm -Rf libs \

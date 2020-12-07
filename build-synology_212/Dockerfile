@@ -92,7 +92,7 @@ RUN cd $YADOMS_DEPS_PATH \
 	&& tar xjf boost_$boost_version.tar.bz2 && cd boost_$boost_version  > /dev/null\
 	&& echo "using gcc : arm : arm-marvell-linux-gnueabi-g++ ;" > /root/user-config.jam \
 	&& ./bootstrap.sh > /dev/null\
-	&& ./b2 --with-atomic --with-chrono --with-date_time --with-filesystem --with-locale --with-regex --with-thread --with-system link=static runtime-link=static --no-samples --no-tests toolset=gcc-arm cxxflags=-fPIC  > /dev/null\
+	&& ./b2 --with-atomic --with-chrono --with-date_time --with-filesystem --with-locale --with-regex --with-test --with-thread --with-system link=static runtime-link=static --no-samples --no-tests toolset=gcc-arm cxxflags=-fPIC  > /dev/null\
 	&& rm -Rf bin.v2 \
 	&& rm -Rf doc \
 	&& rm -Rf libs \

@@ -105,7 +105,7 @@ RUN cd $YADOMS_DEPS_PATH \
 	&& tar xjf boost_$boost_version.tar.bz2 && cd boost_$boost_version  > /dev/null \
 	&& echo "using clang : o64 : o64-clang++ : <archiver>$YADOMS_CCMACOS_TRIPLET-ar <ranlib>$YADOMS_CCMACOS_TRIPLET-ranlib ;" > ~/user-config.jam \
 	&& ./bootstrap.sh\
-	&& ./b2 --with-atomic --with-chrono --with-date_time --with-filesystem --with-regex --with-thread --with-system link=static runtime-link=static --no-samples --no-tests toolset=clang-o64 target-os=darwin cxxflags="-fPIC" visibility=global \
+	&& ./b2 --with-atomic --with-chrono --with-date_time --with-filesystem --with-regex --with-test --with-thread --with-system link=static runtime-link=static --no-samples --no-tests toolset=clang-o64 target-os=darwin cxxflags="-fPIC" visibility=global \
 	&& rm -Rf bin.v2 \
 	&& rm -Rf doc \
 	&& rm -Rf libs \

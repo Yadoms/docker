@@ -45,7 +45,7 @@ RUN cd %YADOMS_DEPS_PATH% \
    && powershell.exe -Command Expand-Archive -Path boost_%boost_version%.zip '%YADOMS_DEPS_PATH%'\
    && cd boost_%boost_version% \
    &&.\bootstrap.bat \
-   && b2.exe --with-atomic --with-chrono --with-date_time --with-filesystem --with-regex --with-thread --with-system --with-test link=static runtime-link=static \
+   && b2.exe --with-atomic --with-chrono --with-date_time --with-filesystem --with-regex --with-test --with-thread --with-system --with-test link=static runtime-link=static \
    && powershell.exe -Command Remove-Item -Path bin.v2 -Recurse \
    && powershell.exe -Command Remove-Item -Path doc -Recurse \
    && powershell.exe -Command Remove-Item -Path libs -Recurse \
