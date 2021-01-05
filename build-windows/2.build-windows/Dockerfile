@@ -27,7 +27,7 @@ RUN powershell.exe -Command iex ((New-Object System.Net.WebClient).DownloadStrin
 ###################################################################
 
 # CMake
-ARG cmake_version=3.18.1
+ARG cmake_version=3.19.2
 RUN choco install cmake --installargs 'ADD_CMAKE_TO_PATH=System' -y --no-progress --version %cmake_version%
 
 #NSIS and 7zip
@@ -35,7 +35,7 @@ RUN choco install nsis 7zip git -y --no-progress
 
 # Boost
 ARG boost_version_major=1
-ARG boost_version_minor=74
+ARG boost_version_minor=75
 ARG boost_version_patch=0
 ARG boost_underscore=_
 ARG boost_version=$boost_version_major$boost_underscore$boost_version_minor$boost_underscore$boost_version_patch
@@ -45,7 +45,7 @@ RUN cd %YADOMS_DEPS_PATH% \
    && powershell.exe -Command Expand-Archive -Path boost_%boost_version%.zip '%YADOMS_DEPS_PATH%'\
    && cd boost_%boost_version% \
    &&.\bootstrap.bat \
-   && b2.exe --with-atomic --with-chrono --with-date_time --with-filesystem --with-regex --with-test --with-thread --with-system --with-test link=static runtime-link=static \
+   && b2.exe --with-atomic --with-chrono --with-date_time --with-filesystem --with-regex --with-test --with-thread --with-system --with-test --with-json link=static runtime-link=static \
    && powershell.exe -Command Remove-Item -Path bin.v2 -Recurse \
    && powershell.exe -Command Remove-Item -Path doc -Recurse \
    && powershell.exe -Command Remove-Item -Path libs -Recurse \
