@@ -237,7 +237,11 @@ RUN cd $YADOMS_DEPS_PATH \
 	&& make install  > /dev/null\	
 	&& cd ../.. && rm -Rf opencv-$opencv_version* && rm -f $opencv_version.zip
 
-
+COPY libudev.tar.gz $YADOMS_DEPS_PATH
+RUN cd $YADOMS_DEPS_PATH \
+	&& tar xf libudev.tar.gz
+	
+	 
 
 # Yadoms configuration file
 RUN echo 'Configuring Yadoms CMakeListsUserConfig.txt' \
@@ -264,6 +268,7 @@ RUN echo 'Configuring Yadoms CMakeListsUserConfig.txt' \
 	&& echo 'set(GAMMU_ROOT "'$YADOMS_DEPS_PATH'/gammu")' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
 	&& echo 'set(SWIG_ROOT "'$YADOMS_DEPS_PATH'/swig-'$swig_version'")' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
 	&& echo 'set(OPENCV_ROOT "'$YADOMS_DEPS_PATH'/opencv")' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
+	&& echo 'set(LIBUDEV_ROOT "'$YADOMS_DEPS_PATH'/libudev")' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
 	&& echo 'SET(COTIRE_USE ON)' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
 	&& echo 'SET(COTIRE_USE_UNITY ON)' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
 	&& echo 'set(CC_RPI_ROOT "/opt/cross-pi-gcc-10.2.0-2")' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt
