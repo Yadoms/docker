@@ -35,6 +35,7 @@ RUN wget 'https://sourceforge.net/projects/dsgpl/files/Tool%20Chain/DSM%206.2.2%
 ENV PATH /opt/x86_64-pc-linux-gnu/bin:$PATH
 ENV LD_LIBRARY_PATH /opt/x86_64-pc-linux-gnu/lib/gcc/x86_64-pc-linux-gnu/4.9.3:$LD_LIBRARY_PATH
 
+
 #############################################################
 ## Build yadoms dependencies
 #############################################################
