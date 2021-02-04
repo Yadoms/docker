@@ -21,7 +21,7 @@ RUN mkdir $YADOMS_DEPS_PATH
 RUN echo "check_certificate = off" >> ~/.wgetrc
 
 # CMake
-ARG cmake_version=3.18.1
+ARG cmake_version=3.19.2
 RUN cd $YADOMS_DEPS_PATH \
 	&& wget --no-verbose https://github.com/Kitware/CMake/releases/download/v$cmake_version/cmake-$cmake_version.tar.gz \
 	&& tar xzf cmake-$cmake_version.tar.gz && cd cmake-$cmake_version \
@@ -30,7 +30,7 @@ RUN cd $YADOMS_DEPS_PATH \
 
 # Boost
 ARG boost_version_major=1
-ARG boost_version_minor=74
+ARG boost_version_minor=75
 ARG boost_version_patch=0
 ARG boost_underscore=_
 ARG boost_version=$boost_version_major$boost_underscore$boost_version_minor$boost_underscore$boost_version_patch
@@ -39,7 +39,7 @@ RUN cd $YADOMS_DEPS_PATH \
 	&& wget --no-verbose https://dl.bintray.com/boostorg/release/$boost_version_dot/source/boost_$boost_version.tar.bz2 \
 	&& tar xjf boost_$boost_version.tar.bz2 && cd boost_$boost_version \
 	&& ./bootstrap.sh \
-	&& ./b2 --with-atomic --with-chrono --with-date_time --with-filesystem --with-locale --with-regex --with-test --with-thread --with-system link=static runtime-link=static --no-samples --no-tests cxxflags=-fPIC \
+	&& ./b2 --with-atomic --with-chrono --with-date_time --with-filesystem --with-locale --with-regex --with-test --with-thread --with-json --with-system link=static runtime-link=static --no-samples --no-tests cxxflags=-fPIC \
 	&& rm -Rf bin.v2 \
 	&& rm -Rf doc \
 	&& rm -Rf libs \

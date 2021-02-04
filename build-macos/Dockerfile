@@ -82,7 +82,7 @@ RUN mkdir -p $YADOMS_BUILD_TOOLS_PATH
 RUN mkdir -p $YADOMS_DEPS_PATH
 
 # CMake
-ARG cmake_version=3.18.1
+ARG cmake_version=3.19.2
 RUN cd $YADOMS_DEPS_PATH \
 	&& wget --no-check-certificate https://github.com/Kitware/CMake/releases/download/v$cmake_version/cmake-$cmake_version.tar.gz \
 	&& tar xzf cmake-$cmake_version.tar.gz && cd cmake-$cmake_version\
@@ -95,7 +95,7 @@ RUN eval `$YADOMS_CCMACOS_TRIPLET-osxcross-conf` \
 
 # Boost
 ARG boost_version_major=1
-ARG boost_version_minor=74
+ARG boost_version_minor=75
 ARG boost_version_patch=0
 ARG boost_underscore=_
 ARG boost_version=$boost_version_major$boost_underscore$boost_version_minor$boost_underscore$boost_version_patch
@@ -105,7 +105,7 @@ RUN cd $YADOMS_DEPS_PATH \
 	&& tar xjf boost_$boost_version.tar.bz2 && cd boost_$boost_version  > /dev/null \
 	&& echo "using clang : o64 : o64-clang++ : <archiver>$YADOMS_CCMACOS_TRIPLET-ar <ranlib>$YADOMS_CCMACOS_TRIPLET-ranlib ;" > ~/user-config.jam \
 	&& ./bootstrap.sh\
-	&& ./b2 --with-atomic --with-chrono --with-date_time --with-filesystem --with-regex --with-test --with-thread --with-system link=static runtime-link=static --no-samples --no-tests toolset=clang-o64 target-os=darwin cxxflags="-fPIC" visibility=global \
+	&& ./b2 --with-atomic --with-chrono --with-date_time --with-filesystem --with-regex --with-test --with-thread --with-system --with-json link=static runtime-link=static --no-samples --no-tests toolset=clang-o64 target-os=darwin cxxflags="-fPIC" visibility=global \
 	&& rm -Rf bin.v2 \
 	&& rm -Rf doc \
 	&& rm -Rf libs \
