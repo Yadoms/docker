@@ -1,2 +1,0 @@
-docker tag build_for_raspberrypi_image yadoms/build_for_raspberrypi_image
-docker push yadoms/build_for_raspberrypi_image
