@@ -36,4 +36,5 @@ jobs:
           file: build-raspberrypi/Dockerfile
           tags: ${{ steps.prep.outputs.tags }}
           cache-from: type=registry,ref=yadoms/build_for_raspberrypi:latest
-          cache-to: type=inline         
+          cache-to: type=inline
+          push: true
