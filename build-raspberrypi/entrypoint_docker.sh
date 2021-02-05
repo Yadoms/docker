@@ -8,7 +8,8 @@ cp $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt sources/
 cp $YADOMS_DEPS_PATH/raspberrypi.cmake sources
 
 echo "Create makefile"
-sh cmake_cross.sh Raspberry /work/sources/raspberrypi.cmake Release
+#sh cmake_cross.sh Raspberry /work/sources/raspberrypi.cmake Release
+sh cmake_raspberry.sh r
 
 echo "Build Yadoms"
 cd projects

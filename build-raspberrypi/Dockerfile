@@ -8,6 +8,15 @@ ENV MAKE_PACKAGE false
 ENV YADOMS_BUILD_TOOLS_PATH /yadoms-build-tools
 ENV YADOMS_DEPS_PATH /yadoms-deps/raspberry
 
+
+#############################################################
+## Build yadoms dependencies
+#############################################################
+
+RUN mkdir -p $YADOMS_BUILD_TOOLS_PATH
+RUN mkdir -p $YADOMS_DEPS_PATH
+
+
 #############################################################
 ## Install all needed packages
 #############################################################
@@ -27,30 +36,45 @@ RUN apt-get update \
 	postgresql-server-dev-all git rpm zip gcc gcc-doc libc6-dev \
 	libffi-dev libssl-dev zlib1g-dev
  
-	
-#############################################################
-## Install toolchain
-#############################################################
+########################################################################################################################
+########################################################################################################################
+########################################################################################################################
+########################################################################################################################
+########################################################################################################################
+####
+####    #############################################################
+####    ## Install toolchain with GCC v10 (raspbian buster only...)
+####    #############################################################
+####    
+####    # Cross toolchain for raspberryPI
+####    # based on https://github.com/abhiTronix/raspberry-pi-cross-compilers
+####    # -> comptible with all RapsberryPI
+####    # -> GCC 10.2
+####    # -> X86_64 COMPILER
+####    # https://github.com/abhiTronix/raspberry-pi-cross-compiler
+####    RUN wget 'https://master.dl.sourceforge.net/project/raspberry-pi-cross-compilers/Raspberry%20Pi%20GCC%20Cross-Compiler%20Toolchains/Buster/GCC%2010.2.0/Raspberry%20Pi%203A%2B%2C%203B%2B%2C%204/cross-gcc-10.2.0-pi_3%2B.tar.gz' \
+####     && tar xf cross-gcc-10.2.0-pi_3+.tar.gz \
+####     && mv cross-pi-gcc-10.2.0-2 /opt/cross-pi-gcc-10.2.0-2 \
+####     && rm -f cross-gcc-10.2.0-pi_3+.tar.gz
+####    ENV PATH /opt/cross-pi-gcc-10.2.0-2/bin:$PATH
+####    ENV LD_LIBRARY_PATH /opt/cross-pi-gcc-10.2.0-2/lib:$LD_LIBRARY_PATH
+####    
+########################################################################################################################
+########################################################################################################################
+########################################################################################################################
+########################################################################################################################
+########################################################################################################################
 
-# Cross toolchain for raspberryPI
-# based on https://github.com/abhiTronix/raspberry-pi-cross-compilers
-# -> comptible with all RapsberryPI
-# -> GCC 10.2
-# -> X86_64 COMPILER
-# https://github.com/abhiTronix/raspberry-pi-cross-compiler
-RUN wget 'https://master.dl.sourceforge.net/project/raspberry-pi-cross-compilers/Raspberry%20Pi%20GCC%20Cross-Compiler%20Toolchains/Buster/GCC%2010.2.0/Raspberry%20Pi%203A%2B%2C%203B%2B%2C%204/cross-gcc-10.2.0-pi_3%2B.tar.gz' \
- && tar xf cross-gcc-10.2.0-pi_3+.tar.gz \
- && mv cross-pi-gcc-10.2.0-2 /opt/cross-pi-gcc-10.2.0-2 \
- && rm -f cross-gcc-10.2.0-pi_3+.tar.gz
-ENV PATH /opt/cross-pi-gcc-10.2.0-2/bin:$PATH
-ENV LD_LIBRARY_PATH /opt/cross-pi-gcc-10.2.0-2/lib:$LD_LIBRARY_PATH
+
 
 #############################################################
-## Build yadoms dependencies
+## Install toolchain (generic 4.9.3)
 #############################################################
-
-RUN mkdir -p $YADOMS_BUILD_TOOLS_PATH
-RUN mkdir -p $YADOMS_DEPS_PATH
+# Installing arm-linux-gnueabihf cross toolchain
+RUN mkdir -p $YADOMS_BUILD_TOOLS_PATH \
+	&& cd $YADOMS_BUILD_TOOLS_PATH \
+	&& git clone --depth=1 https://github.com/raspberrypi/tools.git
+ENV PATH $PATH:$YADOMS_BUILD_TOOLS_PATH/tools/arm-bcm2708/arm-rpi-4.9.3-linux-gnueabihf/bin
 
 # CMake
 ARG cmake_version=3.19.2
@@ -271,7 +295,7 @@ RUN echo 'Configuring Yadoms CMakeListsUserConfig.txt' \
 	&& echo 'set(LIBUDEV_ROOT "'$YADOMS_DEPS_PATH'/libudev")' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
 	&& echo 'SET(COTIRE_USE ON)' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
 	&& echo 'SET(COTIRE_USE_UNITY ON)' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
-	&& echo 'set(CC_RPI_ROOT "/opt/cross-pi-gcc-10.2.0-2")' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt
+	&& echo 'set(CC_RPI_ROOT "'$YADOMS_BUILD_TOOLS_PATH'/tools/arm-bcm2708/arm-rpi-4.9.3-linux-gnueabihf")' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt
 
 #For debug purpose only
 RUN cat $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt
