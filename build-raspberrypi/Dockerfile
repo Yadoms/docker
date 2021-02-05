@@ -278,15 +278,3 @@ RUN cat $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt
 
 COPY raspberrypi.yadoms.cmake $YADOMS_DEPS_PATH/raspberrypi.cmake
 COPY entrypoint_docker.sh /entrypoint_docker.sh
-
-
-####################################################################################
-#RaspberryPI IMAGE generation
-####################################################################################
-
-RUN apt-get update -y
-RUN apt-get install -y dialog apt-utils
-RUN apt-get install -y --allow-unauthenticated build-essential wget git lzop u-boot-tools binfmt-support qemu qemu-user-static multistrap parted dosfstools file udev zip curl
-USER root
-
-
