@@ -93,7 +93,7 @@ ARG openssl_version=1.1.1g
 RUN cd $YADOMS_DEPS_PATH \
 	&& wget --no-check-certificate --no-verbose https://www.openssl.org/source/openssl-$openssl_version.tar.gz  > /dev/null\
 	&& tar xzf openssl-$openssl_version.tar.gz && cd openssl-$openssl_version  > /dev/null\
-	&& ./Configure linux-generic32 --prefix=$YADOMS_DEPS_PATH/openssl --cross-compile-prefix=/opt/cross-pi-gcc-10.2.0-2/bin/arm-linux-gnueabihf-  > /dev/null\
+	&& ./Configure linux-generic32 --prefix=$YADOMS_DEPS_PATH/openssl --cross-compile-prefix=$YADOMS_BUILD_TOOLS_PATH/tools/arm-bcm2708/arm-rpi-4.9.3-linux-gnueabihf/bin/arm-linux-gnueabihf- > /dev/null\
 	&& make CC="arm-linux-gnueabihf-gcc" AR="arm-linux-gnueabihf-ar" RANLIB="arm-linux-gnueabihf-ranlib"  > /dev/null\
 	&& make install  > /dev/null\
 	&& cd .. && rm -Rf openssl-$openssl_version \
