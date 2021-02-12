@@ -13,15 +13,10 @@ sh cmake_macosx.sh d
 echo "Build Yadoms"
 cd projects
 OSXCROSS_MP_INC=1 make all_unity
+echo "Build Yadoms package"
+OSXCROSS_MP_INC=1 make package
 cd -
 
-if [ $MAKE_PACKAGE == "true" ]; then
-	echo "Build Yadoms package"
-	cd projects
-	make package
-	cd -
-	
-	cd update
-	sh make_package.sh Darwin
-	
-fi
+echo "Build Yadoms update package"
+cd update
+sh make_package.sh Darwin
