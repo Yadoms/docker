@@ -15,14 +15,10 @@ sh cmake_linux.sh r
 echo "Build Yadoms"
 cd projects
 make all_unity
+echo "Build Yadoms package"
+make package
 cd -
 
-if [ $MAKE_PACKAGE == "true" ]; then
-	echo "Build Yadoms package"
-	cd projects
-	make package
-	cd -
-	
-	cd update
-	sh make_package.sh Linux
-fi
+echo "Build Yadoms update package"
+cd update
+sh make_package.sh Linux
