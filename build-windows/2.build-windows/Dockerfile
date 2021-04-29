@@ -27,7 +27,7 @@ RUN powershell.exe -Command iex ((New-Object System.Net.WebClient).DownloadStrin
 ###################################################################
 
 # CMake
-ARG cmake_version=3.19.2
+ARG cmake_version=3.20.2
 RUN choco install cmake --installargs 'ADD_CMAKE_TO_PATH=System' -y --no-progress --version %cmake_version%
 
 #NSIS and 7zip
@@ -35,13 +35,13 @@ RUN choco install nsis 7zip git -y --no-progress
 
 # Boost
 ARG boost_version_major=1
-ARG boost_version_minor=75
+ARG boost_version_minor=76
 ARG boost_version_patch=0
 ARG boost_underscore=_
 ARG boost_version=$boost_version_major$boost_underscore$boost_version_minor$boost_underscore$boost_version_patch
 ARG boost_version_dot=$boost_version_major.$boost_version_minor.$boost_version_patch
 RUN cd %YADOMS_DEPS_PATH% \
-   && powershell.exe -Command (New-Object System.Net.WebClient).DownloadFile('https://dl.bintray.com/boostorg/release/%boost_version_dot%/source/boost_%boost_version%.zip', '%YADOMS_DEPS_PATH%\\boost_%boost_version%.zip') \
+   && powershell.exe -Command (New-Object System.Net.WebClient).DownloadFile('https://boostorg.jfrog.io/artifactory/main/release/%boost_version_dot%/source/boost_%boost_version%.zip', '%YADOMS_DEPS_PATH%\\boost_%boost_version%.zip') \
    && powershell.exe -Command Expand-Archive -Path boost_%boost_version%.zip '%YADOMS_DEPS_PATH%'\
    && cd boost_%boost_version% \
    &&.\bootstrap.bat \
@@ -53,7 +53,7 @@ RUN cd %YADOMS_DEPS_PATH% \
    && cd .. && powershell.exe -Command Remove-Item -Path boost_%boost_version%.zip
 
 # OpenSSL (for chocolatey, 1.1.1.700 match 1.1.1g (g is the 7th...)
-ARG openssl_version=1.1.1.700
+ARG openssl_version=1.1.1.1100
 RUN choco install openssl --x86 -y --no-progress --version %openssl_version%
  
 
@@ -70,7 +70,7 @@ RUN cd %YADOMS_DEPS_PATH% \
 
 
 # Protobuf
-ARG protobuf_version=3.13.0
+ARG protobuf_version=3.15.8
 RUN cd %YADOMS_DEPS_PATH% \
    && powershell.exe -Command (New-Object System.Net.WebClient).DownloadFile('https://github.com/google/protobuf/releases/download/v%protobuf_version%/protobuf-cpp-%protobuf_version%.zip', '%YADOMS_DEPS_PATH%\\protobuf.zip') \
    && powershell.exe -Command Expand-Archive -Path protobuf.zip '%YADOMS_DEPS_PATH%'\
@@ -98,8 +98,8 @@ RUN choco install python2 --x86 -y --no-progress --version %python2_version%
 
 # Python3
 ARG python3_version_maj=3
-ARG python3_version_min=8
-ARG python3_version_patch=5
+ARG python3_version_min=9
+ARG python3_version_patch=4
 ARG python3_version=$python3_version_maj.$python3_version_min.$python3_version_patch
 RUN choco install python3 --x86 -y --no-progress --version %python3_version%
 
@@ -112,7 +112,7 @@ RUN cd %YADOMS_DEPS_PATH% \
 
 
 # OpenCV
-ARG opencv_version=4.3.0
+ARG opencv_version=4.5.2
 RUN cd %YADOMS_DEPS_PATH% \
    && powershell.exe -Command (New-Object System.Net.WebClient).DownloadFile('https://github.com/opencv/opencv/archive/%opencv_version%.zip ', '%YADOMS_DEPS_PATH%\\opencv.zip') \
    && powershell.exe -Command Expand-Archive -Path opencv.zip '%YADOMS_DEPS_PATH%'\

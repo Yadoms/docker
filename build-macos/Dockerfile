@@ -82,7 +82,7 @@ RUN mkdir -p $YADOMS_BUILD_TOOLS_PATH
 RUN mkdir -p $YADOMS_DEPS_PATH
 
 # CMake
-ARG cmake_version=3.19.2
+ARG cmake_version=3.20.2
 RUN cd $YADOMS_DEPS_PATH \
 	&& wget --no-check-certificate https://github.com/Kitware/CMake/releases/download/v$cmake_version/cmake-$cmake_version.tar.gz \
 	&& tar xzf cmake-$cmake_version.tar.gz && cd cmake-$cmake_version\
@@ -95,13 +95,13 @@ RUN eval `$YADOMS_CCMACOS_TRIPLET-osxcross-conf` \
 
 # Boost
 ARG boost_version_major=1
-ARG boost_version_minor=75
+ARG boost_version_minor=76
 ARG boost_version_patch=0
 ARG boost_underscore=_
 ARG boost_version=$boost_version_major$boost_underscore$boost_version_minor$boost_underscore$boost_version_patch
 ARG boost_version_dot=$boost_version_major.$boost_version_minor.$boost_version_patch
 RUN cd $YADOMS_DEPS_PATH \
-	&& wget --no-check-certificate --no-verbose https://dl.bintray.com/boostorg/release/$boost_version_dot/source/boost_$boost_version.tar.bz2\
+	&& wget --no-check-certificate --no-verbose https://boostorg.jfrog.io/artifactory/main/release/$boost_version_dot/source/boost_$boost_version.tar.bz2\
 	&& tar xjf boost_$boost_version.tar.bz2 && cd boost_$boost_version  > /dev/null \
 	&& echo "using clang : o64 : o64-clang++ : <archiver>$YADOMS_CCMACOS_TRIPLET-ar <ranlib>$YADOMS_CCMACOS_TRIPLET-ranlib ;" > ~/user-config.jam \
 	&& ./bootstrap.sh\
@@ -128,7 +128,7 @@ RUN cd $YADOMS_DEPS_PATH \
 
 
 # Protobuf (Host)
-ARG protobuf_version=3.13.0
+ARG protobuf_version=3.15.8
 RUN wget --no-check-certificate --no-verbose https://github.com/google/protobuf/releases/download/v$protobuf_version/protobuf-cpp-$protobuf_version.tar.gz  > /dev/null\
 	&& tar xzf protobuf-cpp-$protobuf_version.tar.gz && rm protobuf-cpp-$protobuf_version.tar.gz > /dev/null\
     && cp -R protobuf-$protobuf_version $YADOMS_BUILD_TOOLS_PATH/protobuf-$protobuf_version-host > /dev/null \
@@ -206,8 +206,8 @@ RUN UNATTENDED=1 MACOSX_DEPLOYMENT_TARGET=${DARWIN_OSX_VERSION_MIN} WGETOPTS=--n
 
 # Python 3 (Host)
 ARG python3_version_maj=3
-ARG python3_version_min=8
-ARG python3_version_patch=5
+ARG python3_version_min=9
+ARG python3_version_patch=4
 ARG python3_version=$python3_version_maj.$python3_version_min.$python3_version_patch
 RUN wget --no-check-certificate --no-verbose https://www.python.org/ftp/python/$python3_version/Python-$python3_version.tgz  > /dev/null\
 	&& tar xzf Python-$python3_version.tgz && rm Python-$python3_version.tgz  > /dev/null\

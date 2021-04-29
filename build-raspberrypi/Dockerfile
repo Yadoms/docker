@@ -77,7 +77,7 @@ RUN mkdir -p $YADOMS_BUILD_TOOLS_PATH \
 ENV PATH $PATH:$YADOMS_BUILD_TOOLS_PATH/tools/arm-bcm2708/arm-rpi-4.9.3-linux-gnueabihf/bin
 
 # CMake
-ARG cmake_version=3.19.2
+ARG cmake_version=3.20.2
 RUN cd $YADOMS_DEPS_PATH \
 	&& wget --no-check-certificate --no-verbose https://github.com/Kitware/CMake/releases/download/v$cmake_version/cmake-$cmake_version.tar.gz  > /dev/null\
 	&& tar xzf cmake-$cmake_version.tar.gz && cd cmake-$cmake_version  > /dev/null\
@@ -89,7 +89,7 @@ RUN arm-linux-gnueabihf-gcc --version
 
 
 # OpenSSL (both cross compile and for host)
-ARG openssl_version=1.1.1g
+ARG openssl_version=1.1.1k
 RUN cd $YADOMS_DEPS_PATH \
 	&& wget --no-check-certificate --no-verbose https://www.openssl.org/source/openssl-$openssl_version.tar.gz  > /dev/null\
 	&& tar xzf openssl-$openssl_version.tar.gz && cd openssl-$openssl_version  > /dev/null\
@@ -104,13 +104,13 @@ RUN cd $YADOMS_DEPS_PATH \
 
 # Boost
 ARG boost_version_major=1
-ARG boost_version_minor=75
+ARG boost_version_minor=76
 ARG boost_version_patch=0
 ARG boost_underscore=_
 ARG boost_version=$boost_version_major$boost_underscore$boost_version_minor$boost_underscore$boost_version_patch
 ARG boost_version_dot=$boost_version_major.$boost_version_minor.$boost_version_patch
 RUN cd $YADOMS_DEPS_PATH \
-	&& wget --no-check-certificate --no-verbose https://dl.bintray.com/boostorg/release/$boost_version_dot/source/boost_$boost_version.tar.bz2  > /dev/null\
+	&& wget --no-check-certificate --no-verbose https://boostorg.jfrog.io/artifactory/main/release/$boost_version_dot/source/boost_$boost_version.tar.bz2  > /dev/null\
 	&& tar xjf boost_$boost_version.tar.bz2 && cd boost_$boost_version  > /dev/null\
 	&& echo "using gcc : arm : arm-linux-gnueabihf-g++ ;" > /root/user-config.jam \
 	&& ./bootstrap.sh > /dev/null\
@@ -138,7 +138,7 @@ RUN cd $YADOMS_DEPS_PATH \
 
 
 # Protobuf (Host)
-ARG protobuf_version=3.13.0
+ARG protobuf_version=3.15.8
 RUN wget --no-check-certificate --no-verbose https://github.com/google/protobuf/releases/download/v$protobuf_version/protobuf-cpp-$protobuf_version.tar.gz  > /dev/null\
 	&& tar xzf protobuf-cpp-$protobuf_version.tar.gz && rm protobuf-cpp-$protobuf_version.tar.gz > /dev/null\
         && cp -R protobuf-$protobuf_version $YADOMS_BUILD_TOOLS_PATH/protobuf-$protobuf_version-host > /dev/null \
@@ -200,8 +200,8 @@ RUN mv Python-$python2_version $YADOMS_DEPS_PATH/Python-$python2_version  > /dev
 	
 # Python 3.7 (Host)
 ARG python3_version_maj=3
-ARG python3_version_min=8
-ARG python3_version_patch=5
+ARG python3_version_min=9
+ARG python3_version_patch=4
 ARG python3_version=$python3_version_maj.$python3_version_min.$python3_version_patch
 RUN wget --no-check-certificate --no-check-certificate --no-verbose https://www.python.org/ftp/python/$python3_version/Python-$python3_version.tgz\
 	&& tar xzf Python-$python3_version.tgz && rm Python-$python3_version.tgz\
@@ -246,7 +246,7 @@ RUN cd $YADOMS_DEPS_PATH \
 	&& cd ../.. && rm -Rf gammu-1.40.*
 
 # Opencv
-ARG opencv_version=4.3.0
+ARG opencv_version=4.5.2
 RUN cd $YADOMS_DEPS_PATH \
 	&& wget --no-verbose https://github.com/opencv/opencv/archive/$opencv_version.zip  > /dev/null\
 	&& unzip $opencv_version.zip  > /dev/null\
