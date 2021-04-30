@@ -135,8 +135,7 @@ RUN wget --no-verbose https://github.com/google/protobuf/releases/download/v$pro
 	&& cd $YADOMS_BUILD_TOOLS_PATH/protobuf-$protobuf_version-host \
 	&& mkdir build \
 	&& cd build \
-	&& cmake -Dprotobuf_BUILD_TESTS=OFF -G "NMake Makefiles" -DCMAKE_BUILD_TYPE=Release ../cmake && nmake && nmake install \
-	&& make install  > /dev/null\
+	&& cmake -Dprotobuf_BUILD_TESTS=OFF -DCMAKE_BUILD_TYPE=Release ../cmake && make && make install \
 	&& ldconfig  > /dev/null
 # Protobuf (Darwin)
 RUN mv protobuf-$protobuf_version $YADOMS_DEPS_PATH/protobuf-$protobuf_version \
