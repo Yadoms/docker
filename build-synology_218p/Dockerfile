@@ -103,7 +103,7 @@ RUN cd $YADOMS_DEPS_PATH \
 
 # Protobuf (Host)
 ARG protobuf_version=3.15.8
-RUN wget --no-check-certificate --no-verbose https://github.com/google/protobuf/releases/download/v$protobuf_version/protobuf-cpp-$protobuf_version.tar.gz  > /dev/null\
+RUN wget --no-verbose https://github.com/google/protobuf/releases/download/v$protobuf_version/protobuf-cpp-$protobuf_version.tar.gz \
 	&& tar xzf protobuf-cpp-$protobuf_version.tar.gz && rm protobuf-cpp-$protobuf_version.tar.gz > /dev/null\
         && cp -R protobuf-$protobuf_version $YADOMS_BUILD_TOOLS_PATH/protobuf-$protobuf_version-host > /dev/null \
 	&& cd $YADOMS_BUILD_TOOLS_PATH/protobuf-$protobuf_version-host \
