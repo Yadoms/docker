@@ -56,7 +56,7 @@ RUN x86_64-pc-linux-gnu-gcc --version
 
 # Boost
 ARG boost_version_major=1
-ARG boost_version_minor=76
+ARG boost_version_minor=75
 ARG boost_version_patch=0
 ARG boost_underscore=_
 ARG boost_version=$boost_version_major$boost_underscore$boost_version_minor$boost_underscore$boost_version_patch
