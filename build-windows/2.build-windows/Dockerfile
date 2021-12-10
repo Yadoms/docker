@@ -53,7 +53,7 @@ RUN cd %YADOMS_DEPS_PATH% \
    && cd .. && powershell.exe -Command Remove-Item -Path boost_%boost_version%.zip
 
 # OpenSSL (for chocolatey, 1.1.1.700 match 1.1.1g (g is the 7th...)
-ARG openssl_version=1.1.1.1100
+ARG openssl_version=1.1.1.1200
 RUN choco install openssl --x86 -y --no-progress --version %openssl_version%
  
 
