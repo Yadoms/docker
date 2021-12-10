@@ -13,7 +13,7 @@ RUN apt-get update \
 	postgresql-server-dev-all git rpm zip \
 	libreadline-dev libffi-dev build-essential \
 	libgtk2.0-dev pkg-config libavcodec-dev libavformat-dev libswscale-dev \
-	python-numpy libtbb2 libtbb-dev libjpeg-dev libpng-dev libtiff-dev \
+	python3-numpy libtbb2 libtbb-dev libjpeg-dev libpng-dev libtiff-dev \
 	libudev-dev usbutils
 
 RUN mkdir $YADOMS_DEPS_PATH
