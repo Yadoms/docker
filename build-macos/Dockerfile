@@ -1,4 +1,4 @@
-FROM debian:stable
+FROM debian:10
 MAINTAINER jano42 "https://github.com/jano42"
 LABEL authors=jano42
 
