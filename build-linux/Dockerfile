@@ -21,7 +21,7 @@ RUN mkdir $YADOMS_DEPS_PATH
 RUN echo "check_certificate = off" >> ~/.wgetrc
 
 # CMake
-ARG cmake_version=3.20.2
+ARG cmake_version=3.30.2
 RUN cd $YADOMS_DEPS_PATH \
 	&& wget --no-verbose https://github.com/Kitware/CMake/releases/download/v$cmake_version/cmake-$cmake_version.tar.gz \
 	&& tar xzf cmake-$cmake_version.tar.gz && cd cmake-$cmake_version \
