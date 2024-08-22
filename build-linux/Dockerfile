@@ -6,6 +6,12 @@ ENV YADOMS_BUILD_BRANCH develop
 ENV MAKE_PACKAGE false
 ENV YADOMS_DEPS_PATH /yadoms-deps
 
+# Add bullseye sources list
+RUN echo "deb http://deb.debian.org/debian bullseye main" > /etc/apt/sources.list.d/bullseye.list \
+    && echo "deb http://deb.debian.org/debian bullseye-updates main" >> /etc/apt/sources.list.d/bullseye.list \
+    && echo "deb http://security.debian.org bullseye-security main" >> /etc/apt/sources.list.d/bullseye.list
+
+
 RUN apt-get update \
 	&& apt-get install -y g++ libbz2-dev python2.7-dev python3-dev wget build-essential libssl-dev \
 	autoconf automake libtool curl make g++ unzip \
