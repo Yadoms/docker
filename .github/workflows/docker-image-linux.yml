@@ -17,7 +17,7 @@ jobs:
     - name: Build and push
       uses: docker/build-push-action@v6
       with:
-        context: ./build_for_linux
+        context: "{{defaultContext}}:build_for_linux"
         push: true
         tags: yadoms/build_for_linux:latest
         secrets: |
