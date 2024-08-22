@@ -1,4 +1,4 @@
-FROM debian:stable
+FROM debian:stable-20200803
 MAINTAINER jano42 "https://github.com/jano42"
 LABEL authors=jano42
 
@@ -83,6 +83,7 @@ RUN mkdir -p $YADOMS_DEPS_PATH
 
 # CMake
 ARG cmake_version=3.30.2
+RUN apt-get purge -y cmake
 RUN cd $YADOMS_DEPS_PATH \
 	&& wget --no-check-certificate https://github.com/Kitware/CMake/releases/download/v$cmake_version/cmake-$cmake_version.tar.gz \
 	&& tar xzf cmake-$cmake_version.tar.gz && cd cmake-$cmake_version\
