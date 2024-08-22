@@ -57,7 +57,7 @@ ARG openssl_version=1.1.1k
 RUN cd $YADOMS_DEPS_PATH \
 	&& wget --no-verbose https://www.openssl.org/source/openssl-$openssl_version.tar.gz \
 	&& tar xzf openssl-$openssl_version.tar.gz && cd openssl-$openssl_version \
-	&& ./Configure --prefix=$YADOMS_DEPS_PATH/openssl -fPIC linux-x86_64\
+	&& ./Configure -fPIC linux-x86_64\
 	&& make \
 	&& make install \
 	&& cd .. && rm -Rf openssl-$openssl_version && rm $YADOMS_DEPS_PATH/openssl-$openssl_version.tar.gz \
