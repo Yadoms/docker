@@ -7,13 +7,13 @@ ENV MAKE_PACKAGE false
 ENV YADOMS_DEPS_PATH /yadoms-deps
 
 RUN apt-get update \
-	&& apt-get install -y g++ libbz2-dev python-dev python3-dev wget build-essential libssl-dev \
+	&& apt-get install -y g++ libbz2-dev python2.7-dev python3-dev wget build-essential libssl-dev \
 	autoconf automake libtool curl make g++ unzip \
 	libpcre3 libpcre3-dev libpq5 \
 	postgresql-server-dev-all git rpm zip \
 	libreadline-dev libffi-dev build-essential \
 	libgtk2.0-dev pkg-config libavcodec-dev libavformat-dev libswscale-dev \
-	python3-numpy libtbb2 libtbb-dev libjpeg-dev libpng-dev libtiff-dev \
+	python3-numpy libtbbmalloc2 libtbb-dev libjpeg-dev libpng-dev libtiff-dev \
 	libudev-dev usbutils
 
 RUN mkdir $YADOMS_DEPS_PATH
