@@ -14,14 +14,11 @@ jobs:
       uses: docker/setup-qemu-action@v3
     - name: Set up Docker Buildx
       uses: docker/setup-buildx-action@v3
-    - name: Login to Docker Hub
-      uses: docker/login-action@v3
-      with:
-        username: ${{ secrets.CONTAINER_GH_LOGIN }}
-        password: ${{ secrets.CONTAINER_GH_TOKEN }}
     - name: Build and push
       uses: docker/build-push-action@v6
       with:
         context: ./build_for_linux
         push: true
         tags: yadoms/build_for_linux:latest
+        secrets: |
+          GIT_AUTH_TOKEN=${{ secrets.GITHUB_TOKEN }}
