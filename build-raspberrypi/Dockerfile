@@ -1,4 +1,4 @@
-FROM debian:stable
+FROM --platform=linux/x86_64 debian:stable
 MAINTAINER jano42 "https://github.com/jano42"
 LABEL authors=jano42
 ENV DEBIAN_FRONTEND noninteractive
@@ -22,10 +22,10 @@ RUN mkdir -p $YADOMS_DEPS_PATH
 #############################################################
 
 
-RUN echo "deb http://deb.debian.org/debian/ buster main contrib non-free" | tee -a /etc/apt/sources.list \
+RUN echo "deb http://archive.debian.org/debian/ buster main contrib non-free" | tee -a /etc/apt/sources.list \
 &&  echo "deb http://security.debian.org/ buster/updates main contrib non-free" | tee -a /etc/apt/sources.list \
-&& echo "deb http://deb.debian.org/debian/ buster-updates main contrib non-free" | tee -a /etc/apt/sources.list \
-&& echo "deb http://deb.debian.org/debian buster-backports main contrib non-free" | tee -a /etc/apt/sources.list
+&& echo "deb http://archive.debian.org/debian/ buster-updates main contrib non-free" | tee -a /etc/apt/sources.list \
+&& echo "deb http://archive.debian.org/debian buster-backports main contrib non-free" | tee -a /etc/apt/sources.list
  
 RUN apt-get update \
 	&& apt-get dist-upgrade -q -y \

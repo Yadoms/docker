@@ -11,10 +11,10 @@ ENV YADOMS_DEPS_PATH /yadoms-deps/synology
 ## Install all needed packages
 #############################################################
 
-RUN echo "deb http://deb.debian.org/debian/ stretch main contrib non-free" | tee -a /etc/apt/sources.list \
+RUN echo "deb http://archive.debian.org/debian/ stretch main contrib non-free" | tee -a /etc/apt/sources.list \
 &&  echo "deb http://security.debian.org/ stretch/updates main contrib non-free" | tee -a /etc/apt/sources.list \
-&& echo "deb http://deb.debian.org/debian/ stretch-updates main contrib non-free" | tee -a /etc/apt/sources.list \
-&& echo "deb http://deb.debian.org/debian stretch-backports main contrib non-free" | tee -a /etc/apt/sources.list
+&& echo "deb http://archive.debian.org/debian/ stretch-updates main contrib non-free" | tee -a /etc/apt/sources.list \
+&& echo "deb http://archive.debian.org/debian/ stretch-backports main contrib non-free" | tee -a /etc/apt/sources.list
  
 RUN apt-get update \
 	&& apt-get dist-upgrade -q -y \
