@@ -31,7 +31,6 @@ jobs:
         # generate Docker tags based on the following events/attributes
         tags: |
           type=schedule
-        # set latest tag for default branch
           type=raw,value=latest,enable={{is_default_branch}}
           type=ref,event=branch
           type=ref,event=pr
