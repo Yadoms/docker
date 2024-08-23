@@ -12,6 +12,13 @@ jobs:
   linux:
     name : Generate for Linux
     runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+      packages: write
+      attestations: write
+      id-token: write
+
     steps:
 
     - name: Docker meta
@@ -45,8 +52,8 @@ jobs:
       uses: docker/login-action@v3
       with:
         registry: ghcr.io
-        username: ${{ secrets.CONTAINER_GH_LOGIN }}
-        password: ${{ secrets.CONTAINER_GH_TOKEN }}
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
 
     - name: Build and push
       uses: docker/build-push-action@v6
