@@ -1,12 +1,11 @@
 FROM debian:stable
-MAINTAINER jano42 "https://github.com/jano42"
-LABEL authors=jano42
-ENV DEBIAN_FRONTEND noninteractive
+LABEL org.opencontainers.image.authors="jano42"
+ENV DEBIAN_FRONTEND=noninteractive
 
-ENV YADOMS_BUILD_BRANCH develop
-ENV MAKE_PACKAGE false
-ENV YADOMS_BUILD_TOOLS_PATH /yadoms-build-tools
-ENV YADOMS_DEPS_PATH /yadoms-deps/raspberry
+ENV YADOMS_BUILD_BRANCH=develop
+ENV MAKE_PACKAGE=false
+ENV YADOMS_BUILD_TOOLS_PATH=/yadoms-build-tools
+ENV YADOMS_DEPS_PATH=/yadoms-deps/raspberry
 
 #############################################################
 ## Install all needed packages

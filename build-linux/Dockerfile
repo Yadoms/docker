@@ -1,10 +1,9 @@
 FROM debian:stable
-MAINTAINER jano42 "https://github.com/jano42"
-LABEL authors=jano42,sgallou
+LABEL org.opencontainers.image.authors="jano42"
 
-ENV YADOMS_BUILD_BRANCH develop
-ENV MAKE_PACKAGE false
-ENV YADOMS_DEPS_PATH /yadoms-deps
+ENV YADOMS_BUILD_BRANCH=develop
+ENV MAKE_PACKAGE=false
+ENV YADOMS_DEPS_PATH=/yadoms-deps
 
 # Add bullseye sources list
 RUN echo "deb http://deb.debian.org/debian bullseye main" > /etc/apt/sources.list.d/bullseye.list \
