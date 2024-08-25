@@ -38,9 +38,9 @@ USER root
 
 RUN cp /dev/null /etc/apt/sources.list \
  && echo "deb http://archive.debian.org/debian/ buster main contrib non-free" | tee -a /etc/apt/sources.list \
- && echo "deb http://security.debian.org/ buster/updates main contrib non-free" | tee -a /etc/apt/sources.list \
+ && echo "deb http://security.debian.org/buster/updates main contrib non-free" | tee -a /etc/apt/sources.list \
  && echo "deb http://archive.debian.org/debian/ buster-updates main contrib non-free" | tee -a /etc/apt/sources.list \
- && echo "deb http://archive.debian.org/debian buster-backports main contrib non-free" | tee -a /etc/apt/sources.list
+ && echo "deb http://archive.debian.org/debian/ buster-backports main contrib non-free" | tee -a /etc/apt/sources.list
  
 RUN apt-get update\
 	&& apt-get install -y g++ libbz2-dev python-dev wget build-essential libssl-dev \
