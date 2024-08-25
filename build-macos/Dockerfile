@@ -1,15 +1,14 @@
 FROM debian:stable-20200803
-MAINTAINER jano42 "https://github.com/jano42"
-LABEL authors=jano42
+LABEL org.opencontainers.image.authors="jano42"
 
 #############################################################
 ## Setup env var && arguments
 #############################################################
 
 
-ENV DEBIAN_FRONTEND noninteractive
+ENV DEBIAN_FRONTEND=noninteractive
 
-ENV OSXCROSS_SDK_VERSION 10.15
+ENV OSXCROSS_SDK_VERSION=10.15
 
 #Build arguments
 ARG darwin_sdk_version="10.15"
@@ -24,12 +23,12 @@ ENV DARWIN_SDK_VERSION="${darwin_sdk_version}"         \
     DARWIN_SDK_URL="${darwin_sdk_url}"
 
 
-ENV YADOMS_BUILD_BRANCH develop
-ENV MAKE_PACKAGE false
-ENV YADOMS_BUILD_TOOLS_PATH /yadoms-build-tools
-ENV YADOMS_DEPS_PATH /yadoms-deps/macos
-ENV YADOMS_CCMACOS_TRIPLET x86_64-apple-darwin19
-ENV YADOMS_CCMACOS_CONFTOOL $YADOMS_CCMACOS_TRIPLET-osxcross-conf
+ENV YADOMS_BUILD_BRANCH=develop
+ENV MAKE_PACKAGE=false
+ENV YADOMS_BUILD_TOOLS_PATH=/yadoms-build-tools
+ENV YADOMS_DEPS_PATH=/yadoms-deps/macos
+ENV YADOMS_CCMACOS_TRIPLET=x86_64-apple-darwin19
+ENV YADOMS_CCMACOS_CONFTOOL=$YADOMS_CCMACOS_TRIPLET-osxcross-conf
 
 USER root
 
@@ -38,10 +37,10 @@ USER root
 #############################################################
 
 RUN cp /dev/null /etc/apt/sources.list \
- && echo "deb http://deb.debian.org/debian/ buster main contrib non-free" | tee -a /etc/apt/sources.list \
+ && echo "deb http://archive.debian.org/debian/ buster main contrib non-free" | tee -a /etc/apt/sources.list \
  && echo "deb http://security.debian.org/ buster/updates main contrib non-free" | tee -a /etc/apt/sources.list \
- && echo "deb http://deb.debian.org/debian/ buster-updates main contrib non-free" | tee -a /etc/apt/sources.list \
- && echo "deb http://deb.debian.org/debian buster-backports main contrib non-free" | tee -a /etc/apt/sources.list
+ && echo "deb http://archive.debian.org/debian/ buster-updates main contrib non-free" | tee -a /etc/apt/sources.list \
+ && echo "deb http://archive.debian.org/debian buster-backports main contrib non-free" | tee -a /etc/apt/sources.list
  
 RUN apt-get update\
 	&& apt-get install -y g++ libbz2-dev python-dev wget build-essential libssl-dev \
