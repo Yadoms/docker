@@ -113,7 +113,7 @@ RUN cd $YADOMS_DEPS_PATH \
 	&& cd .. && rm $YADOMS_DEPS_PATH/boost_$boost_version.tar.bz2
 	
 # Poco
-ARG poco_version=1.9.4
+ARG poco_version=1.13.3
 COPY ./Darwin64-osxcross $YADOMS_DEPS_PATH/Darwin64-osxcross
 RUN cd $YADOMS_DEPS_PATH \
 	&& wget --no-check-certificate --no-verbose http://pocoproject.org/releases/poco-$poco_version/poco-$poco_version-all.tar.gz\

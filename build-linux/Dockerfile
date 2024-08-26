@@ -63,7 +63,7 @@ RUN cd $YADOMS_DEPS_PATH \
 	&& rm -Rf $YADOMS_DEPS_PATH/openssl/share
 
 # Poco
-ARG poco_version=1.9.4
+ARG poco_version=1.13.3
 RUN cd $YADOMS_DEPS_PATH \
 	&& wget --no-verbose https://pocoproject.org/releases/poco-$poco_version/poco-$poco_version-all.tar.gz \
 	&& tar xzf poco-$poco_version-all.tar.gz && cd poco-$poco_version-all \

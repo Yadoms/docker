@@ -58,7 +58,7 @@ RUN choco install openssl --x86 -y --no-progress --version %openssl_version%
  
 
 ## 	# Poco
-ARG poco_version=1.10.1
+ARG poco_version=1.13.3
 RUN cd %YADOMS_DEPS_PATH% \
    && powershell.exe -Command (New-Object System.Net.WebClient).DownloadFile('https://pocoproject.org/releases/poco-%poco_version%/poco-%poco_version%-all.zip', '%YADOMS_DEPS_PATH%\\poco.zip') \
    && powershell.exe -Command Expand-Archive -Path poco.zip '%YADOMS_DEPS_PATH%'\
