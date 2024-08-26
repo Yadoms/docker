@@ -9,7 +9,7 @@ jobs:
     runs-on: windows-latest
     steps:
     - name: Checkout code
-      uses: actions/checkout@v2
+      uses: actions/checkout@v4
     - name: Build VSTools container
       run: docker build -t ghcr.io/yadoms/vstools:latest -m 2GB build-windows/1.vstools
     - name: login tp docker
@@ -23,7 +23,7 @@ jobs:
     needs: Windows_1_VSTools
     steps:
     - name: Checkout code
-      uses: actions/checkout@v2
+      uses: actions/checkout@v4
     - name: Build container
       run: docker build -t ghcr.io/yadoms/build_for_windows:latest build-windows/2.build-windows
     - name: login to docker
