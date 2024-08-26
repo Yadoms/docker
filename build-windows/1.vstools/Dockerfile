@@ -1,4 +1,4 @@
-FROM mcr.microsoft.com/windows/servercore:ltsc2019
+FROM mcr.microsoft.com/windows/servercore:ltsc2022
 MAINTAINER jano42 "https://github.com/jano42"
 LABEL authors=jano42
 
