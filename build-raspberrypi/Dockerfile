@@ -73,7 +73,7 @@ RUN apt-get update \
 RUN mkdir -p $YADOMS_BUILD_TOOLS_PATH \
 	&& cd $YADOMS_BUILD_TOOLS_PATH \
 	&& git clone --depth=1 https://github.com/raspberrypi/tools.git
-ENV PATH $PATH:$YADOMS_BUILD_TOOLS_PATH/tools/arm-bcm2708/arm-rpi-4.9.3-linux-gnueabihf/bin
+ENV PATH=$PATH:$YADOMS_BUILD_TOOLS_PATH/tools/arm-bcm2708/arm-rpi-4.9.3-linux-gnueabihf/bin
 
 # CMake
 ARG cmake_version=3.30.2
