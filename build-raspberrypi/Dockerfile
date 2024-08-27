@@ -121,7 +121,7 @@ RUN cd $YADOMS_DEPS_PATH \
 	&& cd .. && rm $YADOMS_DEPS_PATH/boost_$boost_version.tar.bz2
 	
 # Poco
-ARG poco_version=1.11.0
+ARG poco_version=1.12.0
 RUN cd $YADOMS_DEPS_PATH \
 	&& wget --no-check-certificate --no-verbose http://pocoproject.org/releases/poco-$poco_version/poco-$poco_version-all.tar.gz  > /dev/null\
 	&& tar xzf poco-$poco_version-all.tar.gz && cd poco-$poco_version-all  > /dev/null\
