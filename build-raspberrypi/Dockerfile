@@ -103,7 +103,7 @@ RUN cd $YADOMS_DEPS_PATH \
 
 # Boost
 ARG boost_version_major=1
-ARG boost_version_minor=83
+ARG boost_version_minor=85
 ARG boost_version_patch=0
 ARG boost_underscore=_
 ARG boost_version=$boost_version_major$boost_underscore$boost_version_minor$boost_underscore$boost_version_patch
