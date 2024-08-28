@@ -57,9 +57,9 @@ RUN cd $YADOMS_DEPS_PATH \
 # Check GCC version
 RUN x86_64-pc-linux-gnu-gcc --version
 
-# Boost
+# Boost (1.83.0 is the last version compatible with current toolchain)
 ARG boost_version_major=1
-ARG boost_version_minor=86
+ARG boost_version_minor=83
 ARG boost_version_patch=0
 ARG boost_underscore=_
 ARG boost_version=$boost_version_major$boost_underscore$boost_version_minor$boost_underscore$boost_version_patch
@@ -89,7 +89,8 @@ RUN cd $YADOMS_DEPS_PATH \
 	
 
 # Poco
-ARG poco_version=1.13.3
+# Poco (1.11.8p2 is the last version compatible with current toolchain)
+ARG poco_version=1.11.8p2
 RUN cd $YADOMS_DEPS_PATH \
 	&& wget --no-check-certificate --no-verbose http://pocoproject.org/releases/poco-$poco_version/poco-$poco_version-all.tar.gz  > /dev/null\
 	&& tar xzf poco-$poco_version-all.tar.gz && cd poco-$poco_version-all  > /dev/null\
