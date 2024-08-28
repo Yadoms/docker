@@ -16,13 +16,51 @@ RUN echo "deb http://archive.debian.org/debian/ stretch main contrib non-free" |
 && echo "deb http://archive.debian.org/debian/ stretch-updates main contrib non-free" | tee -a /etc/apt/sources.list \
 && echo "deb http://archive.debian.org/debian/ stretch-backports main contrib non-free" | tee -a /etc/apt/sources.list
  
-RUN apt-get update \
-	&& apt-get dist-upgrade -q -y \
-	&& apt-get install -q -y build-essential gawk gfortran texinfo bison libncurses-dev nano ncdu \
-	g++ libbz2-dev python2.7-dev python3-dev wget build-essential libssl-dev \
-	libopencv-gpu-dev autoconf automake libtool curl make g++ unzip \
-	libpcre3 libpcre3-dev libreadline-dev libpq5 \
-	postgresql-server-dev-all git rpm zip gcc gcc-doc libc6-dev
+#RUN apt-get update \
+#	&& apt-get dist-upgrade -q -y \
+#	&& apt-get install -q -y build-essential gawk gfortran texinfo bison libncurses-dev nano ncdu \
+#	g++ libbz2-dev python2.7-dev python3-dev wget libssl-dev \
+#	libopencv-gpu-dev autoconf automake libtool curl make unzip \
+#	libpcre3 libpcre3-dev libreadline-dev libpq5 \
+#	postgresql-server-dev-all git rpm zip gcc gcc-doc libc6-dev
+
+RUN apt-get update
+RUN apt-get dist-upgrade -q -y
+RUN apt-get install -q -y build-essential
+RUN apt-get install -q -y gawk
+RUN apt-get install -q -y gfortran
+RUN apt-get install -q -y texinfo
+RUN apt-get install -q -y bison
+RUN apt-get install -q -y libncurses-dev
+RUN apt-get install -q -y nano
+RUN apt-get install -q -y ncdu
+RUN apt-get install -q -y g++
+RUN apt-get install -q -y libbz2-dev
+RUN apt-get install -q -y python2.7-dev
+RUN apt-get install -q -y python3-dev
+RUN apt-get install -q -y wget
+RUN apt-get install -q -y libssl-dev
+RUN apt-get install -q -y libopencv-gpu-dev
+RUN apt-get install -q -y autoconf
+RUN apt-get install -q -y automake
+RUN apt-get install -q -y libtool
+RUN apt-get install -q -y curl
+RUN apt-get install -q -y make
+RUN apt-get install -q -y unzip
+RUN apt-get install -q -y libpcre3
+RUN apt-get install -q -y libpcre3-dev
+RUN apt-get install -q -y libreadline-dev
+RUN apt-get install -q -y libpq5
+RUN apt-get install -q -y postgresql-server-dev-all
+RUN apt-get install -q -y git
+RUN apt-get install -q -y rpm
+RUN apt-get install -q -y zip
+RUN apt-get install -q -y gcc
+RUN apt-get install -q -y gcc-doc
+RUN apt-get install -q -y libc6-dev
+
+
+
 
 #############################################################
 ## Install toolchain
