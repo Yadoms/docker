@@ -19,7 +19,7 @@ RUN echo "deb http://archive.debian.org/debian/ stretch main contrib non-free" |
 RUN apt-get update \
 	&& apt-get dist-upgrade -q -y \
 	&& apt-get install -q -y build-essential gawk gfortran texinfo bison libncurses-dev nano ncdu \
-	g++ libbz2-dev python-dev python3-dev wget build-essential libssl-dev \
+	g++ libbz2-dev python2.7-dev python3-dev wget build-essential libssl-dev \
 	libopencv-gpu-dev autoconf automake libtool curl make g++ unzip \
 	libpcre3 libpcre3-dev libreadline-dev libpq5 \
 	postgresql-server-dev-all git rpm zip gcc gcc-doc libc6-dev
