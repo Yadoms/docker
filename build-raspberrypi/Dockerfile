@@ -101,7 +101,7 @@ RUN cd $YADOMS_DEPS_PATH \
 	&& cd .. && rm -Rf openssl-$openssl_version && rm $YADOMS_DEPS_PATH/openssl-$openssl_version.tar.gz
 	
 
-# Boost
+# Boost (1.83.0 is the last version compatible with current toolchain based on GCC 4.9.3)
 ARG boost_version_major=1
 ARG boost_version_minor=83
 ARG boost_version_patch=0
@@ -120,7 +120,7 @@ RUN cd $YADOMS_DEPS_PATH \
 	&& rm -Rf tools \
 	&& cd .. && rm $YADOMS_DEPS_PATH/boost_$boost_version.tar.bz2
 	
-# Poco
+# Poco (1.11.8p2 is the last version compatible with current toolchain based on GCC 4.9.3)
 ARG poco_version=1.11.8p2
 RUN cd $YADOMS_DEPS_PATH \
 	&& wget --no-check-certificate --no-verbose http://pocoproject.org/releases/poco-$poco_version/poco-$poco_version-all.tar.gz  > /dev/null\
