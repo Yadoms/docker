@@ -40,7 +40,7 @@ RUN apt-get install -q -y python2.7-dev
 RUN apt-get install -q -y python3-dev
 RUN apt-get install -q -y wget
 RUN apt-get install -q -y libssl-dev
-RUN apt-get install -q -y libopencv-gpu-dev
+#RUN apt-get install -q -y libopencv-gpu-dev
 RUN apt-get install -q -y autoconf
 RUN apt-get install -q -y automake
 RUN apt-get install -q -y libtool
