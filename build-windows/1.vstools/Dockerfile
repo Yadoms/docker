@@ -10,7 +10,7 @@ SHELL ["cmd", "/S", "/C"]
 ###################################################################
 
 # Download & Install Build Tools with the Microsoft.VisualStudio.Workload.AzureBuildTools workload, excluding workloads and components with known issues.
-RUN powershell.exe -Command (New-Object System.Net.WebClient).DownloadFile('https://aka.ms/vs/16/release/vs_buildtools.exe', 'C:\\vs_buildtools.exe') \
+RUN powershell.exe -Command (New-Object System.Net.WebClient).DownloadFile('https://aka.ms/vs/17/release/vs_buildtools.exe', 'C:\\vs_buildtools.exe') \
     && C:\\vs_buildtools.exe --quiet --wait --norestart --nocache \
     --installPath C:\BuildTools \
 	 --includeRecommended \
