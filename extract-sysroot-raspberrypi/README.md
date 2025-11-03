@@ -25,6 +25,7 @@ docker run --rm -it --privileged \
 ```
 
 Parameters are :
+
 - `IMAGE_URL` : Image url from ie Raspberry Pi OS official website (.img or .img.xz)
 - `IMAGE` : Path to a locale image (to not re-download image)
 - `IMAGE_SHA256` : (optional) expected downloaded archive checksum (file or value)

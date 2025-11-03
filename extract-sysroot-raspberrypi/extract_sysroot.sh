@@ -77,13 +77,13 @@ else
   exit 1
 fi
 
-# --- Montage partitions & extraction ---
 echo "[*] Attache l'image en loop et scanne les partitions…"
 LOOPDEV="$(losetup -f --show -P "${IMG_PATH}")"
 cleanup_loop() {
   sync || true
   umount /mnt/boot 2>/dev/null || true
   umount /mnt/root 2>/dev/null || true
+  # démonte les mappings device-mapper si créés
   kpartx -d "${LOOPDEV}" 2>/dev/null || true
   losetup -d "${LOOPDEV}" 2>/dev/null || true
 }
@@ -92,19 +92,73 @@ trap 'cleanup_loop; rm -rf "${TMP_DIR}"' EXIT
 echo "[*] Loop device: ${LOOPDEV}"
 lsblk -o NAME,TYPE,SIZE,FSTYPE,MOUNTPOINT "${LOOPDEV}" || true
 
-# Hypothèse standard Raspberry Pi OS : p1 = boot (FAT), p2 = root (ext4)
-BOOT_PART="${LOOPDEV}p1"
-ROOT_PART="${LOOPDEV}p2"
+# --- Détermine les devices de partition de manière robuste ---
+BOOT_PART=""
+ROOT_PART=""
 
-# Validation basique des partitions
-if ! lsblk -no FSTYPE "${ROOT_PART}" | grep -q 'ext'; then
-  echo "Attention: ${ROOT_PART} n'est pas ext*. Vérifie le partitionnement."
+# 1) Essayer directement /dev/loopXp1/p2 (losetup -P)
+if [[ -b "${LOOPDEV}p1" && -b "${LOOPDEV}p2" ]]; then
+  BOOT_PART="${LOOPDEV}p1"
+  ROOT_PART="${LOOPDEV}p2"
+else
+  # 2) Essayer via kpartx -> /dev/mapper/loopXp1/p2
+  echo "[*] Création des mappages de partition via kpartx…"
+  # -s: silencieux ; -a: add ; certains environnements requièrent -v pour forcer
+  kpartx -as "${LOOPDEV}" || kpartx -av "${LOOPDEV}"
+  base="$(basename "${LOOPDEV}")"
+  if [[ -b "/dev/mapper/${base}p1" && -b "/dev/mapper/${base}p2" ]]; then
+    BOOT_PART="/dev/mapper/${base}p1"
+    ROOT_PART="/dev/mapper/${base}p2"
+  fi
 fi
 
-# Montage en lecture seule
+# 3) Si toujours rien, dernier recours: montage par offset
+mount_by_offset() {
+  local dev="$1" partnum="$2" mnt="$3" fstype_hint="$4"
+  # Récupère le start sector via fdisk
+  local start
+  start="$(fdisk -l "$dev" | awk -v p="$partnum" '$0 ~ "^"dev".*\\*" {next} $0 ~ "^"dev"p"p {print $2}' dev="$dev" p="$partnum")"
+  if [[ -z "$start" ]]; then
+    # autre format fdisk: lignes qui listent partnum en 2e colonne
+    start="$(fdisk -l "$dev" | awk -v p="$partnum" '$0 ~ "^"dev  {next} $0 ~ " "p" " {print $2}' dev="$(basename "$dev")" p="$partnum")"
+  fi
+  if [[ -z "$start" ]]; then
+    echo "Impossible de déterminer l'offset pour ${dev} partition ${partnum}"
+    return 1
+  fi
+  local offset=$(( start * 512 ))
+  echo "[*] Montage par offset (part${partnum}) offset=${offset}"
+  mkdir -p "$mnt"
+  # on laisse le noyau auto-détecter le fs si possible, sinon hint
+  if [[ -n "$fstype_hint" ]]; then
+    mount -o ro,offset="$offset" -t "$fstype_hint" "$dev" "$mnt"
+  else
+    mount -o ro,offset="$offset" "$dev" "$mnt"
+  fi
+}
+
+echo "[*] Résolution des partitions:"
+echo "    BOOT_PART=${BOOT_PART:-<offset>}"
+echo "    ROOT_PART=${ROOT_PART:-<offset>}"
+
+# --- Montage en lecture seule ---
 echo "[*] Montage des partitions (ro)…"
-mount -o ro "${ROOT_PART}" /mnt/root
-mount -o ro "${BOOT_PART}" /mnt/boot 2>/dev/null || true  # FAT peut ne pas exister selon l’image
+mkdir -p /mnt/root /mnt/boot
+
+if [[ -n "${ROOT_PART}" && -b "${ROOT_PART}" ]]; then
+  mount -o ro "${ROOT_PART}" /mnt/root
+else
+  # ext4 attendu pour root
+  mount_by_offset "${LOOPDEV}" 2 /mnt/root ext4
+fi
+
+# /boot peut être FAT ou absent selon image
+if [[ -n "${BOOT_PART}" && -b "${BOOT_PART}" ]]; then
+  mount -o ro "${BOOT_PART}" /mnt/boot || true
+else
+  # essaie offset part1, sans forcer le type (auto-détection vfat)
+  mount_by_offset "${LOOPDEV}" 1 /mnt/boot "" || true
+fi
 
 # Copie du rootfs + /boot dans le sysroot
 echo "[*] Copie du rootfs -> ${OUT}"

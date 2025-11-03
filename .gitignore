@@ -1,2 +1,5 @@
 
 .DS_Store
+extract-sysroot-raspberrypi/input
+extract-sysroot-raspberrypi/output
+extract-sysroot-raspberrypi/sysroot
