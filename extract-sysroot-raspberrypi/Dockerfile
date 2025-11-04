@@ -10,6 +10,7 @@ WORKDIR /work
 RUN apt-get update && apt-get install -y --no-install-recommends \
     ca-certificates curl xz-utils \
     util-linux kpartx e2fsprogs dosfstools mount rsync coreutils file parted \
+    binutils binutils-arm-linux-gnueabihf \
 && rm -rf /var/lib/apt/lists/*
 
 # I/O folders
