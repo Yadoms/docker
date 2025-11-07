@@ -169,13 +169,25 @@ else
 fi
 
 # ===========================================
-#  Fichiers include/exclude pour rsync
+#  Règles de filtrage des fichiers à copier pour rsync
 # ===========================================
-RSYNC_INC="${TMP_DIR}/rsync-include.txt"
-RSYNC_EXC="${TMP_DIR}/rsync-exclude.txt"
+RSYNC_FILTER="${TMP_DIR}/rsync-filter.rules"
 
-# Whitelist pour MODE=minimal (libs/headers/pkg-config/ssl/ld conf)
-cat >"$RSYNC_INC" <<'PATTERNS'
+cat >"$RSYNC_FILTER" <<'RSYNC_FILTER_EOF'
+- /usr/lib/arm-linux-gnueabihf/libicu***
+- /usr/lib/arm-linux-gnueabihf/libQt5***
+- /usr/lib/arm-linux-gnueabihf/libqt5***
+- /usr/lib/arm-linux-gnueabihf/libQt6***
+- /usr/lib/arm-linux-gnueabihf/libqt6***
+- /usr/lib/modules/***
+- /usr/lib/firmware/***
+- /usr/lib/python3.*/***
+- /usr/lib/debug/***
+- /usr/lib/raspi-firmware/***
+- /usr/lib/systemd/***
+- /usr/lib/udev/***
+- /etc/***
+
 + /lib/
 + /lib/***
 + /lib/arm-linux-gnueabihf/
@@ -208,99 +220,9 @@ cat >"$RSYNC_INC" <<'PATTERNS'
 + /opt/
 + /opt/vc/
 + /opt/vc/***
+
 - ***
-PATTERNS
-
-# Exclusions "en dur" pour environnement headless (sans GUI)
-cat >"$RSYNC_EXC" <<'EXCLUDES'
-# === Navigateurs et gros clients ===
-- /usr/lib/chromium/***
-- /usr/lib/chromium-browser/***
-- /usr/lib/firefox/***
-
-# === Stack graphique: X11 / Wayland / GL / GPU ===
-- /usr/lib/xorg/***
-- /usr/lib/X11/***
-- /usr/lib/arm-linux-gnueabihf/dri/***
-- /usr/lib/arm-linux-gnueabihf/libEGL***
-- /usr/lib/arm-linux-gnueabihf/libGLES***
-- /usr/lib/arm-linux-gnueabihf/libGL***
-- /usr/lib/arm-linux-gnueabihf/libOpenGL***
-- /usr/lib/arm-linux-gnueabihf/libopengl***
-- /usr/lib/arm-linux-gnueabihf/libGLX***
-- /usr/lib/arm-linux-gnueabihf/libxkbcommon***
-- /usr/lib/arm-linux-gnueabihf/libX***
-- /usr/lib/arm-linux-gnueabihf/libxcb***
-- /usr/lib/arm-linux-gnueabihf/libwayland***
-- /usr/lib/arm-linux-gnueabihf/libdrm***
-- /usr/lib/arm-linux-gnueabihf/libvulkan***
-- /usr/lib/arm-linux-gnueabihf/libgbm***
-
-# === Toolkits GUI : GTK/Qt/SDL/Cairo/Pango/etc. ===
-- /usr/lib/arm-linux-gnueabihf/libgdk***
-- /usr/lib/arm-linux-gnueabihf/libgtk***
-- /usr/lib/arm-linux-gnueabihf/libQt5***
-- /usr/lib/arm-linux-gnueabihf/libqt5***
-- /usr/lib/arm-linux-gnueabihf/libQt6***
-- /usr/lib/arm-linux-gnueabihf/libqt6***
-- /usr/lib/arm-linux-gnueabihf/libSDL***
-- /usr/lib/arm-linux-gnueabihf/libSDL2***
-- /usr/lib/arm-linux-gnueabihf/libcairo***
-- /usr/lib/arm-linux-gnueabihf/libpango***
-- /usr/lib/arm-linux-gnueabihf/libatk***
-- /usr/lib/arm-linux-gnueabihf/libgdk_pixbuf***
-- /usr/lib/arm-linux-gnueabihf/libfontconfig***
-- /usr/lib/arm-linux-gnueabihf/libfreetype***
-- /usr/lib/arm-linux-gnueabihf/libharfbuzz***
-- /usr/lib/arm-linux-gnueabihf/libpixman***
-- /usr/lib/arm-linux-gnueabihf/libfribidi***
-- /usr/lib/arm-linux-gnueabihf/libEGL_mesa***
-- /usr/lib/arm-linux-gnueabihf/libGLX_mesa***
-
-# === Ressources GUI / thèmes / icônes / polices ===
-- /usr/share/X11/***
-- /usr/share/icons/***
-- /usr/share/fonts/***
-- /usr/share/themes/***
-- /usr/share/gtk-3.0/***
-- /usr/share/gtk-4.0/***
-- /usr/share/wayland/***
-- /usr/share/applications/***
-- /usr/share/mime/***
-- /usr/share/glvnd/***
-- /usr/share/drirc.d/***
-- /usr/share/gdm/***
-- /usr/share/lightdm/***
-- /usr/share/gnome/***
-- /usr/share/kde4/***
-- /usr/share/kf5/***
-- /usr/share/qt5/***
-- /usr/share/qt6/***
-- /usr/share/pixmaps/***
-- /usr/share/backgrounds/***
-
-# === GPU / firmware graphique / noyau ===
-- /lib/modules/***
-- /lib/firmware/***
-- /opt/vc/src/***
-- /opt/vc/lib/libEGL***
-- /opt/vc/lib/libGLES***
-- /opt/vc/lib/libGL***
-- /opt/vc/lib/libvcos***
-- /opt/vc/lib/libvchiq***
-- /opt/vc/lib/libopenmaxil***
-
-# === Divers lourds non critiques pour la compilation ===
-- /usr/lib/llvm-*/
-- /usr/lib/debug/***
-- /usr/share/doc/***
-- /usr/share/man/***
-# locales très volumineuses (adapter si besoin)
-- /usr/share/locale/zh_CN/***
-- /usr/share/locale/ja/***
-- /usr/share/locale/ru/***
-- /usr/share/locale/de/***
-EXCLUDES
+RSYNC_FILTER_EOF
 
 # ===========================================
 #  Copie du sysroot (avec exclusions)
@@ -308,8 +230,7 @@ EXCLUDES
 copy_minimal() {
   echo "[*] MODE=minimal : copie whitelist + exclusions GUI…"
   rsync -aHAX --numeric-ids --delete \
-    --include-from="$RSYNC_INC" \
-    --exclude-from="$RSYNC_EXC" \
+    --filter="merge ${RSYNC_FILTER}" \
     /mnt/root/ "${OUT}/"
 }
 
