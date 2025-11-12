@@ -1,10 +1,15 @@
 
 # Extract RaspberryPi sysroot for Yadoms build
 
-The docker helps to extract RaspberryPi sysroot from an Raspberry Pi OS image.
-The sysroot is needed to build Yadoms and its dependencies.
+This docker image helps to extract RaspberryPi minimal sysroot to build Yadoms from an Raspberry Pi OS image.
 
 # Usage
+
+Get docker image
+
+```console
+docker pull yadoms/rpi-sysroot-extract:latest
+```
 
 Create expected folders
 
@@ -32,3 +37,16 @@ Parameters are :
 - `OUT` : sysroot target folder in the contener
 - `MAKE_TARBALL` : 1 to produce tar.gz in /output, else 0
 
+# Contener image update
+
+If docker image need to be rebuilt (ie in case of extract_sysroot.sh was changed)
+
+```console
+docker build -t rpi-sysroot-extract .
+```
+
+When all is OK, push the image
+
+```console
+docker push yadoms/rpi-sysroot-extract:latest
+```
