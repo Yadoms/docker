@@ -1,5 +1,5 @@
 # syntax=docker/dockerfile:1
-FROM debian:stable
+FROM debian:stable-slim
 LABEL org.opencontainers.image.authors="sgallou"
 ENV DEBIAN_FRONTEND=noninteractive
 WORKDIR /work
@@ -7,7 +7,8 @@ WORKDIR /work
 #############################################################
 ## Install all needed packages
 #############################################################
-RUN apt-get update && apt-get install -y --no-install-recommends \
+RUN apt-get update && \
+    apt-get install -q -y --no-install-recommends \
     ca-certificates curl xz-utils \
     util-linux kpartx e2fsprogs dosfstools mount rsync coreutils file parted \
     binutils binutils-arm-linux-gnueabihf \
