@@ -1,5 +1,5 @@
-FROM debian:stable
-LABEL org.opencontainers.image.authors="jano42"
+FROM debian:stable-slim
+LABEL org.opencontainers.image.authors="sgallou"
 ENV DEBIAN_FRONTEND=noninteractive
 
 ENV YADOMS_BUILD_BRANCH=develop
@@ -23,6 +23,7 @@ RUN mkdir -p $RPI_SYSROOT
 ## Install all needed packages
 #############################################################
 
+# Log current distribution version
 RUN cat /etc/*-release
 
 # TODO utile ?
@@ -31,33 +32,90 @@ RUN cat /etc/*-release
 # && echo "deb http://archive.debian.org/debian/ bullseye-updates main contrib non-free" | tee -a /etc/apt/sources.list \
 # && echo "deb http://archive.debian.org/debian bullseye-backports main contrib non-free" | tee -a /etc/apt/sources.list
  
+# RUN dpkg --add-architecture armhf \
+#     && apt-get update \
+# 	&& apt-get install -q -y --no-install-recommends \
+# 		gcc-arm-linux-gnueabihf g++-arm-linux-gnueabihf binutils-arm-linux-gnueabihf cmake \
+# 		pkg-config ca-certificates wget coreutils bzip2 \
+#     && rm -rf /var/lib/apt/lists/*
 RUN apt-get update \
-	&& apt-get dist-upgrade -q -y \
-	&& apt-get install -q -y gcc-arm-linux-gnueabihf g++-arm-linux-gnueabihf binutils-arm-linux-gnueabihf cmake wget
-	# TODO besoin de pkg-config-arm-linux-gnueabihf ?
+	&& apt-get install -q -y --no-install-recommends \
+        build-essential gcc g++ \
+		gcc-arm-linux-gnueabihf g++-arm-linux-gnueabihf binutils-arm-linux-gnueabihf cmake \
+		ca-certificates wget coreutils bzip2 python3 python3-venv python3-pip \
+        perl \
+    && rm -rf /var/lib/apt/lists/*
+	# TODO besoin ?     && apt-get dist-upgrade -q -y \
+	# TODO besoin ?     pkg-config-arm-linux-gnueabihf
+
+
 
 # Check CMake version
 RUN cmake --version
 
-#TODO encore utile ?
-# # CMake
-# ARG cmake_version=3.30.2
-# RUN cd $YADOMS_DEPS \
-# 	&& wget --no-check-certificate --no-verbose https://github.com/Kitware/CMake/releases/download/v$cmake_version/cmake-$cmake_version.tar.gz  > /dev/null\
-# 	&& tar xzf cmake-$cmake_version.tar.gz && cd cmake-$cmake_version  > /dev/null\
-# 	&& ./bootstrap > /dev/null && make > /dev/null && make install > /dev/null\
-# 	&& cd .. && rm -Rf cmake-$cmake_version && rm $YADOMS_DEPS/cmake-$cmake_version.tar.gz
+
+#############################################################
+## Download and extract minimal RaspberryPi sysroot (created by extract-sysroot-raspberrypi docker)
+#############################################################
+
+ARG RPI_SYSROOT_GOOGLEDRIVE_FILE_ID=1OHgyVJljewb-gIryf8cCTS3abb_kcQ1D
+
+# Create a virtualenv and install gdown inside (needed on debian:stable-slim)
+# Add venv to PATH and download file from Google Drive
+RUN python3 -m venv /opt/venv \
+    && /opt/venv/bin/pip install --no-cache-dir gdown  > /dev/null
+ENV PATH="/opt/venv/bin:${PATH}"
+WORKDIR ${YADOMS_DEPS}
+RUN gdown --id ${RPI_SYSROOT_GOOGLEDRIVE_FILE_ID} -O rpi2-sysroot.tar.gz  > /dev/null
+RUN tar -xvzf rpi2-sysroot.tar.gz -C ${RPI_SYSROOT}  > /dev/null
+RUN rm rpi2-sysroot.tar.gz  > /dev/null
 
 
 #############################################################
-## Mount minimal RaspberryPi sysroot
+## Boost
 #############################################################
+ARG boost_version_major=1
+ARG boost_version_minor=89
+ARG boost_version_patch=0
+ARG boost_underscore=_
+ARG boost_version=$boost_version_major$boost_underscore$boost_version_minor$boost_underscore$boost_version_patch
+ARG boost_version_dot=$boost_version_major.$boost_version_minor.$boost_version_patch
+WORKDIR $YADOMS_DEPS
+RUN wget --no-check-certificate --no-verbose https://archives.boost.io/release/$boost_version_dot/source/boost_$boost_version.tar.bz2  > /dev/null\
+	&& tar xjf boost_$boost_version.tar.bz2  > /dev/null
+WORKDIR $YADOMS_DEPS/boost_$boost_version
+RUN echo "using gcc : arm : arm-linux-gnueabihf-g++ ;" > /tmp/user-config.jam \
+    && ./bootstrap.sh  > /dev/null \
+	&& ./b2 -j$(nproc) \
+		toolset=gcc-arm \
+		target-os=linux \
+        --user-config=/tmp/user-config.jam \
+		architecture=arm address-model=32 abi=aapcs binary-format=elf \
+		threading=multi link=static runtime-link=static \
+		cxxflags="-march=armv7-a -mfpu=neon-vfpv4 -mfloat-abi=hard -fPIC" \
+		--with-atomic --with-chrono --with-date_time --with-filesystem --with-locale --with-regex --with-system --with-test --with-thread \
+		--no-samples --no-tests \
+		--prefix=$YADOMS_DEPS/boost-rpi2-armhf install  > /dev/null
+WORKDIR $YADOMS_DEPS
+RUN	rm -Rf boost_$boost_version \
+	&& rm boost_$boost_version.tar.bz2  > /dev/null
 
-COPY rpi2-sysroot.tar.gz $RPI_SYSROOT
-RUN cd $RPI_SYSROOT \
-	&& tar xf rpi2-sysroot.tar.gz
 
-
+#############################################################
+## OpenSSL (cross compile only)
+#############################################################
+ARG openssl_version=1.1.1k
+WORKDIR $YADOMS_DEPS
+RUN wget --no-check-certificate --no-verbose https://www.openssl.org/source/openssl-1.1.1k.tar.gz \
+    && tar xzf openssl-${openssl_version}.tar.gz  > /dev/null
+WORKDIR $YADOMS_DEPS/openssl-${openssl_version}
+RUN ./Configure linux-generic32 --prefix=$YADOMS_DEPS/openssl-rpi2-armhf --cross-compile-prefix=arm-linux-gnueabihf-  > /dev/null
+RUN make CC="arm-linux-gnueabihf-gcc" AR="arm-linux-gnueabihf-ar" RANLIB="arm-linux-gnueabihf-ranlib" \
+    && make install  > /dev/null
+WORKDIR $YADOMS_DEPS
+RUN rm -Rf openssl-${openssl_version} && rm openssl-${openssl_version}.tar.gz  > /dev/null
+#TODO virer ligne qui suit
+RUN ls $YADOMS_DEPS/openssl-rpi2-armhf
 
 
 # OpenSSL (both cross compile and for host)
@@ -75,32 +133,6 @@ RUN cd $RPI_SYSROOT \
 # 	&& cd .. && rm -Rf openssl-$openssl_version && rm $YADOMS_DEPS/openssl-$openssl_version.tar.gz
 	
 
-# Boost
-ARG boost_version_major=1
-ARG boost_version_minor=89
-ARG boost_version_patch=0
-ARG boost_underscore=_
-ARG boost_version=$boost_version_major$boost_underscore$boost_version_minor$boost_underscore$boost_version_patch
-ARG boost_version_dot=$boost_version_major.$boost_version_minor.$boost_version_patch
-RUN cd $YADOMS_DEPS \
-	&& wget --no-check-certificate --no-verbose https://boostorg.jfrog.io/artifactory/main/release/$boost_version_dot/source/boost_$boost_version.tar.bz2  > /dev/null\
-	&& tar xjf boost_$boost_version.tar.bz2  > /dev/null\
-	&& cd boost_$boost_version  > /dev/null\
-	&& echo "using gcc : arm : arm-linux-gnueabihf-g++ ;" > /root/user-config.jam \
-	&& ./bootstrap.sh > /dev/null\
-	&& ./b2 -j$(nproc) \
-		toolset=gcc-arm \
-		target-os=linux \
-		architecture=arm address-model=32 abi=aapcs binary-format=elf \
-		threading=multi link=static runtime-link=static \
-		cxxflags="-march=armv7-a -mfpu=neon-vfpv4 -mfloat-abi=hard -fPIC" \
-		--with-atomic --with-chrono --with-date_time --with-filesystem --with-locale --with-regex --with-system --with-test --with-thread \
-		--no-samples --no-tests \
-		--prefix=$YADOMS_DEPS/boost-rpi2-armhf install  > /dev/null\
-	&& cd .. \
-	&& rm -Rf boost_$boost_version \
-	&& rm boost_$boost_version.tar.bz2
-	# TODO voir s'il faut nettoyer le répertoire de sortie ($YADOMS_DEPS/boost-rpi2-armhf) : virer doc, fichiers temp, etc
 	
 # Poco (1.11.8p2 is the last version compatible with current toolchain based on GCC 4.9.3)
 #TODO remettre
