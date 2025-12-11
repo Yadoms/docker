@@ -4,11 +4,10 @@ set -e
 cd /work
 
 echo "Copy build config file"
-cp $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt sources/
-cp $YADOMS_DEPS_PATH/raspberrypi.cmake sources
+cp $YADOMS_DEPS/CMakeListsUserConfig.txt sources/
+cp $YADOMS_DEPS/toolchain-rpi2.cmake sources
 
 echo "Create makefile"
-#sh cmake_cross.sh Raspberry /work/sources/raspberrypi.cmake Release
 sh cmake_raspberry.sh r
 
 echo "Build Yadoms"
