@@ -33,7 +33,7 @@ docker run --rm -it --privileged \
   rpi-sysroot-extract
 ```
 
-of from a locale image :
+or from a locale image :
 
 ```console
 docker run --rm -it --privileged \
