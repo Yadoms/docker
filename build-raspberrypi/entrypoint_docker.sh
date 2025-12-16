@@ -1,7 +1,8 @@
 #!/bin/bash
 set -e
 
-cd /work
+#TODO ménage
+# cd /work
 
 echo "Copy build config file"
 #TODO ménage
@@ -16,12 +17,12 @@ cmake -S sources \
     -DCOTIRE_USE=ON \
     -DCOTIRE_USE_UNITY=ON \
     -DDEBUG_WITH_GCC=OFF \
-    -DBOOST_ROOT "$YADOMS_DEPS/boost-rpi2-armhf" \
-    -DPOCO_ROOT "$YADOMS_DEPS/poco-rpi2-armhf" \
-    -DPROTOBUF_ROOT "$YADOMS_DEPS/protobuf-rpi2-armhf" \
-    -DPROTOBUF_PROTOC_EXECUTABLE "protoc" \
+    -DBOOST_ROOT="$YADOMS_DEPS/boost-rpi2-armhf" \
+    -DPOCO_ROOT="$YADOMS_DEPS/poco-rpi2-armhf" \
+    -DPROTOBUF_ROOT="$YADOMS_DEPS/protobuf-rpi2-armhf" \
+    -DPROTOBUF_PROTOC_EXECUTABLE="protoc" \
     -DPROTOBUF_INSTALLED_TO_CUSTOM_DIRECTORY=ON \
-    -DOPENSSL_ROOT "$YADOMS_DEPS/openssl-rpi2-armhf" \
+    -DOPENSSL_ROOT="$YADOMS_DEPS/openssl-rpi2-armhf" \
     -DPYTHON_USE_PKGCONFIG=OFF \
     -DPYTHON_USE_SOURCES=ON \
     -DPython3_ManualSetup=ON \

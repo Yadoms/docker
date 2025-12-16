@@ -315,4 +315,5 @@ RUN rm libudev.tar.gz
 #############################################################
 ## Copy entry point
 #############################################################
-COPY entrypoint_docker.sh /entrypoint_docker.sh
+COPY entrypoint_docker.sh /
+WORKDIR /
