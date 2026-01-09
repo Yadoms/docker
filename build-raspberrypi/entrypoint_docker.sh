@@ -1,13 +1,7 @@
 #!/bin/bash
 set -e
 
-#TODO ménage
-# cd /work
-
-echo "Copy build config file"
-#TODO ménage
-# cp $YADOMS_DEPS/CMakeListsUserConfig.txt sources/
-# cp $YADOMS_DEPS/toolchain-rpi2.cmake sources
+cd /work
 
 echo "Create makefile"
 cmake -S sources \
@@ -20,25 +14,28 @@ cmake -S sources \
     -DBOOST_ROOT="$YADOMS_DEPS/boost-rpi2-armhf" \
     -DPOCO_ROOT="$YADOMS_DEPS/poco-rpi2-armhf" \
     -DPROTOBUF_ROOT="$YADOMS_DEPS/protobuf-rpi2-armhf" \
-    -DPROTOBUF_PROTOC_EXECUTABLE="protoc" \
+    -DPROTOBUF_PROTOC_EXECUTABLE="/usr/local/bin/protoc" \
     -DPROTOBUF_INSTALLED_TO_CUSTOM_DIRECTORY=ON \
     -DOPENSSL_ROOT="$YADOMS_DEPS/openssl-rpi2-armhf" \
     -DPYTHON_USE_PKGCONFIG=OFF \
     -DPYTHON_USE_SOURCES=ON \
     -DPython3_ManualSetup=ON \
-    -DPython3_EXECUTABLE="/usr/local/bin/python3" \
-    -DPython3_LIBRARIES="$YADOMS_DEPS/Python-${python3_version}/libpython$(echo ${python3_version} | awk -F. '{print $1 "." $2}').a\")" \
-    -DPython3_INCLUDE_DIRS="$YADOMS_DEPS/Python-${python3_version}" \
+    -DPython3_EXECUTABLE="/opt/venv/bin/python" \
+    -DPython3_LIBRARIES="$YADOMS_DEPS/python-lib-rpi2-armhf/lib/python3.13/config-3.13-arm-linux-gnueabihf/libpython3.13.a" \
+    -DPython3_INCLUDE_DIRS="$YADOMS_DEPS/python-lib-rpi2-armhf" \
     -DOPENCV_ROOT="$YADOMS_DEPS/opencv-rpi2-armhf" \
     -DLIBUDEV_ROOT="$YADOMS_DEPS/libudev"
 
+  
 echo "Build Yadoms"
-cmake --build projects --target all_unity -j$(nproc)
+cmake --build projects \
+    --target all_unity \
+    -j$(nproc)
 
-echo "Build Yadoms package"
-cmake --build projects --target package -j$(nproc)
+# echo "Build Yadoms package"
+# cmake --build projects --target package -j$(nproc)
 
-echo "Build Yadoms update package"
-cd update
-sh make_package.sh RaspberryPI
-cd -
+# echo "Build Yadoms update package"
+# cd update
+# sh make_package.sh RaspberryPI
+# cd -

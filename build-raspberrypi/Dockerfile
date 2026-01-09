@@ -29,7 +29,7 @@ RUN apt-get install -q -y --no-install-recommends \
         build-essential gcc g++ autoconf automake libtool \
 		gcc-arm-linux-gnueabihf g++-arm-linux-gnueabihf binutils-arm-linux-gnueabihf cmake \
 		ca-certificates wget coreutils bzip2 python3 python3-venv python3-pip \
-        perl swig unzip git python3
+        perl swig unzip git
 RUN rm -rf /var/lib/apt/lists/*
 
 # Check CMake version
@@ -196,13 +196,15 @@ RUN CC=arm-linux-gnueabihf-gcc \
 	--host=arm-linux-gnueabihf \
 	--target=arm-linux-gnueabihf \
 	--build=x86_64-linux-gnu \
-	--disable-ipv6 ac_cv_file__dev_ptmx=no \
+	--disable-ipv6 \
+    ac_cv_file__dev_ptmx=no \
 	ac_cv_file__dev_ptc=no \
 	ac_cv_have_long_long_format=yes \
 	--enable-shared \
 	--without-pymalloc \
 	--with-openssl=${YADOMS_DEPS}/openssl-rpi2-armhf \
-	--with-build-python
+	--with-build-python \
+	--prefix=${YADOMS_DEPS}/python-lib-rpi2-armhf
 RUN make HOSTPYTHON=/usr/local/bin/python3 \
 	BLDSHARED="arm-linux-gnueabihf-gcc -shared" \
 	CROSS-COMPILE=arm-linux-gnueabihf- \
@@ -210,8 +212,10 @@ RUN make HOSTPYTHON=/usr/local/bin/python3 \
 	HOSTARCH=arm-linux \
 	BUILDARCH=arm-linux-gnueabihf \
     -j$(nproc)
+RUN make install
 WORKDIR ${WORK_DIR}
-RUN rm Python-${python3_version}.tar.xz
+RUN rm -Rf Python-${python3_version} \
+	&& rm Python-${python3_version}.tar.xz
 
 
 #############################################################
@@ -326,3 +330,7 @@ RUN rm libudev.tar.gz
 #############################################################
 COPY entrypoint_docker.sh /
 WORKDIR /
+
+#TODO strip tous les binaires/libs
+# En CMmake : placer, après le "cmake --build" et avant le "cmake --install" :
+#    cmake --strip
