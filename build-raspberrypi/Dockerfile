@@ -75,7 +75,7 @@ RUN echo "using gcc : arm : arm-linux-gnueabihf-g++ ;" > /tmp/user-config.jam \
 		architecture=arm address-model=32 abi=aapcs binary-format=elf \
 		threading=multi link=static runtime-link=static \
 		cxxflags="-march=armv7-a -mfpu=neon-vfpv4 -mfloat-abi=hard -fPIC" \
-		--with-atomic --with-chrono --with-date_time --with-filesystem --with-locale --with-regex --with-system --with-test --with-thread \
+		--with-atomic --with-chrono --with-date_time --with-filesystem --with-locale --with-process --with-regex --with-system --with-test --with-thread \
 		--no-samples --no-tests \
 		--prefix=${YADOMS_DEPS}/boost-rpi2-armhf install  > /dev/null
 WORKDIR ${WORK_DIR}
