@@ -21,8 +21,8 @@ cmake -S sources \
     -DPYTHON_USE_SOURCES=ON \
     -DPython3_ManualSetup=ON \
     -DPython3_EXECUTABLE="/opt/venv/bin/python" \
-    -DPython3_LIBRARIES="$YADOMS_DEPS/python-lib-rpi2-armhf/lib/python3.13/config-3.13-arm-linux-gnueabihf/libpython3.13.a" \
-    -DPython3_INCLUDE_DIRS="$YADOMS_DEPS/python-lib-rpi2-armhf/include/python3.13" \
+    -DPython3_LIBRARIES="$YADOMS_DEPS/python-lib-rpi2-armhf/lib/python3.11/config-3.11-arm-linux-gnueabihf/libpython3.11.a" \
+    -DPython3_INCLUDE_DIRS="$YADOMS_DEPS/python-lib-rpi2-armhf/include/python3.11" \
     -DOPENCV_ROOT="$YADOMS_DEPS/opencv-rpi2-armhf" \
     -DLIBUDEV_ROOT="$YADOMS_DEPS/libudev"
 

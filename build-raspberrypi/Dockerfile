@@ -1,4 +1,6 @@
-FROM debian:stable-slim
+FROM debian:bookworm-slim
+# Must match targeted RaspberryPi sysroot (debian version)
+
 LABEL org.opencontainers.image.authors="sgallou"
 ENV DEBIAN_FRONTEND=noninteractive
 
@@ -27,12 +29,37 @@ COPY toolchain-rpi2.cmake ${YADOMS_DEPS}/toolchain-rpi2.cmake
 RUN apt-get update
 RUN apt-get install -q -y --no-install-recommends \
         build-essential gcc g++ autoconf automake libtool \
-		gcc-arm-linux-gnueabihf g++-arm-linux-gnueabihf binutils-arm-linux-gnueabihf cmake \
+		gcc-arm-linux-gnueabihf g++-arm-linux-gnueabihf binutils-arm-linux-gnueabihf \
 		ca-certificates wget coreutils bzip2 python3 python3-venv python3-pip \
-        perl swig unzip git
-RUN rm -rf /var/lib/apt/lists/*
+        perl swig unzip git gnupg openssl
+#TODO remettre RUN rm -rf /var/lib/apt/lists/*
 
-# Check CMake version
+#############################################################
+## Update CMake
+#############################################################
+
+#TODO déplacer :
+RUN apt-get install -q -y --no-install-recommends \
+    libssl-dev pkg-config
+
+ARG cmake_version=3.31.10
+WORKDIR ${WORK_DIR}
+RUN wget --no-verbose https://github.com/Kitware/CMake/releases/download/v$cmake_version/cmake-$cmake_version.tar.gz
+RUN tar xzf cmake-$cmake_version.tar.gz
+WORKDIR ${WORK_DIR}/cmake-${cmake_version}
+RUN	./bootstrap
+RUN make -j$(nproc)
+RUN make install
+WORKDIR ${WORK_DIR}
+RUN rm -Rf cmake-$cmake_version \
+    rm cmake-$cmake_version.tar.gz
+#TODO ménage
+# RUN wget -O - https://apt.kitware.com/keys/kitware-archive-latest.asc \
+#   | gpg --dearmor -o /usr/share/keyrings/kitware-archive-keyring.gpg
+# RUN echo "deb [signed-by=/usr/share/keyrings/kitware-archive-keyring.gpg] https://apt.kitware.com/debian/ bookworm main" \
+#   | tee /etc/apt/sources.list.d/kitware.list
+# RUN apt-get update
+# RUN apt-get install cmake=${cmake_version}
 RUN cmake --version
 
 
@@ -63,7 +90,7 @@ ARG boost_underscore=_
 ARG boost_version=$boost_version_major$boost_underscore$boost_version_minor$boost_underscore$boost_version_patch
 ARG boost_version_dot=$boost_version_major.$boost_version_minor.$boost_version_patch
 WORKDIR ${WORK_DIR}
-RUN wget --no-check-certificate --no-verbose https://archives.boost.io/release/$boost_version_dot/source/boost_$boost_version.tar.bz2  > /dev/null\
+RUN wget --no-check-certificate --no-verbose https://archives.boost.io/release/$boost_version_dot/source/boost_$boost_version.tar.bz2  > /dev/null \
 	&& tar xjf boost_$boost_version.tar.bz2  > /dev/null
 WORKDIR ${WORK_DIR}/boost_$boost_version
 RUN echo "using gcc : arm : arm-linux-gnueabihf-g++ ;" > /tmp/user-config.jam \
@@ -133,7 +160,7 @@ RUN cmake \
     --target all \
     -j$(nproc)
 RUN cmake \
-    --install build-rpi2-static
+    --install build-rpi2-static --strip
 WORKDIR ${WORK_DIR}
 RUN rm -Rf poco-${poco_version}-all/ \
 	&& rm poco-${poco_version}-all.tar.gz
@@ -183,7 +210,8 @@ RUN rm -Rf protobuf-${protobuf_version} \
 #############################################################
 ## Python
 #############################################################
-ARG python3_version=3.13.7
+# Version must match python version installed on host
+ARG python3_version=3.11.2
 WORKDIR ${WORK_DIR}
 RUN wget --no-check-certificate --no-verbose https://www.python.org/ftp/python/${python3_version}/Python-${python3_version}.tar.xz \
 	&& tar xf Python-${python3_version}.tar.xz
@@ -308,8 +336,8 @@ RUN cmake -DCC_RPI_GCC=arm-linux-gnueabihf-gcc \
    -DCMAKE_BUILD_TYPE=Release \
    -DCMAKE_INSTALL_PREFIX=${YADOMS_DEPS}/opencv-rpi2-armhf \
    ..
-RUN make -j$(nproc) \
-	&& make install
+RUN cmake --build . -j$(nproc)
+RUN cmake --install . --strip
 WORKDIR ${WORK_DIR}
 RUN rm -Rf opencv-${opencv_version}* \
 	&& rm -f ${opencv_version}.zip
@@ -331,6 +359,3 @@ RUN rm libudev.tar.gz
 COPY entrypoint_docker.sh /
 WORKDIR /
 
-#TODO strip tous les binaires/libs
-# En CMmake : placer, après le "cmake --build" et avant le "cmake --install" :
-#    cmake --strip
