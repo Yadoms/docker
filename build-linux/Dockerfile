@@ -20,7 +20,7 @@ RUN apt-get update
 RUN apt-get install -q -y --no-install-recommends \
 	g++ libbz2-dev python3-dev wget build-essential libssl-dev \
 	autoconf automake libtool curl make g++ unzip \
-	libpcre2-32-0 libpcre2-dev git rpm zip \
+	libpcre2-32-0 libpcre2-dev git rpm zip ca-certificates \
 	libreadline-dev libffi-dev build-essential \
 	libgtk2.0-dev pkg-config libavcodec-dev libavformat-dev libswscale-dev \
 	python3-numpy libtbbmalloc2 libtbb-dev libjpeg-dev libpng-dev libtiff-dev \
