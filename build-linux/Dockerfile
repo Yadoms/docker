@@ -24,7 +24,7 @@ RUN apt-get install -q -y --no-install-recommends \
 	libgtk2.0-dev pkg-config libavcodec-dev libavformat-dev libswscale-dev \
 	python3-numpy libtbbmalloc2 libtbb-dev libjpeg-dev libpng-dev libtiff-dev \
 	libudev-dev usbutils libpoco-dev protobuf-compiler libprotobuf-dev swig \
-	gammu libgammu-dev libopencv-dev zlib1g-dev libzstd-dev
+	libopencv-dev zlib1g-dev libzstd-dev
 RUN rm -rf /var/lib/apt/lists/*
 
 
@@ -174,18 +174,18 @@ ARG openssl_version=1.1.1k
 # 	&& rm -Rf Python-$python3_version && rm -Rf $YADOMS_DEPS_PATH/python$python3_version_maj$python3_version_min/lib/python$python3_version_maj.$python3_version_min
 
 # Gammu
-# ARG gammu_version=1.41.0
-# RUN cd $YADOMS_DEPS_PATH \
-# 	&& wget --no-verbose https://dl.cihar.com/gammu/releases/gammu-$gammu_version.tar.bz2  > /dev/null\
-# 	&& tar xjf gammu-$gammu_version.tar.bz2  > /dev/null\
-# 	&& cd gammu-$gammu_version \
-# 	&& mkdir rpicc \
-# 	&& cd rpicc \
-# 	&& cmake -DBUILD_SHARED_LIBS=OFF -DWITH_Glib=OFF -DCMAKE_STAGING_PREFIX=$YADOMS_DEPS_PATH/gammu ..  > /dev/null\
-# 	&& make  > /dev/null\
-# 	&& make install  > /dev/null\
-# 	&& cd ../.. && rm -Rf gammu-$gammu_version*
-
+ARG gammu_version=1.41.0
+RUN cd $YADOMS_DEPS_PATH \
+  && wget --no-verbose https://dl.cihar.com/gammu/releases/gammu-$gammu_version.tar.bz2  > /dev/null\
+  && tar xjf gammu-$gammu_version.tar.bz2  > /dev/null\
+  && cd gammu-$gammu_version \
+  && mkdir rpicc \
+  && cd rpicc \
+  && cmake -DBUILD_SHARED_LIBS=OFF -DWITH_Glib=OFF -DCMAKE_STAGING_PREFIX=$YADOMS_DEPS_PATH/gammu ..  > /dev/null\
+  && make  > /dev/null\
+  && make install  > /dev/null\
+  && cd ../.. && rm -Rf gammu-$gammu_version*
+  
 # Opencv
 # ARG opencv_version=4.5.2
 # RUN cd $YADOMS_DEPS_PATH \
