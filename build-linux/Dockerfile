@@ -24,10 +24,7 @@ RUN apt-get install -q -y --no-install-recommends \
 	libgtk2.0-dev pkg-config libavcodec-dev libavformat-dev libswscale-dev \
 	python3-numpy libtbbmalloc2 libtbb-dev libjpeg-dev libpng-dev libtiff-dev \
 	libudev-dev usbutils libpoco-dev protobuf-compiler libprotobuf-dev swig \
-	gammu libgammu-dev libopencv-dev
-#TODO regrouper
-RUN apt-get install -q -y --no-install-recommends \
-	zlib1g-dev
+	gammu libgammu-dev libopencv-dev zlib1g-dev libzstd-dev
 RUN rm -rf /var/lib/apt/lists/*
 
 
