@@ -5,7 +5,6 @@ ENV DEBIAN_FRONTEND=noninteractive
 ENV YADOMS_BUILD_BRANCH=develop
 ENV MAKE_PACKAGE=false
 ENV YADOMS_DEPS=/yadoms-deps
- #TODO à utiliser partout
 ENV WORK_DIR=/tmp/yadoms_workdir
 
 # Log current distribution version
@@ -24,10 +23,12 @@ RUN apt-get install -q -y --no-install-recommends \
 	libreadline-dev libffi-dev build-essential \
 	libgtk2.0-dev pkg-config libavcodec-dev libavformat-dev libswscale-dev \
 	python3-numpy libtbbmalloc2 libtbb-dev libjpeg-dev libpng-dev libtiff-dev \
-	libudev-dev usbutils
-#TODO remettre RUN rm -rf /var/lib/apt/lists/*
-
-RUN echo "check_certificate = off" >> ~/.wgetrc
+	libudev-dev usbutils libpoco-dev protobuf-compiler libprotobuf-dev swig \
+	gammu libgammu-dev libopencv-dev
+#TODO regrouper
+RUN apt-get install -q -y --no-install-recommends \
+	zlib1g-dev
+RUN rm -rf /var/lib/apt/lists/*
 
 
 #############################################################
@@ -35,7 +36,7 @@ RUN echo "check_certificate = off" >> ~/.wgetrc
 #############################################################
 ARG cmake_version=3.31.10
 WORKDIR ${WORK_DIR}
-RUN wget --no-verbose https://github.com/Kitware/CMake/releases/download/v$cmake_version/cmake-$cmake_version.tar.gz
+RUN wget --no-check-certificate --no-verbose https://github.com/Kitware/CMake/releases/download/v$cmake_version/cmake-$cmake_version.tar.gz
 RUN tar xzf cmake-$cmake_version.tar.gz
 WORKDIR ${WORK_DIR}/cmake-${cmake_version}
 RUN	./bootstrap
@@ -87,12 +88,13 @@ WORKDIR ${WORK_DIR}
 RUN rm -Rf openssl-${openssl_version} \
 	&& rm openssl-${openssl_version}.tar.gz
 
-	
+
+
+	#TODO méange
+
 #############################################################
 ## Poco
 #############################################################
-#TODO à intégrer plus haut
-RUN apt-get install -q -y --no-install-recommends libpoco-dev
 # ARG poco_version=1.13.3
 # WORKDIR ${WORK_DIR}
 # RUN wget --no-check-certificate --no-verbose http://pocoproject.org/releases/poco-${poco_version}/poco-${poco_version}-all.tar.gz \
@@ -132,7 +134,6 @@ RUN apt-get install -q -y --no-install-recommends libpoco-dev
 #############################################################
 ## Protobuf
 #############################################################
-RUN apt-get install -q -y --no-install-recommends protobuf-compiler libprotobuf-dev
 # ARG protobuf_version=3.15.8
 # RUN cd $YADOMS_DEPS_PATH \
 # 	&& wget --no-verbose https://github.com/google/protobuf/releases/download/v$protobuf_version/protobuf-cpp-$protobuf_version.tar.gz \
@@ -147,8 +148,6 @@ RUN apt-get install -q -y --no-install-recommends protobuf-compiler libprotobuf-
 
 
 # Swig
-#TODO méange
-RUN apt-get install -q -y --no-install-recommends swig
 # ARG swig_version=4.0.2
 # RUN cd $YADOMS_DEPS_PATH \
 # 	&& wget --no-verbose http://prdownloads.sourceforge.net/swig/swig-$swig_version.tar.gz \
@@ -164,7 +163,6 @@ RUN apt-get install -q -y --no-install-recommends swig
 # 	&& rm $YADOMS_DEPS_PATH/swig-$swig_version.tar.gz
 
 # Python $python3_version
-#TODO
 # ARG python3_version_maj=3
 # ARG python3_version_min=9
 # ARG python3_version_patch=4
@@ -179,7 +177,6 @@ RUN apt-get install -q -y --no-install-recommends swig
 # 	&& rm -Rf Python-$python3_version && rm -Rf $YADOMS_DEPS_PATH/python$python3_version_maj$python3_version_min/lib/python$python3_version_maj.$python3_version_min
 
 # Gammu
-RUN apt-get install -q -y --no-install-recommends gammu libgammu-dev
 # ARG gammu_version=1.41.0
 # RUN cd $YADOMS_DEPS_PATH \
 # 	&& wget --no-verbose https://dl.cihar.com/gammu/releases/gammu-$gammu_version.tar.bz2  > /dev/null\
@@ -193,7 +190,6 @@ RUN apt-get install -q -y --no-install-recommends gammu libgammu-dev
 # 	&& cd ../.. && rm -Rf gammu-$gammu_version*
 
 # Opencv
-RUN apt-get install -q -y --no-install-recommends libopencv-dev
 # ARG opencv_version=4.5.2
 # RUN cd $YADOMS_DEPS_PATH \
 # 	&& wget --no-verbose https://github.com/opencv/opencv/archive/$opencv_version.zip  > /dev/null\
@@ -209,7 +205,6 @@ RUN apt-get install -q -y --no-install-recommends libopencv-dev
 # 	&& make install  > /dev/null\
 # 	&& cd ../.. && rm -Rf opencv-$opencv_version* && rm -f $opencv_version.zip
 
-##TODO j'en suis là
 # Yadoms configuration file
 # RUN echo 'Configuring Yadoms CMakeListsUserConfig.txt' \
 # 	&& echo 'set(BOOST_ROOT "'$YADOMS_DEPS_PATH'/boost_'$boost_version'")' >> $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt \
