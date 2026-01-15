@@ -5,8 +5,8 @@ cd /work
 
 echo "Create makefile"
 cmake -S sources \
-    -B projects-linux \
-    -DYADOMS_BINARY_DIR=bin-linux \
+    -B projects-Linux \
+    -DYADOMS_BINARY_DIR=bin-Linux \
     -DCMAKE_BUILD_TYPE=Release \
     -DCOTIRE_USE=ON \
     -DCOTIRE_USE_UNITY=ON \
@@ -28,43 +28,18 @@ cmake -S sources \
     # -DOPENCV_ROOT="$YADOMS_DEPS/opencv-rpi2-armhf" \
     # -DLIBUDEV_ROOT="$YADOMS_DEPS/libudev"
 
-#TODO utiliser ou faire le ménage de COTIRE_USE et COTIRE_USE_UNITY
+#TODO utiliser ou faire le ménage de COTIRE_USE et COTIRE_USE_UNITY (voir ce que ça donne avec --target all_unity )
 echo "Build Yadoms"
-cmake --build projects-linux \
+cmake --build projects-Linux \
     -j$(nproc)
 
-# echo "Build Yadoms package"
-# cmake --build projects-linux --target package -j$(nproc)
+echo "Build Yadoms package"
+cmake --build projects-Linux \
+    --target package \
+    -j$(nproc)
 
-# echo "Build Yadoms update package"
-# cd update
-# sh make_package.sh RaspberryPI
-# cd -
+echo "Build Yadoms update package"
+cd update
+sh make_package.sh Linux
+cd -
 
-
-##TODO virer
-####################################################################################
-# #!/bin/bash
-# set -e
-
-# cd /work
-
-# echo "Copy build config file"
-# cp $YADOMS_DEPS_PATH/CMakeListsUserConfig.txt sources/
-
-# echo "Display config content"
-# cat sources/CMakeListsUserConfig.txt
-
-# echo "Create makefile"
-# sh cmake_linux.sh r
-
-# echo "Build Yadoms"
-# cd projects
-# make all_unity
-# echo "Build Yadoms package"
-# make package
-# cd -
-
-# echo "Build Yadoms update package"
-# cd update
-# sh make_package.sh Linux

@@ -5,8 +5,8 @@ cd /work
 
 echo "Create makefile"
 cmake -S sources \
-    -B projects-rpi \
-    -DYADOMS_BINARY_DIR=bin-rpi \
+    -B projects-RaspberryPI \
+    -DYADOMS_BINARY_DIR=bin-RaspberryPI \
     -DCMAKE_TOOLCHAIN_FILE=$YADOMS_DEPS/toolchain-rpi2.cmake \
     -DCMAKE_BUILD_TYPE=Release \
     -DCOTIRE_USE=ON \
@@ -27,15 +27,17 @@ cmake -S sources \
     -DOPENCV_ROOT="$YADOMS_DEPS/opencv-rpi2-armhf" \
     -DLIBUDEV_ROOT="$YADOMS_DEPS/libudev"
 
-#TODO utiliser ou faire le ménage de COTIRE_USE et COTIRE_USE_UNITY
+#TODO utiliser ou faire le ménage de COTIRE_USE et COTIRE_USE_UNITY (voir ce que ça donne avec --target all_unity )
 echo "Build Yadoms"
-cmake --build projects-rpi \
+cmake --build projects-RaspberryPI \
     -j$(nproc)
 
-# echo "Build Yadoms package"
-# cmake --build projects-rpi --target package -j$(nproc)
+echo "Build Yadoms package"
+cmake --build projects-RaspberryPI \
+    --target package \
+    -j$(nproc)
 
-# echo "Build Yadoms update package"
-# cd update
-# sh make_package.sh RaspberryPI
-# cd -
+echo "Build Yadoms update package"
+cd update
+sh make_package.sh RaspberryPI
+cd -
