@@ -31,17 +31,12 @@ RUN apt-get install -q -y --no-install-recommends \
     build-essential gcc g++ autoconf automake libtool \
     gcc-arm-linux-gnueabihf g++-arm-linux-gnueabihf binutils-arm-linux-gnueabihf \
     ca-certificates wget coreutils bzip2 python3 python3-venv python3-pip \
-    perl swig unzip git gnupg openssl
-#TODO remettre RUN rm -rf /var/lib/apt/lists/*
+    perl swig unzip zip git gnupg openssl libssl-dev pkg-config
+RUN rm -rf /var/lib/apt/lists/*
 
 #############################################################
 ## Update CMake
 #############################################################
-
-#TODO déplacer :
-RUN apt-get install -q -y --no-install-recommends \
-    libssl-dev pkg-config
-
 ARG cmake_version=3.31.10
 WORKDIR ${WORK_DIR}
 RUN wget --no-verbose https://github.com/Kitware/CMake/releases/download/v$cmake_version/cmake-$cmake_version.tar.gz
@@ -53,13 +48,6 @@ RUN make install
 WORKDIR ${WORK_DIR}
 RUN rm -Rf cmake-$cmake_version \
     rm cmake-$cmake_version.tar.gz
-#TODO ménage
-# RUN wget -O - https://apt.kitware.com/keys/kitware-archive-latest.asc \
-#   | gpg --dearmor -o /usr/share/keyrings/kitware-archive-keyring.gpg
-# RUN echo "deb [signed-by=/usr/share/keyrings/kitware-archive-keyring.gpg] https://apt.kitware.com/debian/ bookworm main" \
-#   | tee /etc/apt/sources.list.d/kitware.list
-# RUN apt-get update
-# RUN apt-get install cmake=${cmake_version}
 RUN cmake --version
 
 

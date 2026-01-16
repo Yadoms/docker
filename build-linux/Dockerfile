@@ -73,7 +73,7 @@ RUN	rm -Rf boost_$boost_version \
 ## OpenSSL
 #############################################################
 #TODO tester version plus récente (voire installée par apt-get)
-ARG openssl_version=1.1.1k
+# ARG openssl_version=1.1.1k
 # WORKDIR ${WORK_DIR}
 # RUN wget --no-check-certificate --no-verbose https://www.openssl.org/source/openssl-1.1.1k.tar.gz \
 #     && tar xzf openssl-${openssl_version}.tar.gz
