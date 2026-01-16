@@ -32,6 +32,10 @@ echo "Build Yadoms"
 cmake --build projects-RaspberryPI \
     -j$(nproc)
 
+echo "Mark workspace safe for git"
+git config --global --add safe.directory "$GITHUB_WORKSPACE" || true
+git config --global --add safe.directory /work || true
+
 echo "Build Yadoms package"
 cmake --build projects-RaspberryPI \
     --target package \
