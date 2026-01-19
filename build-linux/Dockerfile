@@ -23,7 +23,7 @@ RUN apt-get install -q -y --no-install-recommends \
 	libreadline-dev libffi-dev build-essential \
 	libgtk2.0-dev pkg-config libavcodec-dev libavformat-dev libswscale-dev \
 	python3-numpy libtbbmalloc2 libtbb-dev libjpeg-dev libpng-dev libtiff-dev \
-	libudev-dev usbutils libpoco-dev protobuf-compiler libprotobuf-dev swig \
+	libudev-dev usbutils libpoco-dev swig \
 	libopencv-dev zlib1g-dev libzstd-dev
 RUN rm -rf /var/lib/apt/lists/*
 
@@ -130,18 +130,25 @@ RUN	rm -Rf boost_$boost_version \
 
 #############################################################
 ## Protobuf
+# Can't not be installed from apt-get because need --with-pic
 #############################################################
-# ARG protobuf_version=3.15.8
-# RUN cd $YADOMS_DEPS_PATH \
-# 	&& wget --no-verbose https://github.com/google/protobuf/releases/download/v$protobuf_version/protobuf-cpp-$protobuf_version.tar.gz \
-# 	&& tar xzf protobuf-cpp-$protobuf_version.tar.gz && cd protobuf-$protobuf_version \
-# 	&& ./autogen.sh \
-# 	&& ./configure --enable-shared=no --prefix=$YADOMS_DEPS_PATH/protobuf --with-pic \
-# 	&& make \
-# 	&& make install \
-# 	&& ldconfig \
-# 	&& cd .. && rm -Rf protobuf-$protobuf_version && rm $YADOMS_DEPS_PATH/protobuf-cpp-$protobuf_version.tar.gz \
-# 	&& rm -f $YADOMS_DEPS_PATH/protobuf/lib/libprotoc.* && rm -f $YADOMS_DEPS_PATH/protobuf/lib/libprotobuf-lite.*
+ARG protobuf_version=3.15.8
+WORKDIR $YADOMS_DEPS_PATH
+RUN	wget --no-verbose https://github.com/google/protobuf/releases/download/v$protobuf_version/protobuf-cpp-$protobuf_version.tar.gz \
+RUN tar xzf protobuf-cpp-$protobuf_version.tar.gz
+WORKDIR $YADOMS_DEPS_PATH/protobuf-$protobuf_version
+RUN ./autogen.sh
+# RUN ./configure --enable-shared=no --prefix=$YADOMS_DEPS_PATH/protobuf --with-pic
+RUN ./configure --enable-shared=no --with-pic
+RUN make 
+RUN make install
+RUN ldconfig
+WORKDIR $YADOMS_DEPS_PATH
+#TODO remettre nettoyage
+# RUN rm -Rf protobuf-$protobuf_version \
+# 	&& rm $YADOMS_DEPS_PATH/protobuf-cpp-$protobuf_version.tar.gz \
+# 	&& rm -f $YADOMS_DEPS_PATH/protobuf/lib/libprotoc.* \
+# 	&& rm -f $YADOMS_DEPS_PATH/protobuf/lib/libprotobuf-lite.*
 
 
 # Swig

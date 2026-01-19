@@ -10,7 +10,7 @@ on:
 jobs:               
   windows:
     name : Generate for Windows
-    runs-on: windows-2022
+    runs-on: windows-latest
 
     permissions:
       contents: read
