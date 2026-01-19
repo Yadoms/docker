@@ -1,10 +1,9 @@
-FROM ghcr.io/yadoms/vstools:latest
-MAINTAINER jano42 "https://github.com/jano42"
-LABEL authors=jano42
+FROM abrarov/msvc-2022:latest
+LABEL org.opencontainers.image.authors="sgallou"
 
-ENV YADOMS_BUILD_BRANCH develop
-ENV MAKE_PACKAGE false
-ENV YADOMS_DEPS_PATH  C:/yadoms-deps
+ENV YADOMS_BUILD_BRANCH=develop
+ENV MAKE_PACKAGE=false
+ENV YADOMS_DEPS_PATH=C:/yadoms-deps
 
 #shell commad for powershell
 #SHELL ["C:\\BuildTools\\Common7\\Tools\\VsDevCmd.bat", "&&", "powershell.exe", "-NoLogo", "-ExecutionPolicy", "Bypass"]
@@ -19,7 +18,6 @@ RUN powershell.exe -Command New-Item -ItemType Directory -Path %YADOMS_DEPS_PATH
 # Install chocolatey
 ###################################################################
 
-# install chocolatey
 RUN powershell.exe -Command iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))
 
 ###################################################################
@@ -27,7 +25,7 @@ RUN powershell.exe -Command iex ((New-Object System.Net.WebClient).DownloadStrin
 ###################################################################
 
 # CMake
-ARG cmake_version=3.30.2
+ARG cmake_version=3.31.10
 RUN choco install cmake --installargs 'ADD_CMAKE_TO_PATH=System' -y --no-progress --version %cmake_version%
 
 #NSIS and 7zip
@@ -35,7 +33,7 @@ RUN choco install nsis 7zip git -y --no-progress
 
 # Boost
 ARG boost_version_major=1
-ARG boost_version_minor=86
+ARG boost_version_minor=89
 ARG boost_version_patch=0
 ARG boost_underscore=_
 ARG boost_version=$boost_version_major$boost_underscore$boost_version_minor$boost_underscore$boost_version_patch
@@ -83,35 +81,24 @@ RUN cd %YADOMS_DEPS_PATH% \
    && cd .. && cd .. && powershell.exe -Command Remove-Item -Path protobuf.zip 
 
 # Swig
+#TODO par choco ?
 ARG swig_version=4.0.2
 RUN cd %YADOMS_DEPS_PATH% \
    && powershell.exe -Command (New-Object System.Net.WebClient).DownloadFile('https://freefr.dl.sourceforge.net/project/swig/swigwin/swigwin-%swig_version%/swigwin-%swig_version%.zip', '%YADOMS_DEPS_PATH%\\swig.zip') \
    && powershell.exe -Command Expand-Archive -Path swig.zip '%YADOMS_DEPS_PATH%'\
    && powershell.exe -Command Remove-Item -Path swig.zip 
 
-# Python2
-ARG python2_version_maj=2
-ARG python2_version_min=7
-ARG python2_version_patch=18
-ARG python2_version=$python2_version_maj.$python2_version_min.$python2_version_patch
-RUN choco install python2 --x86 -y --no-progress --version %python2_version%
-
 # Python3
+#TODO par choco ?
 ARG python3_version_maj=3
 ARG python3_version_min=9
 ARG python3_version_patch=4
 ARG python3_version=$python3_version_maj.$python3_version_min.$python3_version_patch
 RUN choco install python3 --x86 -y --no-progress --version %python3_version%
 
-# PostgreSQL
-ARG postgresql_version=9.6.19-1
-RUN cd %YADOMS_DEPS_PATH% \
-   && powershell.exe -Command (New-Object System.Net.WebClient).DownloadFile('https://get.enterprisedb.com/postgresql/postgresql-%postgresql_version%-windows-binaries.zip', '%YADOMS_DEPS_PATH%\\pg.zip') \
-   && powershell.exe -Command Expand-Archive -Path pg.zip '%YADOMS_DEPS_PATH%'\
-   && powershell.exe -Command Remove-Item -Path pg.zip 
-
 
 # OpenCV
+#TODO par choco ?
 ARG opencv_version=4.5.2
 RUN cd %YADOMS_DEPS_PATH% \
    && powershell.exe -Command (New-Object System.Net.WebClient).DownloadFile('https://github.com/opencv/opencv/archive/%opencv_version%.zip ', '%YADOMS_DEPS_PATH%\\opencv.zip') \
@@ -126,6 +113,7 @@ RUN cd %YADOMS_DEPS_PATH% \
 
 
 # Gammu
+#TODO par choco ?
 ARG gammu_version=1.41.0
 RUN cd %YADOMS_DEPS_PATH% \
    && powershell.exe -Command (New-Object System.Net.WebClient).DownloadFile('https://dl.cihar.com/gammu/releases/gammu-%gammu_version%.zip', '%YADOMS_DEPS_PATH%\\gammu.zip') \
@@ -139,20 +127,20 @@ RUN cd %YADOMS_DEPS_PATH% \
    && cd .. && cd .. && powershell.exe -Command Remove-Item -Path gammu.zip 
 
 # Yadoms configuration file
-RUN echo 'Configuring Yadoms CMakeListsUserConfig.txt' \
-   && echo set(BOOST_ROOT "%YADOMS_DEPS_PATH%/boost_%boost_version%") >> %YADOMS_DEPS_PATH%/CMakeListsUserConfig.txt \
-   && echo set(POCO_ROOT "%YADOMS_DEPS_PATH%/poco-%poco_version%-all") >> %YADOMS_DEPS_PATH%/CMakeListsUserConfig.txt \
-   && echo set(PROTOBUF_ROOT "%YADOMS_DEPS_PATH%/protobuf-%protobuf_version%") >> %YADOMS_DEPS_PATH%/CMakeListsUserConfig.txt \
-   && echo set(OPENSSL_ROOT "C:/Program Files (x86)/OpenSSL-Win32") >> %YADOMS_DEPS_PATH%/CMakeListsUserConfig.txt \
-   && echo set(DEBUG_WITH_GCC OFF) >> %YADOMS_DEPS_PATH%/CMakeListsUserConfig.txt \
-   && echo set(Python2_ROOT "C:/Python%python2_version_maj%%python2_version_min%") >> %YADOMS_DEPS_PATH%/CMakeListsUserConfig.txt \
-   && echo set(Python3_ROOT "C:/Python%python3_version_maj%%python3_version_min%") >> %YADOMS_DEPS_PATH%/CMakeListsUserConfig.txt \
-   && echo set(OPENCV_ROOT "%YADOMS_DEPS_PATH%/opencv-%opencv_version%/build") >> %YADOMS_DEPS_PATH%/CMakeListsUserConfig.txt \
-   && echo set(PostgreSQL_ROOT "%YADOMS_DEPS_PATH%/pgsql") >> %YADOMS_DEPS_PATH%/CMakeListsUserConfig.txt \
-   && echo set(GAMMU_ROOT "%YADOMS_DEPS_PATH%/gammu-%gammu_version%") >> %YADOMS_DEPS_PATH%/CMakeListsUserConfig.txt \
-   && echo set(SWIG_ROOT "%YADOMS_DEPS_PATH%/swigwin-%swig_version%") >> %YADOMS_DEPS_PATH%/CMakeListsUserConfig.txt \
-   && echo SET(COTIRE_USE ON) >> %YADOMS_DEPS_PATH%/CMakeListsUserConfig.txt \
-   && echo SET(COTIRE_USE_UNITY ON) >> %YADOMS_DEPS_PATH%/CMakeListsUserConfig.txt \
-   && echo set(USE_NSIS ON) >> %YADOMS_DEPS_PATH%/CMakeListsUserConfig.txt
+# RUN echo 'Configuring Yadoms CMakeListsUserConfig.txt' \
+#    && echo set(BOOST_ROOT "%YADOMS_DEPS_PATH%/boost_%boost_version%") >> %YADOMS_DEPS_PATH%/CMakeListsUserConfig.txt \
+#    && echo set(POCO_ROOT "%YADOMS_DEPS_PATH%/poco-%poco_version%-all") >> %YADOMS_DEPS_PATH%/CMakeListsUserConfig.txt \
+#    && echo set(PROTOBUF_ROOT "%YADOMS_DEPS_PATH%/protobuf-%protobuf_version%") >> %YADOMS_DEPS_PATH%/CMakeListsUserConfig.txt \
+#    && echo set(OPENSSL_ROOT "C:/Program Files (x86)/OpenSSL-Win32") >> %YADOMS_DEPS_PATH%/CMakeListsUserConfig.txt \
+#    && echo set(DEBUG_WITH_GCC OFF) >> %YADOMS_DEPS_PATH%/CMakeListsUserConfig.txt \
+#    && echo set(Python2_ROOT "C:/Python%python2_version_maj%%python2_version_min%") >> %YADOMS_DEPS_PATH%/CMakeListsUserConfig.txt \
+#    && echo set(Python3_ROOT "C:/Python%python3_version_maj%%python3_version_min%") >> %YADOMS_DEPS_PATH%/CMakeListsUserConfig.txt \
+#    && echo set(OPENCV_ROOT "%YADOMS_DEPS_PATH%/opencv-%opencv_version%/build") >> %YADOMS_DEPS_PATH%/CMakeListsUserConfig.txt \
+#    && echo set(PostgreSQL_ROOT "%YADOMS_DEPS_PATH%/pgsql") >> %YADOMS_DEPS_PATH%/CMakeListsUserConfig.txt \
+#    && echo set(GAMMU_ROOT "%YADOMS_DEPS_PATH%/gammu-%gammu_version%") >> %YADOMS_DEPS_PATH%/CMakeListsUserConfig.txt \
+#    && echo set(SWIG_ROOT "%YADOMS_DEPS_PATH%/swigwin-%swig_version%") >> %YADOMS_DEPS_PATH%/CMakeListsUserConfig.txt \
+#    && echo SET(COTIRE_USE ON) >> %YADOMS_DEPS_PATH%/CMakeListsUserConfig.txt \
+#    && echo SET(COTIRE_USE_UNITY ON) >> %YADOMS_DEPS_PATH%/CMakeListsUserConfig.txt \
+#    && echo set(USE_NSIS ON) >> %YADOMS_DEPS_PATH%/CMakeListsUserConfig.txt
    
 COPY entrypoint_docker.ps1 C:
