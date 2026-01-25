@@ -157,36 +157,51 @@ RUN rm -Rf poco-${poco_version}-all/ \
 #############################################################
 ## Protobuf
 #############################################################
-# Protobuf (Host)
+# Protobuf compiler (Host)
 ARG protobuf_version=3.15.8
 WORKDIR ${WORK_DIR}
 RUN wget --no-verbose https://github.com/google/protobuf/releases/download/v${protobuf_version}/protobuf-cpp-${protobuf_version}.tar.gz \
     && tar xzf protobuf-cpp-${protobuf_version}.tar.gz
 RUN cp -R protobuf-${protobuf_version} protobuf-${protobuf_version}-host
 WORKDIR ${WORK_DIR}/protobuf-${protobuf_version}-host
-RUN mkdir build
-WORKDIR ${WORK_DIR}/protobuf-${protobuf_version}-host/build
-RUN cmake -Dprotobuf_BUILD_TESTS=OFF -DCMAKE_BUILD_TYPE=Release ../cmake
-RUN make -j$(nproc) \
-    && make install \
-    && ldconfig
+RUN cmake -S cmake \
+    -B build \
+    -DCMAKE_BUILD_TYPE=Release \
+    -Dprotobuf_BUILD_TESTS=OFF
+RUN cmake --build build -j$(nproc)
+RUN cmake --install build
+#TODO ménage
+# RUN mkdir build
+# WORKDIR ${WORK_DIR}/protobuf-${protobuf_version}-host/build
+# RUN cmake -Dprotobuf_BUILD_TESTS=OFF -DCMAKE_BUILD_TYPE=Release ../cmake
+# RUN make -j$(nproc) \
+#     && make install \
+#     && ldconfig
 
-# Protobuf (Pi)	
+# Protobuf library (Pi)	
 WORKDIR ${WORK_DIR}/protobuf-${protobuf_version}
-RUN ./autogen.sh
-RUN	./configure \
-    --enable-shared=no \
-    --host=arm-linux \
-    CC=arm-linux-gnueabihf-gcc \
-    CXX=arm-linux-gnueabihf-g++ \
-    AR=arm-linux-gnueabihf-ar \
-    STRIP=arm-linux-gnueabihf-strip \
-    RANLIB=arm-linux-gnueabihf-ranlib \
-    --prefix=${YADOMS_DEPS}/protobuf-rpi2-armhf \
-    --with-protoc=protoc \
-    --with-pic
-RUN make -j$(nproc) \
-    && make install
+RUN cmake -S cmake \
+    -B build \
+    -DCMAKE_BUILD_TYPE=Release \
+    -DCMAKE_POSITION_INDEPENDENT_CODE=ON \
+    -DCMAKE_INSTALL_PREFIX=${YADOMS_DEPS}/protobuf-rpi2-armhf \
+    -Dprotobuf_BUILD_TESTS=OFF
+RUN cmake --build build -j$(nproc)
+RUN cmake --install build
+# RUN ./autogen.sh
+# RUN	./configure \
+#     --enable-shared=no \
+#     --host=arm-linux \
+#     CC=arm-linux-gnueabihf-gcc \
+#     CXX=arm-linux-gnueabihf-g++ \
+#     AR=arm-linux-gnueabihf-ar \
+#     STRIP=arm-linux-gnueabihf-strip \
+#     RANLIB=arm-linux-gnueabihf-ranlib \
+#     --prefix=${YADOMS_DEPS}/protobuf-rpi2-armhf \
+#     --with-protoc=protoc \
+#     --with-pic
+# RUN make -j$(nproc) \
+#     && make install
 
 # Cleanup
 WORKDIR ${WORK_DIR}
@@ -237,22 +252,29 @@ RUN rm -Rf Python-${python3_version} \
 #############################################################
 ## Gammu
 #############################################################
-ARG gammu_version=1.41.0
-WORKDIR ${WORK_DIR}
-RUN wget --no-verbose https://dl.cihar.com/gammu/releases/gammu-$gammu_version.tar.bz2
-RUN tar xjf gammu-$gammu_version.tar.bz2
-WORKDIR ${WORK_DIR}/gammu-$gammu_version
-RUN cmake \
-    -S . \
-    -B build-rpi2-armhf \
-    -DCMAKE_TOOLCHAIN_FILE=${YADOMS_DEPS}/toolchain-rpi2.cmake \
-    -DBUILD_SHARED_LIBS=OFF \
-    -DWITH_Glib=OFF \
-    -DCMAKE_INSTALL_PREFIX=${YADOMS_DEPS_PATH}/gammu-rpi2-armhf
-RUN cmake --build build -j$(nproc)
-RUN cmake --install build --strip
-WORKDIR ${WORK_DIR}
-RUN rm -Rf gammu-$gammu_version*
+#TODO
+# Repair link on sysroot
+# cd /rpi_sysroot/usr/lib/arm-linux-gnueabihf
+# sudo rm -f libm.so
+# sudo ln -s libm.so.6 libm.so
+
+# ARG gammu_version=1.42.0
+# WORKDIR ${WORK_DIR}
+# RUN wget --no-verbose https://dl.cihar.com/gammu/releases/gammu-$gammu_version.tar.bz2
+# RUN tar xjf gammu-$gammu_version.tar.bz2
+# WORKDIR ${WORK_DIR}/gammu-$gammu_version
+# RUN cmake \
+#     -S . \
+#     -B build \
+#     -DCMAKE_TOOLCHAIN_FILE=${YADOMS_DEPS}/toolchain-rpi2.cmake \
+#     -DBUILD_SHARED_LIBS=OFF \
+#     -DWITH_Glib=OFF \
+#     -DINSTALL_DOC=OFF \
+#     -DCMAKE_INSTALL_PREFIX=${YADOMS_DEPS_PATH}/gammu-rpi2-armhf
+# RUN cmake --build build -j$(nproc)
+# RUN cmake --install build --strip
+# WORKDIR ${WORK_DIR}
+# RUN rm -Rf gammu-$gammu_version*
 
 
 #############################################################
