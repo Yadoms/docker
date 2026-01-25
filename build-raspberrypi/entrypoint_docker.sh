@@ -25,6 +25,7 @@ cmake -S sources \
     -DPython3_LIBRARIES="$YADOMS_DEPS/python-lib-rpi2-armhf/lib/python3.11/config-3.11-arm-linux-gnueabihf/libpython3.11.a" \
     -DPython3_INCLUDE_DIRS="$YADOMS_DEPS/python-lib-rpi2-armhf/include/python3.11" \
     -DOPENCV_ROOT="$YADOMS_DEPS/opencv-rpi2-armhf" \
+    -DGAMMU_ROOT="$YADOMS_DEPS/gammu-rpi2-armhf" \
     -DLIBUDEV_ROOT="$YADOMS_DEPS/libudev"
 
 #TODO utiliser ou faire le ménage de COTIRE_USE et COTIRE_USE_UNITY (voir ce que ça donne avec --target all_unity )

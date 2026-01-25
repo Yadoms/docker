@@ -17,14 +17,13 @@ RUN mkdir -p {$YADOMS_DEPS}
 #############################################################
 RUN apt-get update
 RUN apt-get install -q -y --no-install-recommends \
-	g++ libbz2-dev python3-dev wget build-essential libssl-dev \
+	g++ libbz2-dev wget build-essential \
 	autoconf automake libtool curl make g++ unzip \
 	libpcre2-32-0 libpcre2-dev git rpm zip ca-certificates \
 	libreadline-dev libffi-dev build-essential \
 	libgtk2.0-dev pkg-config libavcodec-dev libavformat-dev libswscale-dev \
 	python3-numpy libtbbmalloc2 libtbb-dev libjpeg-dev libpng-dev libtiff-dev \
-	libudev-dev usbutils libpoco-dev swig \
-	libopencv-dev zlib1g-dev libzstd-dev
+	usbutils swig libssl-dev libudev-dev
 RUN rm -rf /var/lib/apt/lists/*
 
 
@@ -54,36 +53,37 @@ ARG boost_underscore=_
 ARG boost_version=$boost_version_major$boost_underscore$boost_version_minor$boost_underscore$boost_version_patch
 ARG boost_version_dot=$boost_version_major.$boost_version_minor.$boost_version_patch
 WORKDIR ${WORK_DIR}
-RUN wget --no-check-certificate --no-verbose https://archives.boost.io/release/$boost_version_dot/source/boost_$boost_version.tar.bz2  > /dev/null\
-	&& tar xjf boost_$boost_version.tar.bz2  > /dev/null
+RUN wget --no-check-certificate --no-verbose https://archives.boost.io/release/$boost_version_dot/source/boost_$boost_version.tar.bz2
+RUN tar xjf boost_$boost_version.tar.bz2
 WORKDIR ${WORK_DIR}/boost_$boost_version
-RUN ./bootstrap.sh  > /dev/null
+RUN ./bootstrap.sh
 RUN	./b2 -j$(nproc) \
 	threading=multi link=static runtime-link=static \
 	cxxflags=-fPIC \
 	--with-atomic --with-chrono --with-date_time --with-filesystem --with-locale --with-process --with-regex --with-system --with-test --with-thread \
 	--no-samples --no-tests \
-	--prefix=${YADOMS_DEPS}/boost install  > /dev/null
+	--prefix=${YADOMS_DEPS}/boost \
+	install
 WORKDIR ${WORK_DIR}
 RUN	rm -Rf boost_$boost_version \
-	&& rm boost_$boost_version.tar.bz2  > /dev/null
+	&& rm boost_$boost_version.tar.bz2
 
 
 #############################################################
 ## OpenSSL
 #############################################################
 #TODO tester version plus récente (voire installée par apt-get)
-# ARG openssl_version=1.1.1k
-# WORKDIR ${WORK_DIR}
-# RUN wget --no-check-certificate --no-verbose https://www.openssl.org/source/openssl-1.1.1k.tar.gz \
-#     && tar xzf openssl-${openssl_version}.tar.gz
-# WORKDIR ${WORK_DIR}/openssl-${openssl_version}
-# RUN ./Configure linux-x86_64 -fPIC --prefix=${YADOMS_DEPS}/openssl
-# RUN make -j$(nproc)
-# RUN make install
-# WORKDIR ${WORK_DIR}
-# RUN rm -Rf openssl-${openssl_version} \
-# 	&& rm openssl-${openssl_version}.tar.gz
+ARG openssl_version=3.6.0
+WORKDIR ${WORK_DIR}
+RUN wget --no-check-certificate --no-verbose https://github.com/openssl/openssl/releases/download/openssl-${openssl_version}/openssl-${openssl_version}.tar.gz
+RUN tar xzf openssl-${openssl_version}.tar.gz
+WORKDIR ${WORK_DIR}/openssl-${openssl_version}
+RUN ./Configure linux-x86_64 -fPIC --prefix=${YADOMS_DEPS}/openssl
+RUN make -j$(nproc)
+RUN make install
+WORKDIR ${WORK_DIR}
+RUN rm -Rf openssl-${openssl_version} \
+	&& rm openssl-${openssl_version}.tar.gz
 
 
 
@@ -92,63 +92,79 @@ RUN	rm -Rf boost_$boost_version \
 #############################################################
 ## Poco
 #############################################################
-# ARG poco_version=1.13.3
-# WORKDIR ${WORK_DIR}
-# RUN wget --no-check-certificate --no-verbose http://pocoproject.org/releases/poco-${poco_version}/poco-${poco_version}-all.tar.gz \
-# 	&& tar xzf poco-${poco_version}-all.tar.gz
-# WORKDIR ${WORK_DIR}/poco-${poco_version}-all/
-# RUN cmake \
-#     -S . \
-#     -B build \
-#     -DCMAKE_BUILD_TYPE=Release \
-#     -DBUILD_SHARED_LIBS=OFF \
-#     -DENABLE_JSON=OFF \
-#     -DENABLE_MONGODB=OFF \
-#     -DENABLE_DATA_SQLITE=OFF \
-#     -DENABLE_REDIS=OFF \
-#     -DENABLE_PROMETHEUS=OFF \
-#     -DENABLE_PDF=OFF \
-#     -DENABLE_SEVENZIP=OFF \
-#     -DENABLE_CPPPARSER=OFF \
-#     -DENABLE_POCODOC=OFF \
-#     -DENABLE_PAGECOMPILER=OFF \
-#     -DENABLE_PAGECOMPILER_FILE2PAGE=OFF \
-#     -DENABLE_ACTIVERECORD=OFF \
-#     -DENABLE_ACTIVERECORD_COMPILER=OFF \
-#     -DOPENSSL_ROOT_DIR=$YADOMS_DEPS/openssl \
-#     -DCMAKE_INSTALL_PREFIX=${YADOMS_DEPS}/poco
-# RUN cmake \
-#     --build build \
-#     --target all \
-#     -j$(nproc)
-# RUN cmake \
-#     --install build --strip
-# WORKDIR ${WORK_DIR}
-# RUN rm -Rf poco-${poco_version}-all/ \
-# 	&& rm poco-${poco_version}-all.tar.gz
+ARG poco_version=1.13.3
+WORKDIR ${WORK_DIR}
+RUN wget --no-check-certificate --no-verbose http://pocoproject.org/releases/poco-${poco_version}/poco-${poco_version}-all.tar.gz
+RUN tar xzf poco-${poco_version}-all.tar.gz
+WORKDIR ${WORK_DIR}/poco-${poco_version}-all/
+RUN cmake \
+    -S . \
+    -B build \
+    -DCMAKE_POSITION_INDEPENDENT_CODE=ON \
+    -DCMAKE_BUILD_TYPE=Release \
+    -DBUILD_SHARED_LIBS=OFF \
+    -DENABLE_JSON=OFF \
+    -DENABLE_MONGODB=OFF \
+    -DENABLE_DATA_SQLITE=OFF \
+    -DENABLE_REDIS=OFF \
+    -DENABLE_PROMETHEUS=OFF \
+    -DENABLE_PDF=OFF \
+    -DENABLE_SEVENZIP=OFF \
+    -DENABLE_CPPPARSER=OFF \
+    -DENABLE_POCODOC=OFF \
+    -DENABLE_PAGECOMPILER=OFF \
+    -DENABLE_PAGECOMPILER_FILE2PAGE=OFF \
+    -DENABLE_ACTIVERECORD=OFF \
+    -DENABLE_ACTIVERECORD_COMPILER=OFF \
+    -DOPENSSL_ROOT_DIR=${YADOMS_DEPS}/openssl \
+    -DCMAKE_INSTALL_PREFIX=${YADOMS_DEPS}/poco
+RUN cmake \
+    --build build \
+    --target all \
+    -j$(nproc)
+RUN cmake \
+    --install build --strip
+WORKDIR ${WORK_DIR}
+RUN rm -Rf poco-${poco_version}-all/ \
+	&& rm poco-${poco_version}-all.tar.gz
 
 
 #############################################################
 ## Protobuf
-# Can't not be installed from apt-get because need --with-pic
 #############################################################
 ARG protobuf_version=3.15.8
-WORKDIR $YADOMS_DEPS_PATH
-RUN	wget --no-verbose https://github.com/google/protobuf/releases/download/v$protobuf_version/protobuf-cpp-$protobuf_version.tar.gz \
+WORKDIR ${WORK_DIR}
+RUN	wget --no-verbose https://github.com/google/protobuf/releases/download/v$protobuf_version/protobuf-cpp-$protobuf_version.tar.gz
 RUN tar xzf protobuf-cpp-$protobuf_version.tar.gz
-WORKDIR $YADOMS_DEPS_PATH/protobuf-$protobuf_version
-RUN ./autogen.sh
-# RUN ./configure --enable-shared=no --prefix=$YADOMS_DEPS_PATH/protobuf --with-pic
-RUN ./configure --enable-shared=no --with-pic
-RUN make 
-RUN make install
-RUN ldconfig
-WORKDIR $YADOMS_DEPS_PATH
-#TODO remettre nettoyage
-# RUN rm -Rf protobuf-$protobuf_version \
-# 	&& rm $YADOMS_DEPS_PATH/protobuf-cpp-$protobuf_version.tar.gz \
-# 	&& rm -f $YADOMS_DEPS_PATH/protobuf/lib/libprotoc.* \
-# 	&& rm -f $YADOMS_DEPS_PATH/protobuf/lib/libprotobuf-lite.*
+WORKDIR ${WORK_DIR}/protobuf-$protobuf_version
+#TODO mettre à jour raspberryPi 
+#TODO mettre à jour wiki pour windows :
+#    cmake --build build --config Release
+#    cmake --install build --config Release)
+RUN cmake -S cmake \
+    -B build \
+    -DCMAKE_BUILD_TYPE=Release \
+    -DCMAKE_POSITION_INDEPENDENT_CODE=ON \
+    -DCMAKE_INSTALL_PREFIX=${YADOMS_DEPS}/protobuf \
+    -Dprotobuf_BUILD_TESTS=OFF
+#TODO définir WITH_PROTOC=ON|OFF ?
+#TODO définir BUILD_SHARED_LIBS=OFF ?
+# TODO ajouter protobuf_DISABLE_RTTI=ON ?
+
+RUN cmake --build build -j$(nproc)
+RUN cmake --install build
+# RUN ./autogen.sh
+# RUN ./configure --enable-shared=no --prefix=${YADOMS_DEPS}/protobuf --with-pic
+# RUN make -j$(nproc)
+# RUN make install
+# RUN ldconfig
+WORKDIR ${WORK_DIR}
+RUN rm -Rf protobuf-$protobuf_version \
+	&& rm ${WORK_DIR}/protobuf-cpp-$protobuf_version.tar.gz
+
+#TODO utile ?
+RUN	rm -f ${WORK_DIR}/protobuf/lib/libprotoc.* \
+	&& rm -f ${WORK_DIR}/protobuf/lib/libprotobuf-lite.*
 
 
 # Swig
@@ -166,48 +182,154 @@ WORKDIR $YADOMS_DEPS_PATH
 # 	&& rm -Rf swig-$swig_version/Docs \
 # 	&& rm $YADOMS_DEPS_PATH/swig-$swig_version.tar.gz
 
-# Python $python3_version
-# ARG python3_version_maj=3
-# ARG python3_version_min=9
-# ARG python3_version_patch=4
-# ARG python3_version=$python3_version_maj.$python3_version_min.$python3_version_patch
-# RUN wget --no-verbose https://www.python.org/ftp/python/$python3_version/Python-$python3_version.tgz  > /dev/null\
-# 	&& tar xzf Python-$python3_version.tgz && rm Python-$python3_version.tgz  > /dev/null\
-# 	&& cd Python-$python3_version \
-# 	&& ./configure --enable-shared --without-pymalloc --prefix=$YADOMS_DEPS_PATH/python$python3_version_maj$python3_version_min > /dev/null\
-# 	&& make > /dev/null\
-# 	&& make install  > /dev/null\
-# 	&& cd ..\
-# 	&& rm -Rf Python-$python3_version && rm -Rf $YADOMS_DEPS_PATH/python$python3_version_maj$python3_version_min/lib/python$python3_version_maj.$python3_version_min
+#############################################################
+## Python
+#############################################################
+# Version must match python version installed on host
+ARG python3_version=3.11.2
+WORKDIR ${WORK_DIR}
+RUN wget --no-check-certificate --no-verbose https://www.python.org/ftp/python/${python3_version}/Python-${python3_version}.tar.xz
+RUN tar xf Python-${python3_version}.tar.xz
+WORKDIR ${WORK_DIR}/Python-${python3_version}
+RUN ./configure \
+    --enable-shared \
+    --without-pymalloc \
+    --prefix=${YADOMS_DEPS}/python-lib
+RUN make -j$(nproc)
+RUN make install
+WORKDIR ${WORK_DIR}
+RUN rm -Rf Python-${python3_version} \
+    && rm Python-${python3_version}.tar.xz
 
-# Gammu
+
+#############################################################
+## Gammu
+#############################################################
 ARG gammu_version=1.41.0
-RUN cd $YADOMS_DEPS_PATH \
-  && wget --no-verbose https://dl.cihar.com/gammu/releases/gammu-$gammu_version.tar.bz2  > /dev/null\
-  && tar xjf gammu-$gammu_version.tar.bz2  > /dev/null\
-  && cd gammu-$gammu_version \
-  && mkdir rpicc \
-  && cd rpicc \
-  && cmake -DBUILD_SHARED_LIBS=OFF -DWITH_Glib=OFF -DCMAKE_STAGING_PREFIX=$YADOMS_DEPS_PATH/gammu ..  > /dev/null\
-  && make  > /dev/null\
-  && make install  > /dev/null\
-  && cd ../.. && rm -Rf gammu-$gammu_version*
-  
-# Opencv
-# ARG opencv_version=4.5.2
-# RUN cd $YADOMS_DEPS_PATH \
-# 	&& wget --no-verbose https://github.com/opencv/opencv/archive/$opencv_version.zip  > /dev/null\
-# 	&& unzip $opencv_version.zip  > /dev/null\
-# 	&& cd opencv-$opencv_version \
-# 	&& mkdir build \
-# 	&& cd build \
-# 	&& cmake -DWITH_EIGEN:BOOL="0" -DWITH_IMGCODEC_HDR:BOOL="0" -DBUILD_opencv_ts:BOOL="0" -DBUILD_opencv_video:BOOL="0" -DWITH_TIFF:BOOL="0" -DBUILD_PACKAGE:BOOL="0" -DBUILD_opencv_features2d:BOOL="0" -DBUILD_ITT:BOOL="0" -Dthunder:BOOL="0" -Dlzw:BOOL="0" -DCV_TRACE:BOOL="0" -DWITH_MSMF:BOOL="0" -DWITH_FFMPEG:BOOL="0" -DWITH_IMGCODEC_PXM:BOOL="0" -DWITH_MSMF_DXVA:BOOL="0" -DCPACK_SOURCE_ZIP:BOOL="0" -Dpackbits:BOOL="0" -DBUILD_opencv_apps:BOOL="0" -DBUILD_PROTOBUF:BOOL="0" -DBUILD_opencv_objdetect:BOOL="0" -DBUILD_IPP_IW:BOOL="0" -DBUILD_opencv_videoio:BOOL="0" -DBUILD_PERF_TESTS:BOOL="0" -Dmdi:BOOL="0" -DWITH_1394:BOOL="0" -DINSTALL_PDB:BOOL="0" -DWITH_OPENCL:BOOL="0" -DM_LIBRARY:FILEPATH="M_LIBRARY-NOTFOUND" -DUSE_WIN32_FILEIO:BOOL="1" -DCPACK_SOURCE_7Z:BOOL="0" -DBUILD_opencv_stitching:BOOL="0" -Dccitt:BOOL="0" -DVIDEOIO_ENABLE_STRICT_PLUGIN_CHECK:BOOL="0" -DWITH_IPP:BOOL="0" -DBUILD_opencv_dnn:BOOL="0" -DWITH_ITT:BOOL="0" -DCPACK_BINARY_NSIS:BOOL="0" -DBUILD_opencv_photo:BOOL="0" -DBUILD_opencv_calib3d:BOOL="0" -DWITH_QUIRC:BOOL="0" -DWITH_WEBP:BOOL="0" -DBUILD_opencv_python_bindings_generator:BOOL="0" -DWITH_PROTOBUF:BOOL="0" -DBUILD_JASPER:BOOL="1" -DWITH_OPENCLAMDBLAS:BOOL="0" -DBUILD_JAVA:BOOL="0" -DWITH_VTK:BOOL="0" -DBUILD_opencv_java_bindings_generator:BOOL="0" -DBUILD_opencv_highgui:BOOL="0" -DWITH_ARITH_DEC:BOOL="0" -DWITH_IMGCODEC_SUNRASTER:BOOL="0" -DWITH_ADE:BOOL="0" -DBUILD_OPENEXR:BOOL="0" -DWITH_OPENEXR:BOOL="0" -DWITH_OPENCLAMDFFT:BOOL="0" -DVIDEOIO_ENABLE_PLUGINS:BOOL="0" -DWITH_DSHOW:BOOL="0" -DOPENCV_DNN_OPENCL:BOOL="0" -DWITH_LAPACK:BOOL="0" -DWITH_IMGCODEC_PFM:BOOL="0" -Dlogluv:BOOL="0" -DINSTALL_PDB_COMPONENT_EXCLUDE_FROM_ALL:BOOL="0" -DBUILD_opencv_ml:BOOL="0" -DOPENCV_ENABLE_MEMALIGN:BOOL="0" -DBUILD_opencv_python_tests:BOOL="0" -DCV_ENABLE_INTRINSICS:BOOL="0" -DOPENCL_FOUND:BOOL="0" -DWITH_OPENCL_D3D11_NV:BOOL="0" -Dnext:BOOL="0" -DBUILD_opencv_gapi:BOOL="0" -DBUILD_opencv_flann:BOOL="0" -DBUILD_TESTS:BOOL="0" -DWITH_DIRECTX:BOOL="0" -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=$YADOMS_DEPS_PATH/opencv .. >/dev/null \
-# 	&& make  > /dev/null\
-# 	&& make install  > /dev/null\
-# 	&& cmake -DWITH_EIGEN:BOOL="0" -DWITH_IMGCODEC_HDR:BOOL="0" -DBUILD_opencv_ts:BOOL="0" -DBUILD_opencv_video:BOOL="0" -DWITH_TIFF:BOOL="0" -DBUILD_PACKAGE:BOOL="0" -DBUILD_opencv_features2d:BOOL="0" -DBUILD_ITT:BOOL="0" -Dthunder:BOOL="0" -Dlzw:BOOL="0" -DCV_TRACE:BOOL="0" -DWITH_MSMF:BOOL="0" -DWITH_FFMPEG:BOOL="0" -DWITH_IMGCODEC_PXM:BOOL="0" -DWITH_MSMF_DXVA:BOOL="0" -DCPACK_SOURCE_ZIP:BOOL="0" -Dpackbits:BOOL="0" -DBUILD_opencv_apps:BOOL="0" -DBUILD_PROTOBUF:BOOL="0" -DBUILD_opencv_objdetect:BOOL="0" -DBUILD_IPP_IW:BOOL="0" -DBUILD_opencv_videoio:BOOL="0" -DBUILD_PERF_TESTS:BOOL="0" -Dmdi:BOOL="0" -DWITH_1394:BOOL="0" -DINSTALL_PDB:BOOL="0" -DWITH_OPENCL:BOOL="0" -DM_LIBRARY:FILEPATH="M_LIBRARY-NOTFOUND" -DUSE_WIN32_FILEIO:BOOL="1" -DCPACK_SOURCE_7Z:BOOL="0" -DBUILD_opencv_stitching:BOOL="0" -Dccitt:BOOL="0" -DVIDEOIO_ENABLE_STRICT_PLUGIN_CHECK:BOOL="0" -DWITH_IPP:BOOL="0" -DBUILD_opencv_dnn:BOOL="0" -DWITH_ITT:BOOL="0" -DCPACK_BINARY_NSIS:BOOL="0" -DBUILD_opencv_photo:BOOL="0" -DBUILD_opencv_calib3d:BOOL="0" -DWITH_QUIRC:BOOL="0" -DWITH_WEBP:BOOL="0" -DBUILD_opencv_python_bindings_generator:BOOL="0" -DWITH_PROTOBUF:BOOL="0" -DBUILD_JASPER:BOOL="1" -DWITH_OPENCLAMDBLAS:BOOL="0" -DBUILD_JAVA:BOOL="0" -DWITH_VTK:BOOL="0" -DBUILD_opencv_java_bindings_generator:BOOL="0" -DBUILD_opencv_highgui:BOOL="0" -DWITH_ARITH_DEC:BOOL="0" -DWITH_IMGCODEC_SUNRASTER:BOOL="0" -DWITH_ADE:BOOL="0" -DBUILD_OPENEXR:BOOL="0" -DWITH_OPENEXR:BOOL="0" -DWITH_OPENCLAMDFFT:BOOL="0" -DVIDEOIO_ENABLE_PLUGINS:BOOL="0" -DWITH_DSHOW:BOOL="0" -DOPENCV_DNN_OPENCL:BOOL="0" -DWITH_LAPACK:BOOL="0" -DWITH_IMGCODEC_PFM:BOOL="0" -Dlogluv:BOOL="0" -DINSTALL_PDB_COMPONENT_EXCLUDE_FROM_ALL:BOOL="0" -DBUILD_opencv_ml:BOOL="0" -DOPENCV_ENABLE_MEMALIGN:BOOL="0" -DBUILD_opencv_python_tests:BOOL="0" -DCV_ENABLE_INTRINSICS:BOOL="0" -DOPENCL_FOUND:BOOL="0" -DWITH_OPENCL_D3D11_NV:BOOL="0" -Dnext:BOOL="0" -DBUILD_opencv_gapi:BOOL="0" -DBUILD_opencv_flann:BOOL="0" -DBUILD_TESTS:BOOL="0" -DWITH_DIRECTX:BOOL="0" -DCMAKE_BUILD_TYPE=Debug -DCMAKE_INSTALL_PREFIX=$YADOMS_DEPS_PATH/opencv .. >/dev/null \
-# 	&& make  > /dev/null\
-# 	&& make install  > /dev/null\
-# 	&& cd ../.. && rm -Rf opencv-$opencv_version* && rm -f $opencv_version.zip
+WORKDIR ${WORK_DIR}
+RUN wget --no-verbose https://dl.cihar.com/gammu/releases/gammu-$gammu_version.tar.bz2
+RUN tar xjf gammu-$gammu_version.tar.bz2
+WORKDIR ${WORK_DIR}/gammu-$gammu_version
+RUN cmake \
+    -S . \
+    -B build \
+    -DCMAKE_POSITION_INDEPENDENT_CODE=ON \
+    -DBUILD_SHARED_LIBS=OFF \
+    -DWITH_Glib=OFF \
+    -DCMAKE_INSTALL_PREFIX=${YADOMS_DEPS_PATH}/gammu
+RUN cmake --build build -j$(nproc)
+RUN cmake --install build --strip
+WORKDIR ${WORK_DIR}
+RUN rm -Rf gammu-$gammu_version*
+
+
+#############################################################
+## OpenCV
+#############################################################
+ARG opencv_version=4.5.2
+WORKDIR ${WORK_DIR}
+RUN wget --no-verbose --no-check-certificate https://github.com/opencv/opencv/archive/${opencv_version}.zip
+RUN unzip ${opencv_version}.zip
+WORKDIR ${WORK_DIR}/opencv-${opencv_version}
+RUN mkdir build
+WORKDIR ${WORK_DIR}/opencv-${opencv_version}/build
+RUN cmake \
+    -DBUILD_SHARED_LIBS=OFF \
+    -DWITH_EIGEN:BOOL="0" \
+    -DWITH_IMGCODEC_HDR:BOOL="0" \
+    -DBUILD_opencv_ts:BOOL="0" \
+    -DBUILD_opencv_video:BOOL="0" \
+    -DWITH_TIFF:BOOL="0" \
+    -DBUILD_PACKAGE:BOOL="0" \
+    -DBUILD_opencv_features2d:BOOL="0" \
+    -DBUILD_ITT:BOOL="0" \
+    -Dthunder:BOOL="0" \
+    -Dlzw:BOOL="0" \
+    -DCV_TRACE:BOOL="0" \
+    -DWITH_MSMF:BOOL="0" \
+    -DWITH_FFMPEG:BOOL="0" \
+    -DWITH_IMGCODEC_PXM:BOOL="0" \
+    -DWITH_MSMF_DXVA:BOOL="0" \
+    -DCPACK_SOURCE_ZIP:BOOL="0" \
+    -Dpackbits:BOOL="0" \
+    -DBUILD_opencv_apps:BOOL="0" \
+    -DBUILD_PROTOBUF:BOOL="0" \
+    -DBUILD_opencv_objdetect:BOOL="0" \
+    -DBUILD_IPP_IW:BOOL="0" \
+    -DBUILD_opencv_videoio:BOOL="0" \
+    -DBUILD_PERF_TESTS:BOOL="0" \
+    -Dmdi:BOOL="0" \
+    -DWITH_1394:BOOL="0" \
+    -DINSTALL_PDB:BOOL="0" \
+    -DWITH_OPENCL:BOOL="0" \
+    -DM_LIBRARY:FILEPATH="M_LIBRARY-NOTFOUND" \
+    -DUSE_WIN32_FILEIO:BOOL="1" \
+    -DCPACK_SOURCE_7Z:BOOL="0" \
+    -DBUILD_opencv_stitching:BOOL="0" \
+    -Dccitt:BOOL="0" \
+    -DVIDEOIO_ENABLE_STRICT_PLUGIN_CHECK:BOOL="0" \
+    -DWITH_IPP:BOOL="0" \
+    -DBUILD_opencv_dnn:BOOL="0" \
+    -DWITH_ITT:BOOL="0" \
+    -DCPACK_BINARY_NSIS:BOOL="0" \
+    -DBUILD_opencv_photo:BOOL="0" \
+    -DBUILD_opencv_calib3d:BOOL="0" \
+    -DWITH_QUIRC:BOOL="0" \
+    -DWITH_WEBP:BOOL="0" \
+    -DBUILD_opencv_python_bindings_generator:BOOL="0" \
+    -DWITH_PROTOBUF:BOOL="0" \
+    -DBUILD_JASPER:BOOL="1" \
+    -DWITH_OPENCLAMDBLAS:BOOL="0" \
+    -DBUILD_JAVA:BOOL="0" \
+    -DWITH_VTK:BOOL="0" \
+    -DBUILD_opencv_java_bindings_generator:BOOL="0" \
+    -DBUILD_opencv_highgui:BOOL="0" \
+    -DWITH_ARITH_DEC:BOOL="0" \
+    -DWITH_IMGCODEC_SUNRASTER:BOOL="0" \
+    -DWITH_ADE:BOOL="0" \
+    -DBUILD_OPENEXR:BOOL="0" \
+    -DWITH_OPENEXR:BOOL="0" \
+    -DWITH_OPENCLAMDFFT:BOOL="0" \
+    -DVIDEOIO_ENABLE_PLUGINS:BOOL="0" \
+    -DWITH_DSHOW:BOOL="0" \
+    -DOPENCV_DNN_OPENCL:BOOL="0" \
+    -DWITH_LAPACK:BOOL="0" \
+    -DWITH_IMGCODEC_PFM:BOOL="0" \
+    -Dlogluv:BOOL="0" \
+    -DINSTALL_PDB_COMPONENT_EXCLUDE_FROM_ALL:BOOL="0" \
+    -DBUILD_opencv_ml:BOOL="0" \
+    -DOPENCV_ENABLE_MEMALIGN:BOOL="0" \
+    -DBUILD_opencv_python_tests:BOOL="0" \
+    -DCV_ENABLE_INTRINSICS:BOOL="0" \
+    -DOPENCL_FOUND:BOOL="0" \
+    -DWITH_OPENCL_D3D11_NV:BOOL="0" \
+    -Dnext:BOOL="0" \
+    -DBUILD_opencv_gapi:BOOL="0" \
+    -DBUILD_opencv_flann:BOOL="0" \
+    -DBUILD_TESTS:BOOL="0" \
+    -DWITH_DIRECTX:BOOL="0" \
+    -DCMAKE_POSITION_INDEPENDENT_CODE=ON \
+    -DCMAKE_BUILD_TYPE=Release \
+    -DCMAKE_INSTALL_PREFIX=${YADOMS_DEPS}/opencv \
+    ..
+RUN cmake --build . -j$(nproc)
+RUN cmake --install . --strip
+WORKDIR ${WORK_DIR}
+RUN rm -Rf opencv-${opencv_version}* \
+    && rm -f ${opencv_version}.zip
+
+
+#############################################################
+## Libudev
+#############################################################
+# TODO : supprimer aussi le fichier
+# WORKDIR ${WORK_DIR}
+# COPY libudev.tar.gz .
+# RUN tar xf libudev.tar.gz
+# RUN cp -R libudev ${YADOMS_DEPS}
+# RUN rm libudev.tar.gz
+
+
 
 # Yadoms configuration file
 # RUN echo 'Configuring Yadoms CMakeListsUserConfig.txt' \

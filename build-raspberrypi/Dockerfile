@@ -233,6 +233,27 @@ WORKDIR ${WORK_DIR}
 RUN rm -Rf Python-${python3_version} \
     && rm Python-${python3_version}.tar.xz
 
+    
+#############################################################
+## Gammu
+#############################################################
+ARG gammu_version=1.41.0
+WORKDIR ${WORK_DIR}
+RUN wget --no-verbose https://dl.cihar.com/gammu/releases/gammu-$gammu_version.tar.bz2
+RUN tar xjf gammu-$gammu_version.tar.bz2
+WORKDIR ${WORK_DIR}/gammu-$gammu_version
+RUN cmake \
+    -S . \
+    -B build-rpi2-armhf \
+    -DCMAKE_TOOLCHAIN_FILE=${YADOMS_DEPS}/toolchain-rpi2.cmake \
+    -DBUILD_SHARED_LIBS=OFF \
+    -DWITH_Glib=OFF \
+    -DCMAKE_INSTALL_PREFIX=${YADOMS_DEPS_PATH}/gammu-rpi2-armhf
+RUN cmake --build build -j$(nproc)
+RUN cmake --install build --strip
+WORKDIR ${WORK_DIR}
+RUN rm -Rf gammu-$gammu_version*
+
 
 #############################################################
 ## OpenCV
