@@ -168,8 +168,8 @@ RUN cmake -S cmake \
     -B build \
     -DCMAKE_BUILD_TYPE=Release \
     -Dprotobuf_BUILD_TESTS=OFF
-RUN cmake --build build -j$(nproc)
-RUN cmake --install build
+RUN cmake --build build --target protoc -j$(nproc)
+RUN cmake --build build --target install/strip
 #TODO ménage
 # RUN mkdir build
 # WORKDIR ${WORK_DIR}/protobuf-${protobuf_version}-host/build
@@ -182,12 +182,15 @@ RUN cmake --install build
 WORKDIR ${WORK_DIR}/protobuf-${protobuf_version}
 RUN cmake -S cmake \
     -B build \
-    -DCMAKE_BUILD_TYPE=Release \
+    -DCMAKE_TOOLCHAIN_FILE=${YADOMS_DEPS}/toolchain-rpi2.cmake \
     -DCMAKE_POSITION_INDEPENDENT_CODE=ON \
-    -DCMAKE_INSTALL_PREFIX=${YADOMS_DEPS}/protobuf-rpi2-armhf \
-    -Dprotobuf_BUILD_TESTS=OFF
-RUN cmake --build build -j$(nproc)
-RUN cmake --install build
+    -Dprotobuf_BUILD_TESTS=OFF \
+    -Dprotobuf_WITH_ZLIB=OFF \
+    -Dprotobuf_BUILD_PROTOC=OFF \
+    -DProtobuf_PROTOC_EXECUTABLE=/usr/local/bin/protoc \
+    -DCMAKE_BUILD_TYPE=Release \
+    -DCMAKE_INSTALL_PREFIX=${YADOMS_DEPS}/protobuf-rpi2-armhf
+RUN cmake --build build -j$(nproc) --target install
 # RUN ./autogen.sh
 # RUN	./configure \
 #     --enable-shared=no \
