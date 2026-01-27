@@ -101,7 +101,6 @@ RUN	rm -Rf boost_$boost_version \
 #############################################################
 ## OpenSSL (cross compile only)
 #############################################################
-#TODO tester version plus récente
 ARG openssl_version=3.6.0
 WORKDIR ${WORK_DIR}
 RUN wget --no-check-certificate --no-verbose https://www.openssl.org/source/openssl-${openssl_version}.tar.gz \

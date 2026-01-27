@@ -133,9 +133,6 @@ WORKDIR ${WORK_DIR}
 RUN	wget --no-verbose https://github.com/google/protobuf/releases/download/v$protobuf_version/protobuf-cpp-$protobuf_version.tar.gz
 RUN tar xzf protobuf-cpp-$protobuf_version.tar.gz
 WORKDIR ${WORK_DIR}/protobuf-$protobuf_version
-#TODO mettre à jour wiki pour windows :
-#    cmake --build build --config Release
-#    cmake --install build --config Release)
 RUN cmake -S cmake \
     -B build \
     -DBUILD_SHARED_LIBS=OFF \
