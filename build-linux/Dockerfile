@@ -140,11 +140,10 @@ RUN cmake -S cmake \
     -B build \
     -DBUILD_SHARED_LIBS=OFF \
     -Dprotobuf_DISABLE_RTTI=ON \
+    -Dprotobuf_BUILD_TESTS=OFF \
     -DCMAKE_BUILD_TYPE=Release \
     -DCMAKE_POSITION_INDEPENDENT_CODE=ON \
-    -DCMAKE_INSTALL_PREFIX=${YADOMS_DEPS}/protobuf \
-    -Dprotobuf_BUILD_TESTS=OFF
-
+    -DCMAKE_INSTALL_PREFIX=${YADOMS_DEPS}/protobuf
 RUN cmake --build build -j$(nproc)
 RUN cmake --install build
 WORKDIR ${WORK_DIR}

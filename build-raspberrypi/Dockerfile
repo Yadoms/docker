@@ -60,12 +60,12 @@ ARG RPI_SYSROOT_GOOGLEDRIVE_FILE_ID=1OHgyVJljewb-gIryf8cCTS3abb_kcQ1D
 # Create a virtualenv and install gdown inside (needed on debian:stable-slim)
 # Add venv to PATH and download file from Google Drive
 RUN python3 -m venv /opt/venv \
-    && /opt/venv/bin/pip install --no-cache-dir gdown  > /dev/null
+    && /opt/venv/bin/pip install --no-cache-dir gdown
 ENV PATH="/opt/venv/bin:${PATH}"
 WORKDIR ${WORK_DIR}
-RUN gdown --id ${RPI_SYSROOT_GOOGLEDRIVE_FILE_ID} -O rpi2-sysroot.tar.gz  > /dev/null
-RUN tar -xvzf rpi2-sysroot.tar.gz -C ${RPI_SYSROOT}  > /dev/null
-RUN rm rpi2-sysroot.tar.gz  > /dev/null
+RUN gdown --id ${RPI_SYSROOT_GOOGLEDRIVE_FILE_ID} -O rpi2-sysroot.tar.gz
+RUN tar -xvzf rpi2-sysroot.tar.gz -C ${RPI_SYSROOT}
+RUN rm rpi2-sysroot.tar.gz
 
 
 #############################################################
@@ -78,11 +78,11 @@ ARG boost_underscore=_
 ARG boost_version=$boost_version_major$boost_underscore$boost_version_minor$boost_underscore$boost_version_patch
 ARG boost_version_dot=$boost_version_major.$boost_version_minor.$boost_version_patch
 WORKDIR ${WORK_DIR}
-RUN wget --no-check-certificate --no-verbose https://archives.boost.io/release/$boost_version_dot/source/boost_$boost_version.tar.bz2  > /dev/null \
-    && tar xjf boost_$boost_version.tar.bz2  > /dev/null
+RUN wget --no-check-certificate --no-verbose https://archives.boost.io/release/$boost_version_dot/source/boost_$boost_version.tar.bz2 \
+    && tar xjf boost_$boost_version.tar.bz2
 WORKDIR ${WORK_DIR}/boost_$boost_version
 RUN echo "using gcc : arm : arm-linux-gnueabihf-g++ ;" > /tmp/user-config.jam \
-    && ./bootstrap.sh  > /dev/null \
+    && ./bootstrap.sh \
     && ./b2 -j$(nproc) \
     toolset=gcc-arm \
     target-os=linux \
@@ -92,26 +92,26 @@ RUN echo "using gcc : arm : arm-linux-gnueabihf-g++ ;" > /tmp/user-config.jam \
     cxxflags="-march=armv7-a -mfpu=neon-vfpv4 -mfloat-abi=hard -fPIC" \
     --with-atomic --with-chrono --with-date_time --with-filesystem --with-locale --with-process --with-regex --with-system --with-test --with-thread \
     --no-samples --no-tests \
-    --prefix=${YADOMS_DEPS}/boost-rpi2-armhf install  > /dev/null
+    --prefix=${YADOMS_DEPS}/boost-rpi2-armhf install
 WORKDIR ${WORK_DIR}
 RUN	rm -Rf boost_$boost_version \
-    && rm boost_$boost_version.tar.bz2  > /dev/null
+    && rm boost_$boost_version.tar.bz2
 
 
 #############################################################
 ## OpenSSL (cross compile only)
 #############################################################
 #TODO tester version plus récente
-ARG openssl_version=1.1.1k
+ARG openssl_version=3.6.0
 WORKDIR ${WORK_DIR}
-RUN wget --no-check-certificate --no-verbose https://www.openssl.org/source/openssl-1.1.1k.tar.gz \
-    && tar xzf openssl-${openssl_version}.tar.gz  > /dev/null
+RUN wget --no-check-certificate --no-verbose https://www.openssl.org/source/openssl-${openssl_version}.tar.gz \
+    && tar xzf openssl-${openssl_version}.tar.gz
 WORKDIR ${WORK_DIR}/openssl-${openssl_version}
-RUN ./Configure linux-generic32 --prefix=${YADOMS_DEPS}/openssl-rpi2-armhf --cross-compile-prefix=arm-linux-gnueabihf-  > /dev/null
-RUN make CC="arm-linux-gnueabihf-gcc" AR="arm-linux-gnueabihf-ar" RANLIB="arm-linux-gnueabihf-ranlib" -j$(nproc) \
-    && make install  > /dev/null
+RUN ./Configure linux-generic32 --prefix=${YADOMS_DEPS}/openssl-rpi2-armhf --cross-compile-prefix=arm-linux-gnueabihf-
+RUN make CC="arm-linux-gnueabihf-gcc" AR="arm-linux-gnueabihf-ar" RANLIB="arm-linux-gnueabihf-ranlib" -j$(nproc)
+RUN make install
 WORKDIR ${WORK_DIR}
-RUN rm -Rf openssl-${openssl_version} && rm openssl-${openssl_version}.tar.gz  > /dev/null
+RUN rm -Rf openssl-${openssl_version} && rm openssl-${openssl_version}.tar.gz
 
 
 #############################################################
@@ -120,7 +120,7 @@ RUN rm -Rf openssl-${openssl_version} && rm openssl-${openssl_version}.tar.gz  >
 ARG poco_version=1.13.3
 WORKDIR ${WORK_DIR}
 RUN wget --no-check-certificate --no-verbose http://pocoproject.org/releases/poco-${poco_version}/poco-${poco_version}-all.tar.gz \
-    && tar xzf poco-${poco_version}-all.tar.gz  > /dev/null
+    && tar xzf poco-${poco_version}-all.tar.gz
 WORKDIR ${WORK_DIR}/poco-${poco_version}-all/
 RUN cmake \
     -S . \
@@ -167,16 +167,11 @@ WORKDIR ${WORK_DIR}/protobuf-${protobuf_version}-host
 RUN cmake -S cmake \
     -B build \
     -DCMAKE_BUILD_TYPE=Release \
+    -DBUILD_SHARED_LIBS=OFF \
+    -Dprotobuf_DISABLE_RTTI=ON \
     -Dprotobuf_BUILD_TESTS=OFF
 RUN cmake --build build --target protoc -j$(nproc)
 RUN cmake --build build --target install/strip
-#TODO ménage
-# RUN mkdir build
-# WORKDIR ${WORK_DIR}/protobuf-${protobuf_version}-host/build
-# RUN cmake -Dprotobuf_BUILD_TESTS=OFF -DCMAKE_BUILD_TYPE=Release ../cmake
-# RUN make -j$(nproc) \
-#     && make install \
-#     && ldconfig
 
 # Protobuf library (Pi)	
 WORKDIR ${WORK_DIR}/protobuf-${protobuf_version}
@@ -184,6 +179,8 @@ RUN cmake -S cmake \
     -B build \
     -DCMAKE_TOOLCHAIN_FILE=${YADOMS_DEPS}/toolchain-rpi2.cmake \
     -DCMAKE_POSITION_INDEPENDENT_CODE=ON \
+    -DBUILD_SHARED_LIBS=OFF \
+    -Dprotobuf_DISABLE_RTTI=ON \
     -Dprotobuf_BUILD_TESTS=OFF \
     -Dprotobuf_WITH_ZLIB=OFF \
     -Dprotobuf_BUILD_PROTOC=OFF \
@@ -191,20 +188,6 @@ RUN cmake -S cmake \
     -DCMAKE_BUILD_TYPE=Release \
     -DCMAKE_INSTALL_PREFIX=${YADOMS_DEPS}/protobuf-rpi2-armhf
 RUN cmake --build build -j$(nproc) --target install
-# RUN ./autogen.sh
-# RUN	./configure \
-#     --enable-shared=no \
-#     --host=arm-linux \
-#     CC=arm-linux-gnueabihf-gcc \
-#     CXX=arm-linux-gnueabihf-g++ \
-#     AR=arm-linux-gnueabihf-ar \
-#     STRIP=arm-linux-gnueabihf-strip \
-#     RANLIB=arm-linux-gnueabihf-ranlib \
-#     --prefix=${YADOMS_DEPS}/protobuf-rpi2-armhf \
-#     --with-protoc=protoc \
-#     --with-pic
-# RUN make -j$(nproc) \
-#     && make install
 
 # Cleanup
 WORKDIR ${WORK_DIR}
