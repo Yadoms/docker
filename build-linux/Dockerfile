@@ -72,7 +72,6 @@ RUN	rm -Rf boost_$boost_version \
 #############################################################
 ## OpenSSL
 #############################################################
-#TODO tester version plus récente (voire installée par apt-get)
 ARG openssl_version=3.6.0
 WORKDIR ${WORK_DIR}
 RUN wget --no-check-certificate --no-verbose https://github.com/openssl/openssl/releases/download/openssl-${openssl_version}/openssl-${openssl_version}.tar.gz
@@ -85,9 +84,6 @@ WORKDIR ${WORK_DIR}
 RUN rm -Rf openssl-${openssl_version} \
 	&& rm openssl-${openssl_version}.tar.gz
 
-
-
-	#TODO méange
 
 #############################################################
 ## Poco
@@ -137,50 +133,26 @@ WORKDIR ${WORK_DIR}
 RUN	wget --no-verbose https://github.com/google/protobuf/releases/download/v$protobuf_version/protobuf-cpp-$protobuf_version.tar.gz
 RUN tar xzf protobuf-cpp-$protobuf_version.tar.gz
 WORKDIR ${WORK_DIR}/protobuf-$protobuf_version
-#TODO mettre à jour raspberryPi 
 #TODO mettre à jour wiki pour windows :
 #    cmake --build build --config Release
 #    cmake --install build --config Release)
 RUN cmake -S cmake \
     -B build \
+    -DBUILD_SHARED_LIBS=OFF \
+    -Dprotobuf_DISABLE_RTTI=ON \
     -DCMAKE_BUILD_TYPE=Release \
     -DCMAKE_POSITION_INDEPENDENT_CODE=ON \
     -DCMAKE_INSTALL_PREFIX=${YADOMS_DEPS}/protobuf \
     -Dprotobuf_BUILD_TESTS=OFF
-#TODO définir WITH_PROTOC=ON|OFF ?
-#TODO définir BUILD_SHARED_LIBS=OFF ?
-# TODO ajouter protobuf_DISABLE_RTTI=ON ?
 
 RUN cmake --build build -j$(nproc)
 RUN cmake --install build
-# RUN ./autogen.sh
-# RUN ./configure --enable-shared=no --prefix=${YADOMS_DEPS}/protobuf --with-pic
-# RUN make -j$(nproc)
-# RUN make install
-# RUN ldconfig
 WORKDIR ${WORK_DIR}
 RUN rm -Rf protobuf-$protobuf_version \
 	&& rm ${WORK_DIR}/protobuf-cpp-$protobuf_version.tar.gz
-
-#TODO utile ?
 RUN	rm -f ${WORK_DIR}/protobuf/lib/libprotoc.* \
 	&& rm -f ${WORK_DIR}/protobuf/lib/libprotobuf-lite.*
 
-
-# Swig
-# ARG swig_version=4.0.2
-# RUN cd $YADOMS_DEPS_PATH \
-# 	&& wget --no-verbose http://prdownloads.sourceforge.net/swig/swig-$swig_version.tar.gz \
-# 	&& tar xzf swig-$swig_version.tar.gz \
-# 	&& cd swig-$swig_version \
-# 	&& ./configure \
-# 	&& make \
-# 	&& make install \
-# 	&& cd .. \
-# 	&& rm -f swig-$swig_version/Source/Modules/*.o \
-# 	&& rm -Rf swig-$swig_version/Examples \
-# 	&& rm -Rf swig-$swig_version/Docs \
-# 	&& rm $YADOMS_DEPS_PATH/swig-$swig_version.tar.gz
 
 #############################################################
 ## Python
@@ -317,17 +289,6 @@ RUN cmake --install . --strip
 WORKDIR ${WORK_DIR}
 RUN rm -Rf opencv-${opencv_version}* \
     && rm -f ${opencv_version}.zip
-
-
-#############################################################
-## Libudev
-#############################################################
-# TODO : supprimer aussi le fichier
-# WORKDIR ${WORK_DIR}
-# COPY libudev.tar.gz .
-# RUN tar xf libudev.tar.gz
-# RUN cp -R libudev ${YADOMS_DEPS}
-# RUN rm libudev.tar.gz
 
 
 #############################################################
