@@ -17,13 +17,13 @@ RUN mkdir -p {$YADOMS_DEPS}
 #############################################################
 RUN apt-get update
 RUN apt-get install -q -y --no-install-recommends \
-	g++ libbz2-dev wget build-essential \
-	autoconf automake libtool curl make g++ unzip \
-	libpcre2-32-0 libpcre2-dev git rpm zip ca-certificates \
-	libreadline-dev libffi-dev build-essential \
-	libgtk2.0-dev pkg-config libavcodec-dev libavformat-dev libswscale-dev \
-	python3-numpy libtbbmalloc2 libtbb-dev libjpeg-dev libpng-dev libtiff-dev \
-	usbutils swig libssl-dev libudev-dev
+    g++ libbz2-dev wget build-essential \
+    autoconf automake libtool curl make g++ unzip \
+    libpcre2-32-0 libpcre2-dev git rpm zip ca-certificates \
+    libreadline-dev libffi-dev build-essential \
+    libgtk2.0-dev pkg-config libavcodec-dev libavformat-dev libswscale-dev \
+    python3-numpy libtbbmalloc2 libtbb-dev libjpeg-dev libpng-dev libtiff-dev \
+    usbutils swig libssl-dev libudev-dev
 RUN rm -rf /var/lib/apt/lists/*
 
 
@@ -58,15 +58,15 @@ RUN tar xjf boost_$boost_version.tar.bz2
 WORKDIR ${WORK_DIR}/boost_$boost_version
 RUN ./bootstrap.sh
 RUN	./b2 -j$(nproc) \
-	threading=multi link=static runtime-link=static \
-	cxxflags=-fPIC \
-	--with-atomic --with-chrono --with-date_time --with-filesystem --with-locale --with-process --with-regex --with-system --with-test --with-thread \
-	--no-samples --no-tests \
-	--prefix=${YADOMS_DEPS}/boost \
-	install
+    threading=multi link=static runtime-link=static \
+    cxxflags=-fPIC \
+    --with-atomic --with-chrono --with-date_time --with-filesystem --with-locale --with-process --with-regex --with-system --with-test --with-thread \
+    --no-samples --no-tests \
+    --prefix=${YADOMS_DEPS}/boost \
+    install
 WORKDIR ${WORK_DIR}
 RUN	rm -Rf boost_$boost_version \
-	&& rm boost_$boost_version.tar.bz2
+    && rm boost_$boost_version.tar.bz2
 
 
 #############################################################
@@ -82,13 +82,13 @@ RUN make -j$(nproc)
 RUN make install
 WORKDIR ${WORK_DIR}
 RUN rm -Rf openssl-${openssl_version} \
-	&& rm openssl-${openssl_version}.tar.gz
+    && rm openssl-${openssl_version}.tar.gz
 
 
 #############################################################
 ## Poco
 #############################################################
-ARG poco_version=1.13.3
+ARG poco_version=1.14.2
 WORKDIR ${WORK_DIR}
 RUN wget --no-check-certificate --no-verbose http://pocoproject.org/releases/poco-${poco_version}/poco-${poco_version}-all.tar.gz
 RUN tar xzf poco-${poco_version}-all.tar.gz
@@ -122,7 +122,7 @@ RUN cmake \
     --install build --strip
 WORKDIR ${WORK_DIR}
 RUN rm -Rf poco-${poco_version}-all/ \
-	&& rm poco-${poco_version}-all.tar.gz
+    && rm poco-${poco_version}-all.tar.gz
 
 
 #############################################################
@@ -145,9 +145,9 @@ RUN cmake --build build -j$(nproc)
 RUN cmake --install build
 WORKDIR ${WORK_DIR}
 RUN rm -Rf protobuf-$protobuf_version \
-	&& rm ${WORK_DIR}/protobuf-cpp-$protobuf_version.tar.gz
+    && rm ${WORK_DIR}/protobuf-cpp-$protobuf_version.tar.gz
 RUN	rm -f ${WORK_DIR}/protobuf/lib/libprotoc.* \
-	&& rm -f ${WORK_DIR}/protobuf/lib/libprotobuf-lite.*
+    && rm -f ${WORK_DIR}/protobuf/lib/libprotobuf-lite.*
 
 
 #############################################################

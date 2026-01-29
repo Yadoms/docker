@@ -9,6 +9,7 @@ set(CMAKE_PACKAGE_PLATFORM_NAME "RaspberryPI")
 set(CMAKE_C_COMPILER   i686-w64-mingw32-gcc)
 set(CMAKE_CXX_COMPILER i686-w64-mingw32-g++)
 set(CMAKE_RC_COMPILER  i686-w64-mingw32-windres)
+set(CMAKE_MC_COMPILER  i686-w64-mingw32-windmc)
 
 # Where to look at includes/libs (don't go out of sysroot)
 set(CMAKE_FIND_ROOT_PATH "${RPI_SYSROOT}")

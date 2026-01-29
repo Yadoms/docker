@@ -116,7 +116,7 @@ RUN rm -Rf openssl-${openssl_version} && rm openssl-${openssl_version}.tar.gz
 #############################################################
 ## Poco
 #############################################################
-ARG poco_version=1.13.3
+ARG poco_version=1.14.2
 WORKDIR ${WORK_DIR}
 RUN wget --no-check-certificate --no-verbose http://pocoproject.org/releases/poco-${poco_version}/poco-${poco_version}-all.tar.gz \
     && tar xzf poco-${poco_version}-all.tar.gz
