@@ -8,8 +8,8 @@ on:
       - "v*.*.*"
 
 jobs:
-
   linux:
+  
     name : Generate for Linux
     runs-on: ubuntu-latest
 
