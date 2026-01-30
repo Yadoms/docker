@@ -113,28 +113,12 @@ RUN tar xzf poco-${poco_version}-all.tar.gz
 WORKDIR ${WORK_DIR}/poco-${poco_version}-all/
 
 # Some workarounds on Poco 1.14.2
+# Issue [#5174](https://github.com/pocoproject/poco/issues/5174)
 RUN sed -i 's/#include <Windows.h>/#include <windows.h>/' \
     Foundation/include/Poco/FileStreamRWLock_WIN32.h
+# Issue [#5176](https://github.com/pocoproject/poco/issues/5176)
 RUN sed -i '/#include "Poco\/UnWindows.h"/a #include <limits>' \
    Foundation/src/SharedMemory_WIN32.cpp
-RUN sed -i '/#include <sql.h>/a #include <sqlext.h>' \
-   Data/ODBC/src/Binder.cpp
-RUN sed -i '/#include "Poco\/Data\/ODBC\/Utility.h"/a #include <sqlext.h>' \
-   Data/ODBC/src/ODBCMetaColumn.cpp
-
-   ### TODO J'en suis là
-
-   ### Issue Poco en cours de rédaction (enfin pour l'instant ça marche pas)
-#    I'm trying to build Poco 1.14.2 from Linux (Debian-12) for Windows.
-
-# I encounter some issues :
-
-# - in `Foundation/src/SharedMemory_WIN32.cpp`, `std::numeric_limits` is used but `<limits>`is not included.
-# - in `Data/ODBC/src/Binder.cpp`, `SQL_GUID` is used but `<sqlext.h>` is not included
-# - in `Data/ODBC/src/ODBCMetaColumn.cpp`, `SQL_GUID` is used but `<sqlext.h>` is not included
-
-
-
 
 RUN cmake \
    -G Ninja \
@@ -144,8 +128,12 @@ RUN cmake \
    -DCMAKE_BUILD_TYPE=Release \
    -DBUILD_SHARED_LIBS=OFF \
    -DENABLE_JSON=OFF \
-   -DENABLE_MONGODB=OFF \
+   -DENABLE_DATA=OFF \
+   -DENABLE_DATA_ODBC=OFF \
    -DENABLE_DATA_SQLITE=OFF \
+   -DENABLE_DATA_MYSQL=OFF \
+   -DENABLE_DATA_POSTGRESQL=OFF \
+   -DENABLE_MONGODB=OFF \
    -DENABLE_REDIS=OFF \
    -DENABLE_PROMETHEUS=OFF \
    -DENABLE_PDF=OFF \
