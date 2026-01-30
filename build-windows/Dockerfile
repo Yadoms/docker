@@ -195,5 +195,11 @@ RUN cmake \
    -DCMAKE_INSTALL_PREFIX=${YADOMS_DEPS}/protobuf
 RUN cmake --build build -j$(nproc) --target install
 
+# Cleanup
+WORKDIR ${WORK_DIR}
+RUN rm -Rf protobuf-${protobuf_version} \
+    && rm -Rf protobuf-${protobuf_version}-host \
+    && rm protobuf-cpp-${protobuf_version}.tar.gz
+
 
 #TODO merger les workflow github
