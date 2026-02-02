@@ -21,12 +21,13 @@ RUN apt-get update
 RUN apt-get install -q -y --no-install-recommends \
    g++ libbz2-dev wget build-essential cmake ninja-build \
    mingw-w64 mingw-w64-tools gcc-mingw-w64 g++-mingw-w64 \
+   binutils-mingw-w64-i686 \
    autoconf automake libtool curl make g++ unzip \
    libpcre2-32-0 libpcre2-dev git rpm zip ca-certificates \
    libreadline-dev libffi-dev build-essential \
    libgtk2.0-dev pkg-config libavcodec-dev libavformat-dev libswscale-dev \
    python3-numpy libtbbmalloc2 libtbb-dev libjpeg-dev libpng-dev libtiff-dev \
-   usbutils swig libssl-dev libudev-dev
+   usbutils swig libssl-dev libudev-dev python3 python3-venv python3-pip
 RUN rm -rf /var/lib/apt/lists/*
 
 
@@ -202,4 +203,48 @@ RUN rm -Rf protobuf-${protobuf_version} \
     && rm protobuf-cpp-${protobuf_version}.tar.gz
 
 
-#TODO merger les workflow github
+#############################################################
+## Python
+#############################################################
+# Version must match python version installed on host
+ARG python3_version=3.13.5
+WORKDIR ${WORK_DIR}
+RUN wget -q https://www.python.org/ftp/python/${python3_version}/python-${python3_version}-embed-win32.zip
+RUN unzip -q python-${python3_version}-embed-win32.zip -d pywin32
+WORKDIR ${WORK_DIR}/pywin32
+RUN gendef python313.dll
+RUN i686-w64-mingw32-dlltool -d python313.def -D python313.dll -l libpython313.a
+
+# RUN wget --no-check-certificate --no-verbose https://www.python.org/ftp/python/${python3_version}/Python-${python3_version}.tar.xz \
+#     && tar xf Python-${python3_version}.tar.xz
+# WORKDIR ${WORK_DIR}/Python-${python3_version}
+# RUN CC=i686-w64-mingw32-gcc \
+#     CXX=i686-w64-mingw32-g++ \
+#     AR=i686-w64-mingw32-ar \
+#     RANLIB=i686-w64-mingw32-ranlib \
+#     ./configure \
+#     --host=i686-w64-mingw32 \
+#     --target=i686-w64-mingw32 \
+#     --build=x86_64-linux-gnu \
+#     --disable-ipv6 \
+#     ac_cv_file__dev_ptmx=no \
+#     ac_cv_file__dev_ptc=no \
+#     ac_cv_have_long_long_format=yes \
+#     --enable-shared \
+#     --without-pymalloc \
+#     --with-openssl=${YADOMS_DEPS}/openssl \
+#     --with-build-python=/usr/bin/python${python3_version%.*} \
+#     --prefix=${YADOMS_DEPS}/python-lib
+# RUN make HOSTPYTHON=/usr/local/bin/python3 \
+#     BLDSHARED="i686-w64-mingw32-gcc -shared" \
+#     CROSS_COMPILE=i686-w64-mingw32- \
+#     CROSS_COMPILE_TARGET=yes \
+#     -j$(nproc)
+# RUN make install
+# WORKDIR ${WORK_DIR}
+# RUN rm -Rf Python-${python3_version} \
+#     && rm Python-${python3_version}.tar.xz
+
+#TODO WIP...
+
+#TODO merger les workflow github (utiliser des matrices ?)
