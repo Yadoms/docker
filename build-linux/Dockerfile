@@ -290,9 +290,9 @@ RUN rm -Rf opencv-${opencv_version}* \
 #############################################################
 ## Copy entry point
 #############################################################
-COPY entrypoint_docker.sh /
-COPY entrypoint_docker_tests.sh /
+COPY entrypoint.sh /
+COPY entrypoint_tests.sh /
 WORKDIR /
-RUN chmod +x /entrypoint_docker.sh
-RUN chmod +x /entrypoint_docker_tests.sh
-ENTRYPOINT ["/entrypoint_docker.sh"]
+RUN chmod +x /entrypoint.sh
+RUN chmod +x /entrypoint_tests.sh
+ENTRYPOINT ["/entrypoint.sh"]

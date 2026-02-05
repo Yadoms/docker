@@ -372,7 +372,7 @@ RUN rm libudev.tar.gz
 #############################################################
 ## Copy entry point
 #############################################################
-COPY entrypoint_docker.sh /
+COPY entrypoint.sh /
 WORKDIR /
-RUN chmod +x /entrypoint_docker.sh
-ENTRYPOINT ["/entrypoint_docker.sh"]
+RUN chmod +x /entrypoint.sh
+ENTRYPOINT ["/entrypoint.sh"]
